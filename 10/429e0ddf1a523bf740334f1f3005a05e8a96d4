@@ -1,0 +1,133 @@
+internal/model/review.go
+  s_c9e1eb70c3afb6::t_3f76cb77baf46b 16,19,21-30
+cmd/opencodereview/sarif_test.go
+  s_c9e1eb70c3afb6::t_90fd82e7d5fedd 111-112
+  s_c9e1eb70c3afb6::t_bd1561e96936fe 334-335,339
+  s_c9e1eb70c3afb6::t_09a908d22fd07f 83-84
+cmd/opencodereview/session_cmd.go
+  s_c9e1eb70c3afb6::t_a721772c5970d5 208,210-211
+cmd/opencodereview/output.go
+  s_c9e1eb70c3afb6::t_9189e6b7a8649e 185-188
+CPF平台AI评审对比报告.md
+  s_c9e1eb70c3afb6::t_a3d94d69c85e86 63-99
+  s_c9e1eb70c3afb6::t_711ea37b9cc5f1 60-62
+  s_c9e1eb70c3afb6::t_1fe281eebc1cdc 100-102
+internal/config/template/prompts/review_filter_task_system.md
+  s_c9e1eb70c3afb6::t_d403e43b2194f7 13-14
+internal/viewer/templates/session.html
+  s_c9e1eb70c3afb6::t_4fd35f98500932 166,168,173
+CPF评审知识库反推.md
+  s_c9e1eb70c3afb6::t_7e143cab90c01f 1-88
+internal/config/toolsconfig/tools.json
+  s_c9e1eb70c3afb6::t_c822ea52ea68a0 45
+  s_c9e1eb70c3afb6::t_a7d4f02b57e90a 65,68,76-78,80-92
+internal/tool/comment_args_repair.go
+  s_c9e1eb70c3afb6::t_91e96afbd0050b 36-38
+internal/viewer/server.go
+  s_c9e1eb70c3afb6::t_1cc5616006ac85 261-262
+  s_c9e1eb70c3afb6::t_26a213b14d1c83 457-458
+  s_c9e1eb70c3afb6::t_915154554fb05e 215,227
+  s_c9e1eb70c3afb6::t_121678737594d8 433-436
+internal/tool/code_comment.go
+  s_c9e1eb70c3afb6::t_ab8c6c1f19a27b 154-162
+  s_c9e1eb70c3afb6::t_f7ad37e5abc873 24,27-32,43,48-53
+cmd/opencodereview/sarif.go
+  s_c9e1eb70c3afb6::t_71819c9cadac29 153,164,170,181
+internal/viewer/store.go
+  s_c9e1eb70c3afb6::t_5784f7c8e11ba2 254-256
+  s_c9e1eb70c3afb6::t_1c96aad1b68cae 252-253
+  s_c9e1eb70c3afb6::t_ce052421450f00 720-728
+internal/viewer/static/style.css
+  s_c9e1eb70c3afb6::t_2f85653c9e4cb8 1262
+  s_c9e1eb70c3afb6::t_7155090de3105f 1327-1335
+  s_c9e1eb70c3afb6::t_917882268b88aa 165-166
+  s_c9e1eb70c3afb6::t_93fd583a4f81fb 1284
+  s_c9e1eb70c3afb6::t_c87afd95634759 1190-1191
+  s_c9e1eb70c3afb6::t_2013c871505cb9 87-90
+internal/config/template/prompts/main_task_system.md
+  s_c9e1eb70c3afb6::t_8e8219efb7ff02 21-43
+cpf-ai-review-comments.json
+  s_c9e1eb70c3afb6::t_7f4caacf55d66c 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "10429e0ddf1a523bf740334f1f3005a05e8a96d4",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_c9e1eb70c3afb6": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ebc594ca0ffeArae1KeiS53Yk0",
+        "model": "GLM 5.3"
+      },
+      "human_author": null,
+      "total_additions": 68,
+      "total_deletions": 42,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_01f2f445ae66bb": "GLM 5.3",
+        "t_09a908d22fd07f": "GLM 5.3",
+        "t_1012cbb0931440": "GLM 5.3",
+        "t_121678737594d8": "GLM 5.3",
+        "t_1c96aad1b68cae": "GLM 5.3",
+        "t_1cc5616006ac85": "GLM 5.3",
+        "t_2013c871505cb9": "GLM 5.3",
+        "t_26a213b14d1c83": "GLM 5.3",
+        "t_2f85653c9e4cb8": "GLM 5.3",
+        "t_3936784c03fc4a": "GLM 5.3",
+        "t_3f76cb77baf46b": "GLM 5.3",
+        "t_468543cf119d03": "GLM 5.3",
+        "t_47469c645982e8": "GLM 5.3",
+        "t_4fd35f98500932": "GLM 5.3",
+        "t_5784f7c8e11ba2": "GLM 5.3",
+        "t_5f79a8b9a96002": "GLM 5.3",
+        "t_6037805dd47415": "GLM 5.3",
+        "t_7155090de3105f": "GLM 5.3",
+        "t_71819c9cadac29": "GLM 5.3",
+        "t_7e143cab90c01f": "GLM 5.3",
+        "t_824f9434b4045b": "GLM 5.3",
+        "t_8e8219efb7ff02": "GLM 5.3",
+        "t_8ea02c0a4b710f": "GLM 5.3",
+        "t_90fd82e7d5fedd": "GLM 5.3",
+        "t_915154554fb05e": "GLM 5.3",
+        "t_917882268b88aa": "GLM 5.3",
+        "t_9189e6b7a8649e": "GLM 5.3",
+        "t_91e96afbd0050b": "GLM 5.3",
+        "t_93fd583a4f81fb": "GLM 5.3",
+        "t_9513fb814fd756": "GLM 5.3",
+        "t_a3d94d69c85e86": "GLM 5.3",
+        "t_a64a2bce2b932a": "GLM 5.3",
+        "t_a721772c5970d5": "GLM 5.3",
+        "t_a7d4f02b57e90a": "GLM 5.3",
+        "t_ab8c6c1f19a27b": "GLM 5.3",
+        "t_bc5045a65fd4b8": "GLM 5.3",
+        "t_bd1561e96936fe": "GLM 5.3",
+        "t_bd6622a9edb1a9": "GLM 5.3",
+        "t_c5cf638ca9e04f": "GLM 5.3",
+        "t_c822ea52ea68a0": "GLM 5.3",
+        "t_c87afd95634759": "GLM 5.3",
+        "t_cd5458c8be5476": "GLM 5.3",
+        "t_ce052421450f00": "GLM 5.3",
+        "t_d403e43b2194f7": "GLM 5.3",
+        "t_ddbdf36c70b1fe": "GLM 5.3",
+        "t_e4417d177f9104": "GLM 5.3",
+        "t_e51ae25b87d182": "GLM 5.3",
+        "t_e94726d5d5e261": "GLM 5.3",
+        "t_ef33ca6ebacc8d": "GLM 5.3",
+        "t_f7ad37e5abc873": "GLM 5.3"
+      },
+      "model_totals": {
+        "GLM 5.3": {
+          "additions": 660,
+          "deletions": 97
+        }
+      }
+    }
+  }
+}
