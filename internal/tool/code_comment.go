@@ -21,12 +21,15 @@ const (
 	codeCommentCategoryTest            = "test"
 	codeCommentCategoryStyle           = "style"
 	codeCommentCategoryDocumentation   = "documentation"
+	codeCommentCategoryProcess         = "process"
 	codeCommentCategoryOther           = "other"
 
-	codeCommentSeverityCritical = "critical"
-	codeCommentSeverityHigh     = "high"
-	codeCommentSeverityMedium   = "medium"
-	codeCommentSeverityLow      = "low"
+	codeCommentSeverityCritical          = "critical"
+	codeCommentSeverityHigh              = "high"
+	codeCommentSeverityMedium            = "medium"
+	codeCommentSeverityLow               = "low"
+	codeCommentSeveritySuggestion        = "suggestion"
+	codeCommentSeverityNeedsConfirmation = "needs_confirmation"
 )
 
 var validCodeCommentCategories = map[string]struct{}{
@@ -37,14 +40,17 @@ var validCodeCommentCategories = map[string]struct{}{
 	codeCommentCategoryTest:            {},
 	codeCommentCategoryStyle:           {},
 	codeCommentCategoryDocumentation:   {},
+	codeCommentCategoryProcess:         {},
 	codeCommentCategoryOther:           {},
 }
 
 var validCodeCommentSeverities = map[string]struct{}{
-	codeCommentSeverityCritical: {},
-	codeCommentSeverityHigh:     {},
-	codeCommentSeverityMedium:   {},
-	codeCommentSeverityLow:      {},
+	codeCommentSeverityCritical:          {},
+	codeCommentSeverityHigh:              {},
+	codeCommentSeverityMedium:            {},
+	codeCommentSeverityLow:               {},
+	codeCommentSeveritySuggestion:        {},
+	codeCommentSeverityNeedsConfirmation: {},
 }
 
 // CodeCommentProvider submits review comments to the per-Agent CommentCollector.
@@ -144,6 +150,15 @@ func parseCommentsInner(args map[string]any, defaultPath string) ([]model.LlmCom
 		}
 		if severity, ok := obj["severity"].(string); ok {
 			cm.Severity = normalizeCodeCommentSeverity(severity)
+		}
+		if topic, ok := obj["topic"].(string); ok {
+			cm.Topic = topic
+		}
+		if impact, ok := obj["impact"].(string); ok {
+			cm.Impact = impact
+		}
+		if ruleID, ok := obj["rule_id"].(string); ok {
+			cm.RuleID = ruleID
 		}
 		if pathVal, ok := obj["path"].(string); ok && pathVal != "" {
 			cm.Path = normalizeCommentPath(pathVal)

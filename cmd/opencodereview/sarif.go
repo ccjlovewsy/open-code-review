@@ -150,7 +150,7 @@ func outputSARIF(comments []model.LlmComment, version string, warnings []agent.A
 	return enc.Encode(report)
 }
 
-// sarifRules returns the 8 built-in category rule definitions. Every result's
+// sarifRules returns the 9 built-in category rule definitions. Every result's
 // ruleId must resolve to one of these rules.
 func sarifRules() []sarifRule {
 	return []sarifRule{
@@ -161,12 +161,13 @@ func sarifRules() []sarifRule {
 		{ID: "test", Name: "Test", ShortDescription: sarifMessage{Text: "Test coverage or quality issue"}},
 		{ID: "style", Name: "Style", ShortDescription: sarifMessage{Text: "Code style issue"}},
 		{ID: "documentation", Name: "Documentation", ShortDescription: sarifMessage{Text: "Documentation issue"}},
+		{ID: "process", Name: "Process", ShortDescription: sarifMessage{Text: "Repository-convention or PR-process issue"}},
 		{ID: "other", Name: "Other", ShortDescription: sarifMessage{Text: "Other review finding"}},
 	}
 }
 
 // sarifSeverityLevel maps an OCR severity string to a SARIF result level.
-// critical/high → error, medium → warning, low → note.
+// critical/high → error, medium → warning, low/suggestion/needs_confirmation → note.
 // Empty/unknown falls back to "note", matching normalizeCodeCommentSeverity
 // in internal/tool/code_comment.go which defaults unknown severities to "low"
 // (→ "note" at the SARIF level). This prevents an empty severity from being
@@ -177,7 +178,7 @@ func sarifSeverityLevel(severity string) string {
 		return "error"
 	case "medium":
 		return "warning"
-	case "low":
+	case "low", "suggestion", "needs_confirmation":
 		return "note"
 	default:
 		return "note"

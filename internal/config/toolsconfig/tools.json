@@ -42,7 +42,7 @@
               "properties": {
                 "content": {
                   "type": "string",
-                  "description": "Comment content, typically a brief description of code issues and corresponding suggestions."
+                  "description": "Comment content. State the problem with concrete evidence (file/line references, values, or code excerpts); when the failure chain from entry point to defect is non-obvious, include the trigger path as a call chain. Keep the fix recommendation here or in 'suggestion_code'."
                 },
                 "existing_code": {
                   "type": "string",
@@ -62,9 +62,10 @@
                     "test",
                     "style",
                     "documentation",
+                    "process",
                     "other"
                   ],
-                  "description": "The category the issue belongs to."
+                  "description": "The category the issue belongs to. Use 'process' for repository-convention and PR-process findings (e.g. language conventions, incomplete PR descriptions or test reports)."
                 },
                 "severity": {
                   "type": "string",
@@ -72,9 +73,23 @@
                     "critical",
                     "high",
                     "medium",
-                    "low"
+                    "low",
+                    "suggestion",
+                    "needs_confirmation"
                   ],
-                  "description": "The severity of the issue."
+                  "description": "The severity of the issue. Use 'suggestion' for non-blocking improvement advice; use 'needs_confirmation' when the finding is plausible but the evidence available to you cannot confirm it — state what a maintainer should verify instead of guessing a higher severity."
+                },
+                "topic": {
+                  "type": "string",
+                  "description": "Optional secondary classification within the category, kept short (e.g. 'logic error', 'stability', 'readability', 'consistency')."
+                },
+                "impact": {
+                  "type": "string",
+                  "description": "Optional impact statement: the concrete consequence if the issue is real, including the trigger path when the chain from entry point to failure is non-obvious."
+                },
+                "rule_id": {
+                  "type": "string",
+                  "description": "Optional identifier of the team rule-catalog entry this finding is checked against."
                 },
                 "path": {
                   "type": "string",

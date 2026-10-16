@@ -84,6 +84,10 @@ Copyright 2026 alibaba/open-code-review Contributors
     --severity-medium-fg: #a16207;
     --severity-low-bg: var(--badge-neutral-bg);
     --severity-low-fg: var(--badge-neutral-fg);
+    --severity-suggestion-bg: var(--badge-neutral-bg);
+    --severity-suggestion-fg: var(--badge-neutral-fg);
+    --severity-needs-confirmation-bg: #fdf4ff;
+    --severity-needs-confirmation-fg: #a21caf;
 
     /* Spacing */
     --space-1: 0.25rem;
@@ -158,6 +162,8 @@ Copyright 2026 alibaba/open-code-review Contributors
         --severity-high-fg: #fdba74;
         --severity-medium-bg: rgba(251, 191, 36, 0.12);
         --severity-medium-fg: #fcd34d;
+        --severity-needs-confirmation-bg: rgba(232, 121, 249, 0.12);
+        --severity-needs-confirmation-fg: #f0abfc;
 
         --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
@@ -1181,6 +1187,8 @@ p {
 .severity-high { background: var(--severity-high-bg); color: var(--severity-high-fg); }
 .severity-medium { background: var(--severity-medium-bg); color: var(--severity-medium-fg); }
 .severity-low { background: var(--severity-low-bg); color: var(--severity-low-fg); }
+.severity-suggestion { background: var(--severity-suggestion-bg); color: var(--severity-suggestion-fg); }
+.severity-needs-confirmation { background: var(--severity-needs-confirmation-bg); color: var(--severity-needs-confirmation-fg); }
 
 .comment-groups { margin-top: 0.5rem; }
 
@@ -1251,6 +1259,7 @@ p {
 .cat-test { background: #f0fdf4; color: #15803d; }
 .cat-style { background: #f5f3ff; color: #7c3aed; }
 .cat-documentation { background: #ecfeff; color: #0e7490; }
+.cat-process { background: #fef9c3; color: #854d0e; }
 .cat-other { background: var(--badge-neutral-bg); color: var(--badge-neutral-fg); }
 .cat-default { background: var(--badge-neutral-bg); color: var(--badge-neutral-fg); }
 .severity-default { background: var(--badge-neutral-bg); color: var(--badge-neutral-fg); }
@@ -1272,6 +1281,7 @@ p {
     .cat-test { background: rgba(21, 128, 61, 0.12); color: #86efac; }
     .cat-style { background: rgba(124, 58, 237, 0.12); color: #c4b5fd; }
     .cat-documentation { background: rgba(14, 116, 144, 0.12); color: #67e8f9; }
+    .cat-process { background: rgba(202, 138, 4, 0.12); color: #fde047; }
     .cat-other { background: var(--badge-neutral-bg); color: var(--badge-neutral-fg); }
     .cat-default { background: var(--badge-neutral-bg); color: var(--badge-neutral-fg); }
 }
@@ -1310,6 +1320,15 @@ p {
     font-size: 0.85rem;
     line-height: 1.7;
     color: var(--text-strong);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.comment-impact {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text-muted, var(--text-strong));
     white-space: pre-wrap;
     word-break: break-word;
 }

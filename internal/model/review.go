@@ -13,11 +13,21 @@ type LlmComment struct {
 	EndLine        int    `json:"end_line"`
 	Thinking       string `json:"thinking,omitempty"`
 	// Category classifies the finding. One of:
-	// bug, security, performance, maintainability, test, style, documentation, other.
+	// bug, security, performance, maintainability, test, style, documentation, process, other.
 	Category string `json:"category,omitempty"`
 	// Severity indicates the importance of the finding. One of:
-	// critical, high, medium, low.
+	// critical, high, medium, low, suggestion, needs_confirmation.
 	Severity string `json:"severity,omitempty"`
+	// Topic is the secondary classification within the category (free text,
+	// e.g. "logic error", "stability", "readability"). Empty when the category
+	// alone is specific enough.
+	Topic string `json:"topic,omitempty"`
+	// Impact states the consequence when the finding is real. Empty when the
+	// content already makes the impact obvious.
+	Impact string `json:"impact,omitempty"`
+	// RuleID references an upstream rule identifier the finding was checked
+	// against (e.g. a team rule-catalog id). Empty for ad-hoc findings.
+	RuleID string `json:"rule_id,omitempty"`
 }
 
 // CodeReviewResult holds raw LLM-generated review suggestion for a code segment.
