@@ -33,6 +33,9 @@ var knownCommentFields = map[string]struct{}{
 	"suggestion_code": {},
 	"category":        {},
 	"severity":        {},
+	"topic":           {},
+	"impact":          {},
+	"rule_id":         {},
 	"path":            {},
 	"thinking":        {},
 }

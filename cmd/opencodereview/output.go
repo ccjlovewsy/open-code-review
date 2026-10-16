@@ -182,6 +182,10 @@ func severityColor(severity string) string {
 		return "\033[93m" // bright yellow
 	case "low":
 		return "\033[94m" // bright blue
+	case "suggestion":
+		return "\033[92m" // bright green — non-blocking advice
+	case "needs_confirmation":
+		return "\033[95m" // bright magenta — plausible but unconfirmed
 	default:
 		return "\033[2m" // dim
 	}

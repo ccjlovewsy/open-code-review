@@ -80,8 +80,8 @@ func TestOutputSARIF_BasicStructure(t *testing.T) {
 		t.Errorf("driver.informationUri = %v", driver["informationUri"])
 	}
 	rules, ok := driver["rules"].([]any)
-	if !ok || len(rules) != 8 {
-		t.Errorf("rules should have 8 entries, got %d", len(rules))
+	if !ok || len(rules) != 9 {
+		t.Errorf("rules should have 9 entries, got %d", len(rules))
 	}
 	results, ok := run["results"].([]any)
 	if !ok || len(results) != 1 {
@@ -108,8 +108,8 @@ func TestOutputSARIF_EmptyComments(t *testing.T) {
 		t.Errorf("results should be empty, got %d", len(results))
 	}
 	rules := run["tool"].(map[string]any)["driver"].(map[string]any)["rules"].([]any)
-	if len(rules) != 8 {
-		t.Errorf("rules should still have 8 entries, got %d", len(rules))
+	if len(rules) != 9 {
+		t.Errorf("rules should still have 9 entries, got %d", len(rules))
 	}
 }
 
@@ -331,12 +331,12 @@ func TestOutputSARIF_NoFixes(t *testing.T) {
 
 func TestSarifRules(t *testing.T) {
 	rules := sarifRules()
-	if len(rules) != 8 {
-		t.Fatalf("expected 8 rules, got %d", len(rules))
+	if len(rules) != 9 {
+		t.Fatalf("expected 9 rules, got %d", len(rules))
 	}
 	expectedIDs := map[string]bool{
 		"bug": false, "security": false, "performance": false, "maintainability": false,
-		"test": false, "style": false, "documentation": false, "other": false,
+		"test": false, "style": false, "documentation": false, "process": false, "other": false,
 	}
 	for _, rule := range rules {
 		if rule.ID == "" || rule.Name == "" || rule.ShortDescription.Text == "" {

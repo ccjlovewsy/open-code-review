@@ -249,8 +249,11 @@ type ReviewComment struct {
 	ExistingCode   string
 	StartLine      int
 	EndLine        int
-	Category       string // bug, security, performance, maintainability, test, style, documentation, other
-	Severity       string // critical, high, medium, low
+	Category       string // bug, security, performance, maintainability, test, style, documentation, process, other
+	Severity       string // critical, high, medium, low, suggestion, needs_confirmation
+	Topic          string // optional secondary classification within the category
+	Impact         string // optional impact statement
+	RuleID         string // optional upstream rule-catalog identifier
 	MarkID         string `json:"-"`
 }
 
@@ -713,6 +716,15 @@ func LoadSession(root, encodedRepo, sessionID string) (*ViewSession, error) {
 					}
 					if v, ok := cm["severity"].(string); ok {
 						rc.Severity = v
+					}
+					if v, ok := cm["topic"].(string); ok {
+						rc.Topic = v
+					}
+					if v, ok := cm["impact"].(string); ok {
+						rc.Impact = v
+					}
+					if v, ok := cm["rule_id"].(string); ok {
+						rc.RuleID = v
 					}
 					rc.MarkID = commentMarkID(recUUID, ci, rc, markOccurrences)
 					vs.Comments = append(vs.Comments, rc)

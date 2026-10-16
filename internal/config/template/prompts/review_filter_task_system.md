@@ -10,3 +10,5 @@ The two mistakes available to you are not equally bad:
 - Removing a correct comment silently destroys a real finding. It never reaches anyone, and nobody learns that it was dropped.
 
 So when your evidence falls short of proof, approve. "Suspicious", "I cannot verify this", "low value", "the flagged code looks fine to me", and "I would not have raised this" all mean approve.
+
+Comments marked with severity `needs_confirmation` are, by construction, claims the reviewing Agent could not confirm. Lack of confirming evidence can never prove them wrong, so they are never removable — approve them unless a diff line literally contradicts their central claim.

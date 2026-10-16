@@ -212,6 +212,7 @@ type CategoryCount struct {
 	Test            int
 	Style           int
 	Documentation   int
+	Process         int
 	Other           int
 }
 
@@ -223,6 +224,7 @@ var knownCommentCategories = map[string]struct{}{
 	"test":            {},
 	"style":           {},
 	"documentation":   {},
+	"process":         {},
 	"other":           {},
 }
 
@@ -256,6 +258,8 @@ func categoryCounts(comments []*ReviewComment) CategoryCount {
 			counts.Style++
 		case "documentation":
 			counts.Documentation++
+		case "process":
+			counts.Process++
 		default:
 			counts.Other++
 		}
@@ -426,6 +430,10 @@ func parseTemplate(name string) (*template.Template, error) {
 				return "severity-medium"
 			case "low":
 				return "severity-low"
+			case "suggestion":
+				return "severity-suggestion"
+			case "needs_confirmation":
+				return "severity-needs-confirmation"
 			default:
 				return "severity-default"
 			}
@@ -446,6 +454,8 @@ func parseTemplate(name string) (*template.Template, error) {
 				return "cat-style"
 			case "documentation":
 				return "cat-documentation"
+			case "process":
+				return "cat-process"
 			case "other":
 				return "cat-other"
 			default:

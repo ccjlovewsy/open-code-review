@@ -163,11 +163,14 @@
             <div class="comment-card" data-comment-card data-category="{{commentCategory .Category}}" data-severity="{{commentSeverity .Severity}}" data-mark-id="{{.MarkID}}" hidden>
                 <div class="comment-meta">
                     {{if .Category}}<span class="comment-badge {{categoryClass .Category}}">{{.Category}}</span>{{end}}
+                    {{if .Topic}}<span class="comment-badge cat-default">{{.Topic}}</span>{{end}}
                     {{if .Severity}}<span class="comment-badge {{severityClass .Severity}}">{{.Severity}}</span>{{end}}
+                    {{if .RuleID}}<span class="comment-badge cat-default">{{.RuleID}}</span>{{end}}
                     {{if .StartLine}}<span class="comment-lines{{if $numbered}} sr-only{{end}}">L{{.StartLine}}{{if and .EndLine (ne .EndLine .StartLine)}}-L{{.EndLine}}{{end}}</span>{{end}}
                     <span class="comment-badge mark-chip" data-mark-chip hidden></span>
                 </div>
                 <div class="comment-content">{{.Content}}</div>
+                {{if .Impact}}<div class="comment-impact">{{.Impact}}</div>{{end}}
                 {{if or .ExistingCode .SuggestionCode}}
                 <div class="comment-code-diff">
                     {{if .ExistingCode}}
