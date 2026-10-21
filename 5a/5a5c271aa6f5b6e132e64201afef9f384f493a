@@ -1,0 +1,37 @@
+CPF平台AI评审对比报告.md
+  s_c9e1eb70c3afb6::t_f493bf6de7bd58 106-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "5a5a5c271aa6f5b6e132e64201afef9f384f493a",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_c9e1eb70c3afb6": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ebc594ca0ffeArae1KeiS53Yk0",
+        "model": "GLM 5.3"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 32,
+      "total_deletions": 0,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_5d739f068a79c4": "GLM 5.3",
+        "t_f493bf6de7bd58": "GLM 5.3"
+      },
+      "model_totals": {
+        "GLM 5.3": {
+          "additions": 32,
+          "deletions": 0
+        }
+      }
+    }
+  }
+}
