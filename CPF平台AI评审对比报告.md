@@ -103,6 +103,22 @@ CPF 全中文输出;OCR prompt 全英文。可提供输出语言配置(prompt �
 - OCR 实测评审 CPF 的 PR。
 - OCR 评审结果与 CPF 历史 PR 评论逐条对比(用于量化 Precision/Recall 差异,需实测后做)。
 
+## 8. 增强验收(已完成,2026-10-21)
+
+对同一 commit(kotlin 仓 `c26b1190389b`,develop-2.2.21-OH 分支,provider=火山网关 volcano-glm/GLM 5.3)做新旧 A/B:
+
+| | 旧版 OCR(10-15) | 增强版 OCR(10-21) |
+|---|---|---|
+| 评审完成率 | 2/7 文件完成,5-7 个 item 失败(请求超时) | **7/7 完成,0 失败** |
+| 评论数 | 2 组完成时的少量评论 | **7 条**,全部带 topic/impact |
+| 新 schema | — | `needs_confirmation`×1(C API -1 哨兵假设,证据不足不硬报)、`suggestion`×2、topic 全覆盖 |
+| 跨文件一致性 | 未触发 | 删除的 `threshold>=0` 守卫 vs 新代码回归对比、Kotlin 调用方契约 vs C++ 实现对照 |
+| 评论结构 | 普通 | Problem(证据+行号)→ impact(后果+级别理由)→ suggestion 三段式 |
+
+典型发现(增强后独有质量):std::vector 自引用扩容后指针失效(libstdc++/MSVC STL 差异)、interop 边界非空断言 + 错误路径 NPE + 字符串泄漏、`LLVMKotlinOpaquePasesProfile` 拼写混淆。
+
+运维结论:火山网关长请求需 `custom_providers.<name>.timeout_sec ≥ 600`(默认 5 分钟会杀掉大 prompt 请求);api_key 用 `api_key_cmd: printenv VOLCANO_API_KEY` 避免明文落盘;后台运行需 setsid 双 fork 脱离进程组。
+
 ## 附:证据来源
 
 - OCR:本仓库克隆(`~/code/open-code-review/`),README、`internal/config/rules/`、`internal/config/template/prompts/`。
