@@ -1,0 +1,43 @@
+OCR-vs-CPF实测对比.md
+  s_c9e1eb70c3afb6::t_6c163a23c279b6 123-216
+  s_c9e1eb70c3afb6::t_50b649b7f0eb82 34
+  s_c9e1eb70c3afb6::t_b6095355e6cc45 92
+  s_c9e1eb70c3afb6::t_92ac44817140ec 1-33,35-91,93-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "a269ee5194b0b3a6c2bc7b51c39afbc6de241603",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_c9e1eb70c3afb6": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ebc594ca0ffeArae1KeiS53Yk0",
+        "model": "GLM 5.3"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 340,
+      "total_deletions": 2,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_3dde4d987b5959": "GLM 5.3",
+        "t_50b649b7f0eb82": "GLM 5.3",
+        "t_6c163a23c279b6": "GLM 5.3",
+        "t_92ac44817140ec": "GLM 5.3",
+        "t_b6095355e6cc45": "GLM 5.3"
+      },
+      "model_totals": {
+        "GLM 5.3": {
+          "additions": 340,
+          "deletions": 2
+        }
+      }
+    }
+  }
+}
