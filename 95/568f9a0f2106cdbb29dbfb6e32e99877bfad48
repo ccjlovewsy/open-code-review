@@ -1,0 +1,37 @@
+同类AI评审项目调研.md
+  s_c9e1eb70c3afb6::t_4180265e94496a 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "95568f9a0f2106cdbb29dbfb6e32e99877bfad48",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_c9e1eb70c3afb6": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_ebc594ca0ffeArae1KeiS53Yk0",
+        "model": "GLM 5.3"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 66,
+      "total_deletions": 0,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_2bdac1fd61f9e1": "GLM 5.3",
+        "t_4180265e94496a": "GLM 5.3"
+      },
+      "model_totals": {
+        "GLM 5.3": {
+          "additions": 66,
+          "deletions": 0
+        }
+      }
+    }
+  }
+}
