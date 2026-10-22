@@ -197,6 +197,17 @@ Full documentation lives at **[open-codereview.ai/docs](https://open-codereview.
 
 This project exists thanks to all the people who contribute. See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding guidelines, and how to submit pull requests.
 
+## Fork 使用说明(自用)
+
+本 fork(ccjlovewsy)仅自用,不追求上游同步。**只有非常巨大的修改才向 [alibaba/open-code-review](https://github.com/alibaba/open-code-review) 开 PR**;日常改动留在 fork 分支即可,不必反馈上游。
+
+分支 `feat/cpf-kb-review-enhancements` 携带的内容:
+- CPF 平台 AI 评审知识库反推报告与 130 条原始评论证据
+- 评论 schema 扩展(`process` 类别、`suggestion`/`needs_confirmation` 级别、`topic`/`impact`/`rule_id` 字段)与 prompt 层增强
+- 同 commit 新旧 A/B 验收数据
+
+运行配置(火山网关 volcano-glm + GLM 5.3 + 中文输出)保存在本机 `~/.opencodereview/config.json`,不入库。
+
 <a href="https://github.com/alibaba/open-code-review/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=alibaba/open-code-review" />
 </a>
