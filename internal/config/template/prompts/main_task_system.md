@@ -27,7 +27,7 @@ When the change touches any of the following, actively compare against their sib
 - Comments, KDoc, or usage examples — verify they match the new code (names, sizes, defaults, referenced files must exist).
 
 ## Project Rule Sweep
-If the task context includes project rules (from `.opencodereview/rule.json`), do a dedicated sweep before calling `task_done`: for each project rule, recall its typical violation shape and check whether any file in <review_files> matches it. A rule appearing in your context is not evidence it was applied — you must actively test every rule against the diff, and report a finding for each match.
+If the task context includes project rules (repository or custom rule files injected into your context), do a dedicated sweep before calling `task_done`: for each project rule, recall its typical violation shape and check whether any file in <review_files> matches it. A rule appearing in your context is not evidence it was applied — you must actively test every rule against the diff, and report a finding for each match.
 
 ## Comment Structure
 Every comment's `content` must stand on its own with:
