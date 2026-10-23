@@ -1,23 +1,23 @@
 # OCR vs CPF 平台 AI 评审实测对比报告
 
 > 日期:2026-10-22。样本:CPF-KMP-CMP/kotlin 的 3 个历史 PR(PR#408/427/426,合计 28 条 cpf-manager 评论)。
-> OCR:增强版二进制(~/code/open-code-review/ocr),provider=volcano-glm(GLM 5.3→网关映射 glm-5.3-flash),language=中文,timeout_sec=900,含 CPF 反推沉淀的 `.opencodereview/rule.json`。
-> 原始产物:`/tmp/cpf-compare/`(每 PR 的 .diff、ocr.json、ocr.log、matching.json)。
+> OCR:增强版本地构建,provider=volcano-glm(GLM 5.3),language=中文,timeout_sec=900,含 CPF 反推沉淀的 `.opencodereview/rule.json`。
+> 原始产物留存本地(每 PR 的 .diff、ocr.json、ocr.log、matching.json)。
 
 ## 0. 结论先行
 
 - **总 recall(严格口径,同根因)= 6/28 = 21.4%;宽口径(含同主题不同实例)= 11/28 = 39.3%**。
-- 但这个数字被一个 OCR 输入侧缺陷严重压低:默认排除模式 `**/target/**`(本意防构建产物)误杀 Kotlin/Native 源码包 `konan/target/`,**仅 pr408 就有 7/14 条 CPF 评论(25%)落在 OCR 从未看到的文件上**。剔除该因素后,可达样本上严格 recall = 6/21 = 28.6%,宽口径 = 11/21 = 52.4%。
-- OCR 独有发现 68 条,质量总体扎实(并行编译线程安全、资源泄漏、契约不一致等 high 级发现 CPF 未报);CPF 独有 17 条中有 12 条是 OCR 明确可补的(过滤误杀 7 + 规则已载入未触发 5)。
-- CPF 的两条结构化优势得到量化确认:跨文件穷尽性检查(其唯一【致命】评论)与 PR 流程检查,后者 OCR 架构上暂不支持(输入无 PR body)。
+- 但这个数字被一个 OCR 输入侧缺陷严重压低:默认排除模式 `**/target/**`(本意防构建产物)误杀 Kotlin/Native 源码包 `konan/target/`,**仅 pr408 就有 7/14 条 CPF 评论(占该 PR 的 50%)落在 OCR 从未看到的文件上**。剔除该因素后,可达样本上严格 recall = 6/21 = 28.6%,宽口径 = 11/21 = 52.4%。
+- OCR 独有发现 66 条,质量总体扎实(并行编译线程安全、资源泄漏、契约不一致等 high 级发现 CPF 未报);CPF 独有 17 条中有 12 条是 OCR 明确可补的(过滤误杀 7 + 规则已载入未触发 5)。
+- CPF 的跨文件穷尽性检查优势有量化证据(28 条中唯一的【致命】评论即此类);PR 流程检查(模板/测试报告)依赖 PR body,OCR 架构上暂不支持——属定性差距,本次样本未覆盖(见 §7)。
 
 ## 1. 样本与方法
 
 | PR | cpf-manager 评论 | diff 规模 | OCR 评审方式 | OCR 评论 | 耗时/tokens |
 |---|---|---|---|---|---|
-| 408(bootstrap) | 14 | 20 文件/1181 行 | range 模式 M^1..M(已合并,与 PR diff 逐文件等价) | 29 | 30min/1.0M |
+| 408(bootstrap) | 14 | 20 文件/1181 行 | range 模式 M^1..M(已合并,与 PR diff 逐文件等价) | 29 | 30min/2.2M |
 | 427(C-API 迁移) | 8 | 16 文件/801 行 | worktree(03ce569a40)+ apply + workspace 裸跑 | 18 | 30min/4.0M |
-| 426(并行编译) | 6 | 28 文件/3980 行 | 同上 | 32 | 30min/9.0M |
+| 426(NAPI 代理串) | 6 | 28 文件/3980 行 | 同上 | 32 | 30min/9.0M |
 
 - 样本选择:按 cpf-manager 评论数取 Top(408:14、403:13、409:12),但 **403/409 的服务端 diff 分别达 537/424 文件,按预案顺移**至 427(8)/426(6)。
 - 匹配口径:**强重合**=同文件+同根因(同一缺陷);**弱重合**=同文件+同主题(同一规则族、不同实例/不同机制);两者之外为 CPF-only / OCR-only。每条判定基于双方评论文本逐条人工核对。
@@ -31,7 +31,7 @@
 | 强重合 | 2 | 1 | 3 | **6** |
 | 弱重合 | 1 | 4 | 0 | **5** |
 | CPF-only | 11 | 3 | 3 | **17** |
-| OCR-only | 25 | 13 | 29 | **67** |
+| OCR-only | 25 | 12 | 29 | **66** |
 
 **recall:严格 6/28 = 21.4%;宽口径 11/28 = 39.3%**(口径:重合数/CPF 评论总数)。
 可达样本口径(剔除 7 条落在被误杀文件上的评论):严格 6/21 = 28.6%,宽口径 11/21 = 52.4%。
@@ -85,16 +85,16 @@
 
 | 归因 | 条数 | 说明 |
 |---|---|---|
-| **输入侧过滤误杀**(`**/target/**` 误伤 `konan/target/` 源码包) | **7** | 全部在 pr408;一个默认排除模式吃掉该 PR 25% 的 recall,其中含 CPF 唯一的【致命】跨文件发现 |
+| **输入侧过滤误杀**(`**/target/**` 误伤 `konan/target/` 源码包) | **7** | 全部在 pr408;一个默认排除模式砍掉该 PR 一半的 recall 上限(7/14=50%),其中含 CPF 唯一的【致命】跨文件发现 |
 | **规则已载入但未触发** | 5 | rule.json/delegate 验证确认规则加载,模型未对具体实例开火(408:Usage 脚本名、allWarningsAsErrors、local.properties 清理;427:中文注释;426:NAPI Pin) |
 | **知识库未覆盖** | 5 | 脚本架构硬编码路径、并行 phase 完整性、日志规范(println)、C++ RAII 析构顺序、恒真/死分支检测 |
 
-## 5. OCR-only 发现概览(67 条,逐条性质见附录 A)
+## 5. OCR-only 发现概览(66 条,逐条性质见附录 A)
 
 - **实质 bug 类(高价值)**:并行路径共享编译器状态线程安全(Bitcode.kt:494 [high])、未检查强转必崩路径(:583 [high])、tmpContext 泄漏(:544)、TSFN 生命周期与 GC 卸载链路(ExtraObjectData.cpp:96)、@Escapes 注解契约与零拷贝逃逸矛盾(NapiInterface.kt:125 [high])等——**CPF 均未报**。
 - **流程/配置类(CPF 未涉足的矿脉)**:pr408 上 OCR 对 OAT.xml 连发 9 条(process 类别生效:许可证文件缺失、版权主体不一致、中文全角逗号违反英文约定、转义对照表写反),CPF 对 OAT.xml 零评论。
-- **新 schema 运转良好**:needs_confirmation 用于「llvm-split 输出契约未经验证」「多 napi_env 假设」等证据不足场景(6 条),suggestion 用于非阻塞建议;suggestion/needs_confirmation 未出现在强重合对中,级别对齐良好(pr426 三条强重合 CPF 严重 ↔ OCR high 全部一致;pr408 #6 OCR 低评一级)。
-- **代价**:3 个 PR 合计约 14M tokens;宽口径下 OCR 的 documentation/style 类占 OCR-only 约 40%,存在噪声矿脉(OAT.xml 的 9 条里 4 条属低价值打磨)。
+- **新 schema 运转良好**:needs_confirmation 用于「llvm-split 输出契约未经验证」「多 napi_env 假设」等证据不足场景(共 9 条),suggestion 用于非阻塞建议。级别对齐:pr426 三条强重合 CPF 严重 ↔ OCR high 全部一致;唯一例外是 pr408 #6,OCR 以 suggestion 报了 CPF 判「一般」的行为兼容性问题(低评一级,已由 §6 校准建议覆盖)。
+- **代价**:3 个 PR 合计约 15.3M tokens;OCR-only 中打磨+流程类合计 19/66≈29%,存在噪声矿脉(OAT.xml 的 9 条里 5 条为打磨类)。
 
 ## 6. 对 OCR 知识库与 rule.json 的补强建议(按优先级)
 
@@ -120,8 +120,9 @@
 - pr403/409 因服务端 diff 过大(537/424 文件)按预案顺移为 427/426。
 - 逐条判定由主模型直接核对双方原文完成,未再拆子代理(spec 允许子代理但要求复核原文,直接核对等效且更稳)。
 - kernel 噪声:三次评审各有一次 Round-2 重试/失败(网关偶发),均未影响最终产出(complete,comments 齐全)。
+- 2026-10-23 修正轮:经增强版 OCR 对本报告自审(15 条发现)后修正:OCR-only 计数闭合(66=25+12+29,剔除 3 条误入的重合对应评论)、pr408 误杀占比口径(该 PR 的 50%)、pr408 token 数(实际 2.2M)、pr426 主题标注、needs_confirmation 计数(9 条)、§0/§4/§5 多处表述;匹配判定与结论不变。
 
-## 附录 A:OCR-only 逐条性质表(67 条)
+## 附录 A:OCR-only 逐条性质表(66 条)
 
 性质标签:【真】实质缺陷/契约问题(建议修)【流程】合规/流程发现(依赖仓库治理上下文)【打磨】低价值风格/文档噪音【待确认】needs_confirmation(证据不足,非缺陷断言)
 
@@ -169,13 +170,10 @@
 | Bitcode.kt:583 | high | 未检查强转在并行路径必崩 | 【真】 |
 | Bitcode.kt:544 | medium | tmpContext 无 dispose,资源泄漏 | 【真】 |
 | Bitcode.kt:491 | needs_confirmation | llvm-split 输出命名契约未经验证 | 【待确认】 |
-| NativeSecondStageCompilationConfig.kt:131 | medium | splitBCfile=0 直通 → 必然 IllegalStateException | 【真】 |
-| ContextUtils.kt:633 | low | interop 非空断言 + llvm.used 静默丢失 + 无 verifyModule | 【真】 |
-| Bitcode.kt:426 | low | llvm-link/llvm-split 无超时,无限期阻塞 | 【真】 |
 | TopLevelPhases.kt:314 | low | 日志与实际行为不符 | 【打磨】 |
 | build.gradle.kts:19 | needs_confirmation | 编译器后端首引 kotlinx-coroutines,打包路径未确认 | 【待确认】 |
 
-(注:pr427 OCR 18 条,2 条计入弱重合的第二条对应评论(Bitcode.kt:534/Config:131 中 Config:131 计为 OCR-only 辅助证据)——按主匹配计 13 条 OCR-only;上表 15 行系把 Config:131 一并列出便于复查。)
+(注:pr427 OCR 18 条,6 条计入 §3 强/弱重合对(#3/#4/#5/#6/#8),其余 12 条如上;ContextUtils.kt:633、Bitcode.kt:426、Config:131(NativeSecondStageCompilationConfig.kt)属重合对的 OCR 侧评论,已移出本表。pr408 表中 KotlinBuildPublishingPlugin.kt:164 为同位置的两条独立评论:一条计入 §3 #6 强重合(deploy-url 语义),表内这条为另一主题(双属性链优先级),非重复计数。)
 
 ### pr426(29 条)
 
@@ -213,4 +211,4 @@
 
 (注:pr426 OCR 32 条,3 条计入强重合,:286/:257/:166,其余 29 条如上。)
 
-**OCR-only 性质分布**:【真】41 /【流程】3 /【打磨】14 /【待确认】9(合计 67,与总表一致)。真发现率 61%,与 CPF 评论的误报率无从直接对比(CPF-only 17 条中经核对未见明显误报,但存在 2 条主题级弱相邻已单列)。
+**OCR-only 性质分布**:【真】38(含 1 条验证缺口)/【流程】3 /【打磨】16 /【待确认】9(合计 66,与总表一致)。真发现率 58%,与 CPF 评论的误报率无从直接对比(CPF-only 17 条中经核对未见明显误报,但存在 2 条主题级弱相邻已单列)。
