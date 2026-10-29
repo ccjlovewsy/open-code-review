@@ -1,0 +1,86 @@
+OCR-vs-CPF实测对比.md
+  s_8aa4b35ff120c4::t_9eda87cd91e9b2 233-238
+  s_8aa4b35ff120c4::t_b77485ab8e533d 65-66,81-97
+  s_8aa4b35ff120c4::t_7ea4abdbca2e03 281-329
+  s_8aa4b35ff120c4::t_4badd6a6170009 32-33,43-61
+  s_8aa4b35ff120c4::t_6f3af637bfcc87 144-179
+  s_8aa4b35ff120c4::t_72ea0545c7c827 225
+  s_6437e8ebdae098::t_01ebd16a66d3af 269
+  s_6437e8ebdae098::t_522d5c1df7a8f4 279
+  s_8aa4b35ff120c4::t_b09a161ae6c91b 336,339
+  s_8aa4b35ff120c4::t_e8c9bbef169295 3,6
+  s_8aa4b35ff120c4::t_b8444da3efca05 258
+  s_6437e8ebdae098::t_908e486bd8a7a4 432
+  s_8aa4b35ff120c4::t_d8cd67c8011859 11-12,17-28
+  s_8aa4b35ff120c4::t_3ced1f1a0ad510 202-223
+  s_6437e8ebdae098::t_a63eab12270483 200-201
+  s_8aa4b35ff120c4::t_a0286778ae3cc6 62
+  s_8aa4b35ff120c4::t_8f6a94eded4be8 98
+  s_8aa4b35ff120c4::t_3b10c3ebea1c0f 224
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "3d329b0bf8f8892644d3cf87dc6cc41c758837ae",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_6437e8ebdae098": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e79961201ffeaW1UTJq1slfWMP",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": null,
+      "total_additions": 5,
+      "total_deletions": 3,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_01ebd16a66d3af": "volcengine/deepseek-v4.1-flash",
+        "t_522d5c1df7a8f4": "volcengine/deepseek-v4.1-flash",
+        "t_908e486bd8a7a4": "volcengine/deepseek-v4.1-flash",
+        "t_a63eab12270483": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 5,
+          "deletions": 3
+        }
+      }
+    },
+    "s_8aa4b35ff120c4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e793437afffedlt1j20pcSPBDU",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 177,
+      "total_deletions": 7,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_3ced1f1a0ad510": "volcengine/deepseek-v4.1-flash",
+        "t_4badd6a6170009": "volcengine/deepseek-v4.1-flash",
+        "t_6f3af637bfcc87": "volcengine/deepseek-v4.1-flash",
+        "t_72ea0545c7c827": "volcengine/deepseek-v4.1-flash",
+        "t_7ea4abdbca2e03": "volcengine/deepseek-v4.1-flash",
+        "t_9eda87cd91e9b2": "volcengine/deepseek-v4.1-flash",
+        "t_b09a161ae6c91b": "volcengine/deepseek-v4.1-flash",
+        "t_b77485ab8e533d": "volcengine/deepseek-v4.1-flash",
+        "t_b8444da3efca05": "volcengine/deepseek-v4.1-flash",
+        "t_d8cd67c8011859": "volcengine/deepseek-v4.1-flash",
+        "t_e8c9bbef169295": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 177,
+          "deletions": 7
+        }
+      }
+    }
+  }
+}
