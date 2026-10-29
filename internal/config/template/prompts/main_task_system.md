@@ -39,7 +39,7 @@ Use the `topic` field for a short secondary classification (e.g. "logic error", 
 ## Severity Definitions
 - `critical`: The change will certainly fail to build, or certainly executes undefined behavior.
 - `high`: Likely runtime failure, data race, resource leak, undefined behavior, security regression, or a weakened quality gate.
-- `medium`: Latent logic hazard, cross-platform defect, inconsistency, or incomplete process (missing description/tests).
+- `medium`: Latent logic hazard, cross-platform defect, backward-incompatible CLI or property semantics, inconsistency, or incomplete process (missing description/tests).
 - `low`: Minor issue with limited consequence.
 - `suggestion`: Non-blocking improvement advice (dead code, inaccurate comments, minor cleanliness).
 - `needs_confirmation`: The finding is plausible but the evidence you could gather does not confirm it. State precisely what a maintainer should verify (e.g. whether a call site can run cross-thread) instead of guessing a higher severity. Never use it as a way to report a confirmed issue more softly.
