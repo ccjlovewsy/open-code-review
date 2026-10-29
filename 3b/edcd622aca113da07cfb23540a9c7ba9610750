@@ -1,0 +1,141 @@
+规则映射表.md
+  s_26b6ee984c3b78::t_5ccf7f14f94fc0 135
+  s_26b6ee984c3b78::t_74268ac385f609 114
+  s_26b6ee984c3b78::t_46f3e6743dcc22 150
+  s_26b6ee984c3b78::t_044f9a39b1579f 218
+  s_26b6ee984c3b78::t_d5c2cedd6d8825 363
+  s_26b6ee984c3b78::t_b854afeef05f0d 96
+  s_26b6ee984c3b78::t_e6fcfd95639789 128
+  s_26b6ee984c3b78::t_d117567f0f7024 372
+  s_26b6ee984c3b78::t_41a24902defcfe 227
+  s_26b6ee984c3b78::t_2b6ad0726791cb 30
+  s_26b6ee984c3b78::t_6ab4fa2b0ed649 286,288
+  s_26b6ee984c3b78::t_4c5517a3a48cae 409
+  s_26b6ee984c3b78::t_d7b870d0d73adb 29
+  s_26b6ee984c3b78::t_02063d6cc1a6db 470-506,508-514,516-586,588-601
+  s_26b6ee984c3b78::t_edbc7d67e795c5 170
+  s_26b6ee984c3b78::t_22832a3f6794f1 149
+  s_26b6ee984c3b78::t_20650f4a8cc2ee 367
+  s_26b6ee984c3b78::t_1f3b5a6a5b95d7 417
+  s_26b6ee984c3b78::t_a00db33ba9c84d 147
+  s_26b6ee984c3b78::t_e6a490cd1b3124 99
+  s_26b6ee984c3b78::t_f16ffd841222a0 222
+  s_26b6ee984c3b78::t_599c2776d0c929 208
+  s_26b6ee984c3b78::t_796c78aea28b34 158
+  s_26b6ee984c3b78::t_c4ce14a4616e3d 515
+  s_26b6ee984c3b78::t_26b13ebe2eb1b3 90
+  s_26b6ee984c3b78::t_c4ef6e5b9af91e 223
+  s_26b6ee984c3b78::t_265a93306437d2 1-28,31-84,86-89,91-95,97,101-113,115-127,129-134,136-146,148,151,153-157,159-169,171-204,206,209-217,219-221,224-226,228-267,269-285,289-362,364-366,368-371,373-408,410-416,418-469
+  s_26b6ee984c3b78::t_b7bc44ba3e0fe8 207
+  s_26b6ee984c3b78::t_d4d3a4f9e23422 507,587
+  s_26b6ee984c3b78::t_f636d05c0f0617 85
+  s_26b6ee984c3b78::t_d14d6aa6cf0dc8 152
+  s_26b6ee984c3b78::t_9103641feded40 98,100
+  s_26b6ee984c3b78::t_619d08da4a1c8e 268
+  s_26b6ee984c3b78::t_a19fc9d22d156f 287
+  s_26b6ee984c3b78::t_96c6020401597a 205
+internal/config/template/prompts/main_task_system.md
+  s_fcb41b4406b04d::t_dc282694ceb10b 29-35
+  s_fcb41b4406b04d::t_fe75b707189704 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "3bedcd622aca113da07cfb23540a9c7ba9610750",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_26b6ee984c3b78": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e7a0ce4aeffesRRsqSsWreAlNp",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 655,
+      "total_deletions": 54,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_02063d6cc1a6db": "volcengine/deepseek-v4.1-flash",
+        "t_044f9a39b1579f": "volcengine/deepseek-v4.1-flash",
+        "t_1f3b5a6a5b95d7": "volcengine/deepseek-v4.1-flash",
+        "t_20650f4a8cc2ee": "volcengine/deepseek-v4.1-flash",
+        "t_22832a3f6794f1": "volcengine/deepseek-v4.1-flash",
+        "t_265a93306437d2": "volcengine/deepseek-v4.1-flash",
+        "t_26b13ebe2eb1b3": "volcengine/deepseek-v4.1-flash",
+        "t_27858e3b314460": "volcengine/deepseek-v4.1-flash",
+        "t_2b6ad0726791cb": "volcengine/deepseek-v4.1-flash",
+        "t_41a24902defcfe": "volcengine/deepseek-v4.1-flash",
+        "t_450a60bf462e2d": "volcengine/deepseek-v4.1-flash",
+        "t_46f3e6743dcc22": "volcengine/deepseek-v4.1-flash",
+        "t_47bf75e4f60903": "volcengine/deepseek-v4.1-flash",
+        "t_4c5517a3a48cae": "volcengine/deepseek-v4.1-flash",
+        "t_53bd76bc266aab": "volcengine/deepseek-v4.1-flash",
+        "t_599c2776d0c929": "volcengine/deepseek-v4.1-flash",
+        "t_5ccf7f14f94fc0": "volcengine/deepseek-v4.1-flash",
+        "t_6081af764ac628": "volcengine/deepseek-v4.1-flash",
+        "t_619d08da4a1c8e": "volcengine/deepseek-v4.1-flash",
+        "t_6892b74eba8ed1": "volcengine/deepseek-v4.1-flash",
+        "t_6ab4fa2b0ed649": "volcengine/deepseek-v4.1-flash",
+        "t_74268ac385f609": "volcengine/deepseek-v4.1-flash",
+        "t_796c78aea28b34": "volcengine/deepseek-v4.1-flash",
+        "t_7fdf4f810e82b5": "volcengine/deepseek-v4.1-flash",
+        "t_9103641feded40": "volcengine/deepseek-v4.1-flash",
+        "t_96c6020401597a": "volcengine/deepseek-v4.1-flash",
+        "t_a00db33ba9c84d": "volcengine/deepseek-v4.1-flash",
+        "t_a19fc9d22d156f": "volcengine/deepseek-v4.1-flash",
+        "t_a7637497734e4b": "volcengine/deepseek-v4.1-flash",
+        "t_ae16739ffede6e": "volcengine/deepseek-v4.1-flash",
+        "t_b7bc44ba3e0fe8": "volcengine/deepseek-v4.1-flash",
+        "t_b854afeef05f0d": "volcengine/deepseek-v4.1-flash",
+        "t_b9e24f04197d21": "volcengine/deepseek-v4.1-flash",
+        "t_c4ce14a4616e3d": "volcengine/deepseek-v4.1-flash",
+        "t_c4ef6e5b9af91e": "volcengine/deepseek-v4.1-flash",
+        "t_d117567f0f7024": "volcengine/deepseek-v4.1-flash",
+        "t_d14d6aa6cf0dc8": "volcengine/deepseek-v4.1-flash",
+        "t_d219777d585e3b": "volcengine/deepseek-v4.1-flash",
+        "t_d4d3a4f9e23422": "volcengine/deepseek-v4.1-flash",
+        "t_d5c2cedd6d8825": "volcengine/deepseek-v4.1-flash",
+        "t_d7b870d0d73adb": "volcengine/deepseek-v4.1-flash",
+        "t_e0eb103390c05d": "volcengine/deepseek-v4.1-flash",
+        "t_e20cd900b3708f": "volcengine/deepseek-v4.1-flash",
+        "t_e6a490cd1b3124": "volcengine/deepseek-v4.1-flash",
+        "t_e6fcfd95639789": "volcengine/deepseek-v4.1-flash",
+        "t_edbc7d67e795c5": "volcengine/deepseek-v4.1-flash",
+        "t_f16ffd841222a0": "volcengine/deepseek-v4.1-flash",
+        "t_f636d05c0f0617": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 655,
+          "deletions": 54
+        }
+      }
+    },
+    "s_fcb41b4406b04d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e79ea9e64ffeedhHa4cgsoteY9",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 8,
+      "total_deletions": 1,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_dc282694ceb10b": "volcengine/deepseek-v4.1-flash",
+        "t_fe75b707189704": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 8,
+          "deletions": 1
+        }
+      }
+    }
+  }
+}
