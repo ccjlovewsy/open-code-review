@@ -1,9 +1,10 @@
 # OCR vs CPF 平台 AI 评审实测对比报告
 
-> 日期:2026-10-22(首轮 3 PR);2026-10-29(pr408 重跑);2026-10-29(Stage A 4 PR 实测)。样本:CPF-KMP-CMP/kotlin 的 3 个历史 PR(PR#408/427/426,合计 28 条 cpf-manager 评论)+ Stage A(PR#431/419/447/440,合计 16 条)。
-> OCR:增强版本地构建,provider=volcano-glm(GLM 5.3),language=中文,timeout_sec=900,含 CPF 反推沉淀的 `.opencodereview/rule.json`。
+> 日期:2026-10-22(首轮 3 PR);2026-10-29(pr408 重跑);2026-10-29(Stage A 4 PR 实测);2026-10-29(Stage B 4 PR 实测)。样本:CPF-KMP-CMP/kotlin 的 3 个历史 PR(PR#408/427/426,合计 28 条 cpf-manager 评论)+ Stage A(PR#431/419/447/440,合计 16 条)+ Stage B(PR#398/411/452/438,合计 16 条),合计 11 PR / 60 条。
+> OCR:增强版本地构建,provider=volcano-glm(GLM 5.3),language=中文,timeout_sec=900,含 CPF 反推沉淀的 `.opencodereview/rule.json`。Stage A 为 v1.13.1,Stage B 为 v1.13.3。
 > pr408 重跑基准为最终 merge diff c4244058501(含 konan/target 营救);CPF 评论针对中间状态 bd101f9,详见 §8。
-> Stage A 基准:431/419/447 取 merge commit 的 `<merge>^1..<merge>` range;440 为 open PR,取 merge-base 4acec4fa..head cfdba2c。评审方式、耗时、tokens 与产物见 §9。
+> Stage A 基准:431/419/447 取 merge commit 的 `<merge>^1..<merge>` range;440 为 open PR,取 merge-base 4acec4fa..head cfdba2c。
+> Stage B 基准:398/452/438 取 merge commit 的 `^1..merge`;411 为 open PR(base 2def9483b455 / head acb8c4f75a9b),取 merge-base 7050c74e..head。评审方式、耗时、tokens 与产物见 §9。
 > 原始产物留存本地(每 PR 的 .diff、ocr.json、ocr.log、matching.json)。
 
 ## 0. 结论先行
@@ -19,13 +20,21 @@
 
 - **原始口径:严格 5/16 = 31.3%;宽口径(强+弱)= 11/16 = 68.8%**。构成:强 5、弱 6、CPF-only 5、OCR-only 54。
 - **有效口径:9 条 CPF 评论在 OCR 评审前已被作者修复/补充**(431#3、419#1/#3、447#1/#4/#5/#6、440#2/#4),有效分母 16-9=7;**严格 4/7 = 57.1%,宽口径 6/7 = 85.7%;有效 CPF-only 仅 447#3(GCApi `prctl` 前置条件)**。
-- Stage A 的 5 条强重合全部是运行时/编译管线稳定性缺陷(运行时关闭守卫、备份换名、catch 死代码、StackMap 守卫、`cl::opt` 并发);6 条弱重合集中在测试覆盖、错误信号、相邻日志转换等「同文件同主题、不同机制」。
+- Stage A 的 5 条强重合全部是运行时/编译管线稳定性缺陷(运行时关闭守卫、备份换名、catch 死代码、StackMap 守卫、`cl::opt` 并发);6 条弱重合集中在测试覆盖、错误信号、相邻日志转换等「同主题、不同机制」(其中 4 条为相邻锚点)。
 - **两阶段合并(7 PR,raw):严格 12/44 = 27.3%;宽口径 25/44 = 56.8%。有效口径 11/31 = 35.5% / 20/31 = 64.5%**(首轮有效 24 + Stage A 有效 7)。
+
+**Stage B 4 PR(398/411/452/438,16 条 CPF)**
+
+- **原始口径:严格 3/16 = 18.8%;宽口径(强+弱)= 5/16 = 31.3%**。构成:强 3、弱 2、CPF-only 11、OCR-only 105。
+- **有效口径:12 条 CPF 评论在 OCR 评审前已修复/补充**(398#1-4、411#1/#2/#4/#5/#6、452#1/#2、438#3),有效分母 16-12=4;**严格 3/4 = 75.0%,宽口径 3/4 = 75.0%;有效 CPF-only 1/4 = 25.0%(438#2)**。452 的 2 条均在评审前修复,有效分母为 0。
+- Stage B 的 3 条强重合全部是运行时/内存转储稳定性缺陷:K2RStub 帧布局注释偏移(398#5,注释与宏体偏移差 16 字节)、eager `deltas[deltaIdx]` 无边界索引(411#3)、fork 子进程失败未 `_exit` 逃逸(438#1);2 条弱重合为 STW 热路径每帧开销(411#5)与测试断言恒真(452#2),均属同规则族不同实例。
+- **三阶段合并(11 PR,raw):严格 15/60 = 25.0%;宽口径 30/60 = 50.0%。有效口径 14/35 = 40.0% / 23/35 = 65.7%**(首轮有效 24 + Stage A 有效 7 + Stage B 有效 4)。
 
 **横向观察**
 
-- OCR 独有发现首轮 66 条、Stage A 54 条,质量总体扎实(并行编译线程安全、资源泄漏、契约不一致等 high 级发现 CPF 未报);首轮 CPF 独有 17 条中 12 条可补(过滤误杀 7 + 规则已载入未触发 5),重跑后过滤误杀清零,pr408 真实 miss 收敛为 4 条(#2/#7/#10/#11)。Stage A 的 5 条 CPF-only 中 4 条已修复/结构性,真实 miss 仅 1 条。
-- CPF 的跨文件穷尽性检查优势有量化证据(28 条中唯一的【致命】评论即此类,重跑后已命中);PR 流程检查(模板/测试报告)依赖 PR body,OCR 架构上暂不支持——属定性差距,本次样本未覆盖(见 §7)。Stage A 431#3 再次复现该结构性缺口,但该条在 merge 前已由作者补充。
+- OCR 独有发现首轮 66 条、Stage A 54 条、Stage B 105 条,质量总体扎实(并行编译线程安全、资源泄漏、契约不一致等 high 级发现 CPF 未报);首轮 CPF 独有 17 条中 12 条可补(过滤误杀 7 + 规则已载入未触发 5),重跑后过滤误杀清零,pr408 真实 miss 收敛为 4 条(#2/#7/#10/#11)。Stage A 的 5 条 CPF-only 中 4 条已修复/结构性,真实 miss 仅 1 条;Stage B 的 11 条 CPF-only 中 10 条已修复,真实 miss 仅 438#2(非 OHOS dump 格式变更)。
+- Stage B 的 398 出现一组反向互补:CPF 5 条中 4 条是注释引用/描述失准,均在 merge 前修复;OCR 在同一批文件上仍产出 7 条文档类发现,但唯一与 CPF 同根因的是 K2RStub 帧布局(CPF#5,未修复)。411 的 CPF 前 6 条中 5 条在 head 已修复,OCR 仍独立报出 SafePoint OFF 构建回归、eager 配置编译错误、loop safepoint 健全性等 5 条 high 级问题。
+- CPF 的跨文件穷尽性检查优势有量化证据(28 条中唯一的【致命】评论即此类,重跑后已命中);PR 流程检查(模板/测试报告)依赖 PR body,OCR 架构上暂不支持——属定性差距,本次样本未覆盖(见 §7)。Stage A 431#3 再次复现该结构性缺口,但该条在 merge 前已由作者补充;Stage B 452#1 则暴露 `testData/**` 路径过滤仍会漏掉 CPF 命中的文本文件(该条已修复,不影响有效 recall)。
 
 ## 1. 样本与方法
 
@@ -53,12 +62,25 @@
 - 基准口径:431/419/447 均已合并,评审 `merge_commit^1..merge_commit`;440 仍 open,`base` 分支在评论后已前进(2def9483 -> 实际 merge-base 4acec4fa),若按 base tip 取 diff 会混入 51 个上游文件,故按 **merge-base 4acec4fa..head cfdba2c** 取 PR 净 diff,OCR manifest 与该范围一致(7 文件)。
 - 447 的 OCR 运行 `terminal_state=partial`:60 个选中文件中 50 完成、10 失败(失败集中在 compiler Kotlin 侧,如 `CodeGenerator.kt`、`IntrinsicGenerator.kt`、`ContextUtils.kt` 等);CPF 评论锚定的 6 个文件均在已完成侧,故本 PR 的 CPF 匹配不受该缺口影响,但其 OCR-only 发现数存在低估。
 
-### 1.3 匹配口径
+### 1.3 Stage B 4 PR
 
-- **强重合**=同文件+同根因(同一缺陷);**弱重合**=同文件+同主题(同一规则族、不同实例/不同机制);两者之外为 CPF-only / OCR-only。每条判定基于双方评论文本逐条人工核对,并回溯 merge commit/head 代码确认该缺陷在评审基准上是否仍存在。
-- **文件级匹配**=CPF 有评论、OCR 也有评论的文件数(用于 §1/§2 的辅助列,不等于评论级重合数)。
-- **有效口径**:若 CPF 指出的缺陷在 OCR 评审基准上已被作者修复/补充(含 PR body),则从分母剔除;部分修复仍计为有效 miss(例如 419#2 死代码已清理但工具失败清理仍缺失)。
-- Stage A 每条 CPF 的配对、归因、修复状态与 OCR-only 清单见 `/tmp/cpf-compare/pr<PR>-matching.json`(schema `ocr.cpf-matching/v1`)。
+| PR | cpf-manager 评论 | diff 规模 | OCR 评审方式 | OCR 评论 | 耗时/tokens |
+|---|---|---|---|---|---|
+| 398(stub.s → cpp asm) | 5 | 42 文件/2164+/4613- | range `2f1eb971681^1..2f1eb971681`(merge commit) | 13 | 36m50s/9.6M |
+| 411(leaf/delta-main stackmap) | 6 | 45 文件/2064+/964- | range `7050c74e..acb8c4f75a9b`(open;base 2def9483b455 / head acb8c4f75a9b,merge-base 7050c74e) | 53 | 31m20s/15.8M |
+| 452(sanitizer UT) | 2 | 48 文件/1476+/12- | range `0363a1ada3f^1..0363a1ada3f`(merge commit) | 8 | 30m31s/4.7M |
+| 438(KHandle/MemoryDump) | 3 | 34 文件/4896+/360- | range `879f4da2c95^1..879f4da2c95`(merge commit) | 37 | 31m23s/9.9M |
+
+- Stage B 合计:CPF 16 条、OCR 111 条、39.9M tokens、2h10m04s。
+- **完成度**:398/411/438 的 `terminal_state=partial`(398 有 16 个文件因 9.0M 聚合 token 预算未完成;411 有 5 个文件 timeout;438 有 9 个文件 timeout,含 `MemoryDump.cpp` 与全部 8 个 kdumputil 文件);452 为 `complete`,但 7 个 `native/native.tests/testData/sanitizer/corruption/*.kt` 被路径规则过滤。
+- 完成度对匹配的影响:398 的 CPF#3/#4 锚定文件在失败列表,但两条均已在 merge 前修复;411 的 CPF#4 锚定 `LeafFunctionsAnalysis.kt` timeout,但已在 head 修复;438 的 `MemoryDump.cpp` 组 Round-2 超时后日志记录 "keeping earlier findings",评论仍保留但最终过滤未执行,438#2 的漏报可能部分源于此。OCR-only 数量在 398/411/438 上均存在低估。
+
+### 1.4 匹配口径
+
+- **强重合**=同文件+同根因(同一缺陷);**弱重合**=同文件+同主题(同一规则族、不同实例/不同机制);两者之外为 CPF-only / OCR-only。对于 CPF 锚点与 OCR 锚点不在同一物理文件、但指向同一函数/同一测试族的,标为「弱重合(相邻)」并在 `matching.json` 的 `anchor_relation=adjacent` 中记录。每条判定基于双方评论文本逐条人工核对,并回溯 merge commit/head 代码确认该缺陷在评审基准上是否仍存在。
+- **文件级匹配**=CPF 评论锚定的文件(或同族测试文件,如 `KNRootVisitor.cpp` ↔ `KNRootVisitorTest.cpp`)同时有 OCR 评论的去重文件数;440 的 `CAPIExtensions.cpp/.h` 合并计 1。用于 §2.2 辅助列,不等于评论级重合数。
+- **有效口径**:若 CPF 指出的缺陷在 OCR 评审基准上已被作者修复/补充(含 PR body),则从分母剔除;部分修复仍保留在有效分母(例如 419#2 死代码已清理但工具失败清理仍缺失)。
+- Stage A/B 每条 CPF 的配对、归因、修复状态与 OCR-only 清单见 `/tmp/cpf-compare/pr<PR>-matching.json`(schema `ocr.cpf-matching/v1`)。
 
 ## 2. 总表
 
@@ -94,7 +116,34 @@
 **有效口径(剔除 9 条评审前已修复/补充):严格 4/7 = 57.1%;宽口径 6/7 = 85.7%;有效 CPF-only 1/7 = 14.3%(447#3)**。
 分 PR 有效口径:431 2/2(1 强 1 弱);419 1/1(1 强);447 1/2(1 强,1 有效 miss);440 2/2(1 强 1 弱)。修复状态与证据见 §9.4。
 
-**两阶段合并(7 PR)**:原始严格 12/44 = 27.3%,宽口径 25/44 = 56.8%;有效严格 11/31 = 35.5%,宽口径 20/31 = 64.5%。
+**两阶段合并(首轮 + Stage A,7 PR)**:原始严格 12/44 = 27.3%,宽口径 25/44 = 56.8%;有效严格 11/31 = 35.5%,宽口径 20/31 = 64.5%。
+
+### 2.3 Stage B 4 PR
+
+| | 398 | 411 | 452 | 438 | 合计 |
+|---|---|---|---|---|---|
+| CPF 评论 | 5 | 6 | 2 | 3 | **16** |
+| OCR 评论 | 13 | 53 | 8 | 37 | **111** |
+| 强重合 | 1 | 1 | 0 | 1 | **3** |
+| 弱重合 | 0 | 1 | 1 | 0 | **2** |
+| CPF-only/未匹配 | 4 | 4 | 1 | 2 | **11** |
+| OCR-only | 12 | 50 | 7 | 36 | **105** |
+| 文件级匹配 | 2 | 5 | 1 | 3 | **11** |
+
+**原始口径:严格 3/16 = 18.8%;宽口径 5/16 = 31.3%**。
+**有效口径(剔除 12 条评审前已修复/补充):严格 3/4 = 75.0%;宽口径 3/4 = 75.0%;有效 CPF-only 1/4 = 25.0%(438#2)**。
+分 PR 有效口径:398 1/1(1 强);411 1/1(1 强);452 0/0(无有效分母);438 1/2(1 强,1 有效 miss)。修复状态与证据见 §9.7。文件级匹配沿用 Stage B 汇总口径,不等于评论级重合数。
+
+### 2.4 三阶段合并
+
+| 阶段 | PR | CPF | OCR | 强 | 弱 | CPF-only | OCR-only | 严格 | 宽口径 |
+|---|---|---|---|---|---|---|---|---|---|
+| 首轮 | 3 | 28 | 79 | 7 | 7 | 14 | 66 | 25.0% | 50.0% |
+| Stage A | 4 | 16 | 67 | 5 | 6 | 5 | 54 | 31.3% | 68.8% |
+| Stage B | 4 | 16 | 111 | 3 | 2 | 11 | 105 | 18.8% | 31.3% |
+| **合计** | **11** | **60** | **257** | **15** | **15** | **30** | **225** | **25.0%** | **50.0%** |
+
+有效口径:首轮 7/24 / 14/24,Stage A 4/7 / 6/7,Stage B 3/4 / 3/4;合并 **严格 14/35 = 40.0%,宽口径 23/35 = 65.7%**。Stage B 的 12 条已修复项中,2 条(411#5、452#2)仍被 OCR 弱重合命中,按 pr408 #6 口径保留在原始重合计数,但不计入有效分母。
 
 ## 3. 逐条对照
 
@@ -146,7 +195,7 @@
 | CPF | 内容摘要 | OCR 对应 | 判定 | 归因(CPF-only 时) | 备注 |
 |---|---|---|---|---|---|
 | #1 严重 | 删除 3 处 `kGlobalRuntimeShutdown` 守卫;shutdown 后重入 `initRuntime` 仍执行 `InitMemory`,进入半关闭态 | Runtime.cpp:166-168 [needs_confirmation] OCR#4 | **强重合** | — | 同文件、同一被删守卫、同一触发链;OCR 级别低于 CPF 严重 |
-| #2 严重 | `VisitGlobalPreforwardRoots` 新实现缺少全局/静态根 preforward 的集成回归测试 | KNRootVisitorTest.cpp:44-45 [needs_confirmation] OCR#6 | **弱重合** | — | 同测试覆盖主题;CPF 要 native.tests 集成用例,OCR 指出新增单测在非 OHOS_ARM64+CRT 配置下为空 TU;merge 前已补单测但未补集成用例 |
+| #2 严重 | `VisitGlobalPreforwardRoots` 新实现缺少全局/静态根 preforward 的集成回归测试 | KNRootVisitorTest.cpp:44-45 [needs_confirmation] OCR#6 | **弱重合**(相邻) | — | 同测试覆盖主题;CPF 要 native.tests 集成用例,OCR 指出新增单测在非 OHOS_ARM64+CRT 配置下为空 TU;merge 前已补单测但未补集成用例 |
 | #3 一般 | PR body 为模板,变更描述/测试情况/适配验证均为空 | 无 | CPF-only | 结构性缺口(OCR 不读 PR body) | merge 前作者已补充变更描述与测试情况,不计入 OCR miss |
 
 ### pr419(debug 增量编译;3 条)
@@ -161,7 +210,7 @@
 
 | CPF | 内容摘要 | OCR 对应 | 判定 | 归因(CPF-only 时) | 备注 |
 |---|---|---|---|---|---|
-| #1 严重 | `ThrowInvalidMutabilityException` 用 `RuntimeAssert(false)`,`kIgnore/kLog` 下不终止,违反 `RUNTIME_NORETURN` | Exceptions.h:51 [suggestion] OCR#24 + Arrays.cpp:45-50 [medium] OCR#36 | **弱重合** | — | 同函数/同 exception 语义;merge 已改 `RuntimeFail`;OCR 改报 `Throw` 命名/契约与 `mutabilityCheck` 测试缺口 |
+| #1 严重 | `ThrowInvalidMutabilityException` 用 `RuntimeAssert(false)`,`kIgnore/kLog` 下不终止,违反 `RUNTIME_NORETURN` | Exceptions.h:51 [suggestion] OCR#24 + Arrays.cpp:45-50 [medium] OCR#36 | **弱重合**(相邻) | — | 同函数/同 exception 语义;merge 已改 `RuntimeFail`;OCR 改报 `Throw` 命名/契约与 `mutabilityCheck` 测试缺口 |
 | #2 严重 | `CollectStackMapBaseRoot` 删除 `IsPlausibleStackMapSlot` 守卫,误分类帧可触发 GC 线程 SIGSEGV | ConcurrentMark.cpp:194-195 [high] OCR#12 | **强重合** | — | 同文件、同一被删守卫、同一 `markInSTW` 触发链 |
 | #3 一般 | `SafeAlloc` 的 `prctl(PR_SET_VMA_ANON_NAME)` 去掉 `useMmap` 短路,calloc 分支也会执行 | 无 | CPF-only | **知识库未覆盖**(系统调用前置条件/平台分支) | merge 代码仍缺 `useMmap` 守卫;Stage A 唯一有效 miss |
 | #4 建议 | GC 调度日志先强转 `uint32_t` 再除,>4GB 截断;注释写成 KB;`%d` 应为 `%u` | HeapGrowthController.hpp:57-62 [medium] OCR#18 | **弱重合** | — | merge 已改为先除后截断、`%u` 并修正注释;OCR 改报同一语句的残余风险(NaN/Inf 转 `uint32_t` 为 UB、日志位于 `isfinite` 守卫之前) |
@@ -173,9 +222,55 @@
 | CPF | 内容摘要 | OCR 对应 | 判定 | 归因(CPF-only 时) | 备注 |
 |---|---|---|---|---|---|
 | #1 严重 | `StatepointStubPhase` 翻转进程级 `cl::opt`;fragment 级并行下标志复位/写-写竞争导致 KSG no-op 或 UB | Bitcode.kt:199-201 [high] OCR#5 + CAPIExtensions.cpp:27-34 [high] OCR#3 | **强重合** | — | 同根因;两处 OCR 评论分别从调用方与 C API 侧复现同一 fragment 并行触发链 |
-| #2 一般 | `LLVMKotlinSetRegisteredFlag` 在选项未注册时静默返回,编译成功但 KSG 为 no-op | CAPIExtensions.h:37-42 [low] OCR#4 | **弱重合** | — | head 调用方已加 `require` 兜底使未注册选项编译失败;callee 仍静默返回 0,OCR#4 报的是返回 1 不能证明 set 生效的契约问题 |
-| #3 一般 | 新增 `StatepointStubPhase` 管线未新增自动化测试,仅手工验收 | KonanPropertiesStatepointTest.kt:24-27 [suggestion] OCR#2 | **弱重合** | — | 同测试覆盖主题;CPF 列三条端到端用例,OCR#2 只指出新增测试钉住了契约的一半(未断言 KSG 标志已移除) |
+| #2 一般 | `LLVMKotlinSetRegisteredFlag` 在选项未注册时静默返回,编译成功但 KSG 为 no-op | CAPIExtensions.h:37-42 [low] OCR#4 | **弱重合**(相邻) | — | head 调用方已加 `require` 兜底使未注册选项编译失败;callee 仍静默返回 0,OCR#4 报的是返回 1 不能证明 set 生效的契约问题 |
+| #3 一般 | 新增 `StatepointStubPhase` 管线未新增自动化测试,仅手工验收 | KonanPropertiesStatepointTest.kt:24-27 [suggestion] OCR#2 | **弱重合**(相邻) | — | 同测试覆盖主题;CPF 列三条端到端用例,OCR#2 只指出新增测试钉住了契约的一半(未断言 KSG 标志已移除) |
 | #4 一般 | 注释称空 `llvmStatepointPasses` 跳过 in-process 管线,但 `ifEmpty` 使其回退默认 pass,注释与行为矛盾 | 无(同文件 OCR#1 为跨目标一致性) | CPF-only | head 已删除 `llvmStatepoint*` 属性与注释 | 不计入 OCR miss |
+
+### pr398(stub.s → cpp asm;5 条)
+
+| CPF | 内容摘要 | OCR 对应 | 判定 | 归因(CPF-only 时) | 备注 |
+|---|---|---|---|---|---|
+| #1 一般 | FpUnwind.h 注释仍称 OHOS/Linux 为 address-form,未同步 value-form + `&marker != 0` 保护 | 无 | CPF-only | merge 前 29bb3f 已重写注释 | 不计入 OCR miss |
+| #2 建议 | FpUnwind.cpp:100-101 注释引用不存在的 K2NStubMacOS.cpp / K2NStubOHOS.cpp | 无 | CPF-only | merge 前 29bb3f 已改为单一 K2NStub.cpp | 不计入 OCR miss |
+| #3 建议 | EnterKotlinFromCpp.h:33-34 引用不存在的 EnterKotlinFromCppStubOHOS/MacOS.cpp | 无 | CPF-only | merge 前已改为单一 EnterKotlinFromCppStub.cpp | 该头文件本轮 token budget 未完成;不计入 OCR miss |
+| #4 建议 | Memory.h:389 注释引用不存在的 K2NStubMacOS.cpp / K2NStubOHOS.cpp | 无 | CPF-only | merge 前已改为 K2NStub.cpp | 该文件本轮 token budget 未完成;不计入 OCR miss |
+| #5 一般 | K2RStub.cpp 帧布局注释的寄存器偏移整体少 16 字节(x19@16 vs 实际 32,ret-val@88 vs 104) | K2RStub.cpp:40-44 [high] OCR#10 | **强重合** | — | 同文件同一注释图;OCR 进一步要求核对宏体是否也发生 +16 漂移;merge 未修 |
+
+398 另有 12 条 OCR-only,其中 OCR#8(FpUnwind.h 三个 marker 的 C++ 声明与 `extern "C"` 定义链接性不一致,critical,弱符号恒为 0)为 CPF 未报的高价值发现;OCR#12 为 EnterKotlinFromCppStub.cpp 调用点清单漏列 Worker.cpp,与本 PR 的注释类 CPF 同属文档准确性问题但不同文件/不同注释块,未计重合。
+
+### pr411(leaf/delta-main stackmap;6 条)
+
+| CPF | 内容摘要 | OCR 对应 | 判定 | 归因(CPF-only 时) | 备注 |
+|---|---|---|---|---|---|
+| #1 致命 | `TagStackMapCoversPC` 的 lazy 分支丢失 `return`,非 void 函数落空 UB | 无(同函数 OCR#32 为 STW 分配) | CPF-only | head acb8c4f 已补 `return` | 不计入 OCR miss |
+| #2 严重 | CMS 根收集用 `AllLocationsIterator` 遍历 derived 槽位并当作 `ObjHeader*` 根 | 无 | CPF-only | head 已改 `rootsInfo.getBaseLocations()` | 不计入 OCR miss |
+| #3 严重 | `getRootsInfo` 按 `deltasIdxs.size()` 读取后以 `deltaIdx` 索引,非连续索引越界 | DeltaMainStackMap.cpp:85-86 [low] OCR#21 + :444-451 [needs_confirmation] OCR#18 | **强重合** | — | OCR#21 明指同一 `deltas[deltaIdx]` 无边界索引;OCR#18 独立指出 T(表项数) vs D(去重索引数)的稠密性假设;OCR 级别低于 CPF 严重,且未合成完整触发链 |
+| #4 一般 | leaf 闭包迭代上限硬编码 10,深层调用链无法消除 | 无 | CPF-only | head 已改 `leafFunctionsAnalysisIterationLimit` | 该文件本轮 timeout;不计入 OCR miss |
+| #5 严重 | GC STW 热路径每帧无条件 `dladdr` + `std::string` | ConcurrentMark.cpp:167-174 [medium] OCR#40 | **弱重合** | — | 同文件、同一 STW 每帧开销规则族(OCR 报 stackmap 解码分配);head 已为日志加 `logging::enabled` 守卫 |
+| #6 一般 | `queryFunctionInfoByAddress` 读取未初始化 `Dl_info`,`dli_sname` 为 NULL 时构造 `std::string` UB | 无 | CPF-only | head 已 `Dl_info info{}` + 判空 | 不计入 OCR miss |
+
+411 的 50 条 OCR-only 中 high 级包括:SafePoint.cpp 的 OFF 构建整个 `safePoint()` 函数体被 `ENABLE_STACKMAP` 门控(OCR#29)、eager 配置 `ConcurrentMark` 编译错误(OCR#38)、countable-loop 健全性漏洞可移除无界循环唯一 safepoint(OCR#41)、新增参数配套生成文件未提交(OCR#53);另有 leaf 分析 `isLeaf()` 对 `irFunction == null` 恒真(OCR#42)、构造函数调用绕过 leaf 分析(OCR#43)、cinterop out 参数误用(OCR#44)。
+
+### pr452(sanitizer UT;2 条)
+
+| CPF | 内容摘要 | OCR 对应 | 判定 | 归因(CPF-only 时) | 备注 |
+|---|---|---|---|---|---|
+| #1 严重 | 新增 testData 文件第 45 行含中文注释「// 问题」 | 无(文件被 testData 路径规则过滤) | CPF-only | 输入侧过滤(`native/native.tests/testData/**`) | merge 前已删除该行;不计入 OCR miss |
+| #2 建议 | `assertTrue("62" in text || "62" in text)` 因超集关系恒真,且纯 62 子串过宽 | SanitizerTbiStructTest.kt:49 [medium/test] OCR#4 | **弱重合** | — | 同文件、同一断言失效规则族;OCR#4 报 tbiC03 的 `"Bit 59" \|\| "valid"` 因 "Invalid" 含 "valid" 恒真,不同用例同一机制;merge 已改 Regex |
+
+452 的 2 条 CPF 均在评审前修复,有效分母为 0;OCR 7 条独立发现中 high 级为 `SanitizerTbiStructTest` 以 `File(".")` 解析仓库根,在 native.tests 任务 workingDir 下失效(OCR#1)。
+
+### pr438(KHandle/MemoryDump;3 条)
+
+| CPF | 内容摘要 | OCR 对应 | 判定 | 归因(CPF-only 时) | 备注 |
+|---|---|---|---|---|---|
+| #1 严重 | `DumpMemoryAsyncFork` 子进程分支无 try-catch,dump 失败时跳过 `_exit` 逃逸回父逻辑 | MemoryDump.cpp:1530-1532 [high] OCR#23 | **强重合** | — | 同分支、同触发链;OCR 近乎逐字复现并引用仓库 fork 规则;merge 未修 |
+| #2 一般 | 非 OHOS 平台 `DumpMemoryAsync` 由未压缩流改为 gzip,并移除 `isStrip` 拒绝 | 无 | CPF-only | 评审组超时 + 跨平台行为变更未触发 | **Stage B 唯一有效 miss**;merge 仍未修;`MemoryDump.cpp` 组 Round-2 超时,存在低估 |
+| #3 一般 | `CompressChunkToGzip` 注释称 level 6,实际 `Z_BEST_SPEED`(level 1) | 无 | CPF-only | merge 前已删除 level 6 注释块 | 不计入 OCR miss |
+
+438 的 36 条 OCR-only 中 high 级包括:KHandle `clear()` 语义与其适配的 `ObjHolder` 相反(OCR#1)、HandleScope 新 slot 未清零即进入 GC 根扫描(OCR#2)、worker/压缩线程异常导致 `std::terminate`(OCR#24);另有流式记录顺序破坏(OCR#30)、压缩失败被静默吞掉却报告成功(OCR#32)、RefField marker 检查移除(OCR#26)等。
+
+Stage B 合计:原始严格 3/16、宽 5/16;12 条评审前已修复(其中 411#5、452#2 仍被弱重合命中),有效分母 4,严格/宽口径均为 3/4。
 
 ## 4. 归因 Top 榜
 
@@ -201,6 +296,8 @@
 
 ### 4.3 Stage A(CPF-only 5 条,有效 miss 1 条)
 
+Stage A 没有「输入侧过滤误杀」(447 过滤的 2 个 `testData` 文件与 CPF 评论无关),也没有「规则已载入但未触发」的有效 miss;唯一有效 miss 属知识库缺口。
+
 | 归因 | 条数 | 明细 |
 |---|---|---|
 | 评审前已修复/补充,不计入 OCR miss | 4 | 431#3(PR body)、447#5(0600)、447#6(PC 守卫)、440#4(`llvmStatepoint*` 属性/注释删除) |
@@ -220,6 +317,25 @@
 | 440#2 未注册选项静默返回 | OCR#4 返回 1 不能证明 set 生效 | callee 静默 miss vs 返回值语义 |
 | 440#3 整体缺测试 | OCR#2 新测试只钉住契约一半 | 广度 vs 具体断言缺口 |
 
+### 4.5 Stage B(CPF-only 11 条,有效 miss 1 条)
+
+Stage B 同样没有「规则已载入但未触发」或「知识库未覆盖」的有效 miss;唯一有效 miss 发生在评审组超时的 `MemoryDump.cpp` 上,归因需保留不确定性。
+
+| 归因 | 条数 | 明细 |
+|---|---|---|
+| 评审前已修复/补充,不计入 OCR miss | 10 | 398#1/#2/#3/#4(29bb3f 注释修正)、411#1/#2/#4/#6(head 修复)、452#1(中文注释删除)、438#3(level 6 注释删除) |
+| **评审未完成 + 跨平台行为变更未触发(唯一有效 miss)** | **1** | 438#2:非 OHOS `DumpMemoryAsync` 由原始流改为 gzip、移除 `isStrip` 拒绝;`MemoryDump.cpp` 所在组 Round-2 timeout,Review filter 未执行 |
+| **合计** | **11**(有效 1) | |
+
+另有 2 条已修复项仍被 OCR 弱重合命中(411#5、452#2),按 pr408 #6 口径保留在原始重合计数中,但不计入有效分母;12 条已修复项的证据见 §9.7。
+
+### 4.6 Stage B 弱重合的机制差异(2 条)
+
+| CPF | OCR | 差异 |
+|---|---|---|
+| 411#5 STW 热路径每帧 `dladdr` + string | OCR#40 lazy stackmap 解码每帧 10+ 次 malloc | 日志符号化 vs 根集解码;同属 STW 禁止逐帧昂贵操作 |
+| 452#2 `"62"` 超集/过宽断言 | OCR#4 `"Bit 59" \|\| "valid"` 因 "Invalid" 含 "valid" 恒真 | 同一断言失效规则族,不同测试用例 |
+
 ## 5. OCR-only 发现概览
 
 ### 5.1 首轮(66 条,逐条性质见附录 A)
@@ -233,8 +349,15 @@
 ### 5.2 Stage A(54 条)
 
 - **高价值类别**:419 的 `NATIVE_DEBUGINFO_MINIFY` 默认值语义反转(OCR#1)、自证式测试(OCR#4)、`introducedVersion` 元数据错误(OCR#14);447 的 CRT `StopFinalizerThreadIfRunning` 必 abort(OCR#16)、`ExtraObjectData` 放行 STACK tag(OCR#8)、HiDebug shutdown 后回调复活 runtime(OCR#23)、OOM 转储逻辑扩散到非 OHOS 平台(OCR#20)、`destroyExtraObjectData` CRT 分支分叉(OCR#21)、`-Werror` 门禁移除(OCR#29);440 的 ohos_x64 未同步 `-disable-llvm-passes`(OCR#1)、`emitRuntimeOpt=RUNTIME` 路径绕过 KSG(OCR#6)、`addOccurrence` 重复复位风险(OCR#7/#9);431 的 `RUNTIME_SWITCH` 掩码分叉(OCR#1)、HWASan 有效位在转发后被清零(OCR#5)、llvmInterop 硬编码库列表(OCR#3)。
-- **噪声/低价值**:447 的注解一致性清扫(OCR#32-#35)、kdumputil 文档/格式(OCR#5/#7/#25)、`OhosExecutor` workaround 注释(OCR#26/#30/#31);419 的风格类(OCR#5/#10/#11/#13)。Stage A 的 54 条中,实缺陷与测试缺口仍占多数,但相比首轮,OAT.xml 式流程矿脉消失(Stage A 样本无 OAT.xml 变更)。
+- **噪声/低价值**:447 的注解一致性清扫(OCR#32-#35)、kdumputil 文档/格式(OCR#5/#7/#25)、`OhosExecutor` workaround 注释(OCR#26/#30/#31);419 的风格类(OCR#5/#10/#11/#13)。按 category 统计:bug 16、test 8(合计 24/54≈44%),maintainability 20、documentation 5、style 2、process 2、performance 1(合计 30/54≈56%);相比首轮,OAT.xml 式流程矿脉消失(Stage A 样本无 OAT.xml 变更)。
 - **计数口径**:54 = 67 条 OCR 评论 - 13 条被 §3 配对引用(431 2 条、419 3 条、447 4 条、440 4 条)。逐条清单见各 `pr<PR>-matching.json` 的 `ocr_only`。
+
+### 5.3 Stage B(105 条)
+
+- **高价值类别**:398 的 `FpUnwind.h` marker 声明/定义链接性不一致(critical,OCR#8)、链接器 `__k2rstub` 边界符号依赖(OCR#9);411 的 SafePoint OFF 构建回归(OCR#29 high)、eager 配置 `ConcurrentMark` 编译错误(OCR#38 high)、countable-loop 健全性漏洞(OCR#41 high)、配套生成文件未提交(OCR#53 high)、leaf 分析 `isLeaf()` 恒真与构造函数绕过(OCR#42/#43)、cinterop out 参数误用(OCR#44);438 的 KHandle `clear()` 语义反转(OCR#1 high)、HandleScope 未清零 slot 进入 GC 扫描(OCR#2 high)、worker/压缩线程异常 `std::terminate`(OCR#24 high)、流式顺序破坏(OCR#30)、压缩失败静默吞掉(OCR#32);452 的测试 CWD 路径解析(OCR#1 high)。
+- **噪声/低价值**:398 的文档类 7/12(注释准确性/陈旧注释)、411 的 dead code 与 style 类(OCR#3/#5/#10/#20/#22/#27/#28 等)、438 的文档/格式类(OCR#9/#11/#13/#18/#20);452 样本小,噪声不明显。
+- **统计**:按 category,bug 30、test 6、performance 3(合计 39/105≈37%);maintainability 24、documentation 20、style 10、未分类 7、process 4、other 1(合计 66/105≈63%)。相比 Stage A,Stage B 的 bug 占比更低(30/105≈29% vs 16/54≈30% 基本持平),但 high 级绝对数更高(9 vs Stage A 未单列),且 411/438 两条大 PR 贡献了大部分运行时/内存转储类发现。
+- **计数口径**:105 = 111 条 OCR 评论 - 6 条被 §3 配对引用(398 1 条、411 3 条、452 1 条、438 1 条)。逐条清单见各 `pr<PR>-matching.json` 的 `ocr_only`。
 
 ## 6. 对 OCR 知识库与 rule.json 的补强建议(按优先级)
 
@@ -248,6 +371,10 @@
 4. **恒真/死分支检测**交给后续规则沉淀(tautology 模式:`it = begin() + (ptr - data())` 后比较 `ptr == &*it`),低优先。
 5. ~~级别校准~~ **已完成(66c45d9)**:`main_task_system.md` 已将「CLI/属性语义向后不兼容」从 suggestion 提到 medium。
 6. **重跑残余漏报(新增)**:pr408 #2/#7/#10/#11 在原过滤误杀解除后仍未见,分别对应 crtn.o 链接顺序、compiler driver 与 ld.lld 矛盾、响应文件空格、dynamicLibraries 完整性;建议并入 `R-xplat-5` 的逐项 checklist。
+7. **Stage B 新增缺口(待办)**:
+   - 序列化/转储:平台分支切换输出格式(如非 OHOS `DumpMemoryAsync` 从原始流改为 gzip)必须核对所有消费方,并保留或显式说明原有能力(如非 OHOS `isStrip` 拒绝);对应 438#2。
+   - 输入过滤:`native/native.tests/testData/**` 下的文本类 `.kt` 仍被整目录过滤,452#1 即命中此类文件;建议对 testData 中的源码/文本文件保留语言规范扫描,或至少显式告知过滤范围。
+   - 审查预算:398 的 9.0M 聚合 token 预算导致 16/31 文件未完成,411/438 各有 5/9 文件 timeout;对 40+ 文件或 2000+ 行 diff 建议提高预算或按目录拆分,避免 CPF 锚定文件落入失败列表。
 
 ## 7. 与CPF 评审的结构性差异(实测确认)
 
@@ -278,7 +405,7 @@ CPF 评论针对的是 PR 中间状态,而非最终 merge diff。`52fcab` 在最
 - **konan/target 营救**:目标仓 rule.json 加入 `**/konan/target/**` 后,pr408 的 9 个被误杀文件全部纳入评审范围,OCR 在这些文件上新增 12 条评论;原 7 条过滤误杀中 #1/#8 转弱重合、#14 转强重合,#2/#7/#10/#11 仍漏报。
 - **synthetic diff 验证**:构造含 3 条注入问题的 diff 重跑,OCR 输出 6 条评论,全部命中 3 条注入问题(3/3)。
 
-## 9. Stage A 过程记录(431/419/447/440)
+## 9. Stage A/B 过程记录
 
 ### 9.1 评审方式与基准
 
@@ -297,7 +424,7 @@ CPF 评论针对的是 PR 中间状态,而非最终 merge diff。`52fcab` 在最
 ### 9.2 运行状态与异常
 
 - **terminal_state**:431/419/440 为 `complete`;447 为 `partial`(60 选中、50 完成、10 失败)。447 的 OCR-only 数量因此存在低估,CPF 匹配不受影响。
-- **LLM 重试**:431 总请求 105、失败 2;419 总请求 216、失败 2;447 总请求 541、失败 6、取消 2;440 总请求 97、失败 1。失败均发生在 Round-2(deadline exceeded),首轮评论完整;`warnings` 中有多条 `comment_refiled`(评论被重新挂到更准确的 diff 文件)。
+- **LLM 重试**:431 总请求 105、失败 2;419 总请求 216、失败 2;447 总请求 541、失败 6、取消 2;440 总请求 97、失败 1。失败请求均为 `main_task` 的 timeout;`warnings` 另记录多组 Round-2 deadline exceeded,首轮评论完整;多条 `comment_refiled` 表示评论被重新挂到更准确的 diff 文件。
 - **CPF 快照差异**:447 的 CPF API 另有 1 条 2026-10-19 的 AI 评论(`DBG_OOM` 日志级别,AllocatedSizeTracker.cpp:34),不在 Stage A 冻结的 6 条快照内;若计入,原始严格 5/17 = 29.4%、宽 11/17 = 64.7%,且该条无 OCR 对应,不影响本报告主口径。
 
 ### 9.3 产物
@@ -328,6 +455,49 @@ CPF 评论针对的是 PR 中间状态,而非最终 merge diff。`52fcab` 在最
 
 有效分母推导:16(全部)- 9(上表)= 7;其中 431#2(已补单测未补集成)与 419#2(死代码已清、工具失败清理仍缺)按部分修复保留。有效匹配 6 条(强 4、弱 2),有效 CPF-only 1 条(447#3)。
 
+这与 pr408 §8.1 的现象一致:CPF 评论针对 PR 中间状态,OCR 评审 merge/head 时部分缺陷已被作者修复;直接拿 CPF 评论总数作分母会低估 OCR,故本报告同时给出原始口径与有效口径。
+
+### 9.5 Stage B 评审方式与基准(398/411/452/438)
+
+| PR | 状态 | 基准/merge commit | OCR range | 变更/选中/完成/失败(文件) | CPF/OCR 评论 | 耗时 | tokens |
+|---|---|---|---|---|---|---|---|
+| 398 | merged | `2f1eb971681` | `2f1eb971681^1..2f1eb971681` | 42/31/15/16 | 5/13 | 36m50s | 9,588,652 |
+| 411 | open | base `2def9483b455` / head `acb8c4f75a9b` / merge-base `7050c74e` | `7050c74e..acb8c4f75a9b` | 45/43/38/5 | 6/53 | 31m20s | 15,769,518 |
+| 452 | merged | `0363a1ada3f` | `0363a1ada3f^1..0363a1ada3f` | 48/7/7/0 | 2/8 | 30m31s | 4,669,602 |
+| 438 | merged | `879f4da2c95` | `879f4da2c95^1..879f4da2c95` | 34/28/19/9 | 3/37 | 31m23s | 9,868,122 |
+| **合计** | | | | | **16/111** | **2h10m04s** | **39,895,894** |
+
+- provider/model 均为 `volcano-glm` / `glm-5.3`,OCR `v1.13.3`,并发 8,仓库路径 `/Users/zhangxinyu/oh/hello/kotlin`。
+- 变更文件数:398 `2164+/4613-`;411 `2064+/964-`;452 `1476+/12-`;438 `4896+/360-`。
+- 452 的 48 个变更文件中,7 个 `native/native.tests/testData/sanitizer/corruption/*.kt` 被路径/扩展规则过滤;CPF#1 恰好锚定其中之一。
+
+### 9.6 Stage B 运行状态与异常
+
+- **terminal_state**:452 为 `complete`;398/411/438 为 `partial`。
+- **398**:`budget_exceeded=true`,9.0M 聚合 token 预算耗尽,16/31 文件未完成:`StubUnwindPersonalityMacOS.cpp`、`KonanStartStub.cpp`、`EnterKotlinFromCpp.h`、`SafePoint.cpp`、`ArkTSConfig.cpp/.h`、`Linker.kt`、`IrToBitcode.kt`、`CompilerCInterface.cpp`、`N2KStubPersonalityRefOHOS.cpp`、`CodeGenerator.kt`、`Runtime.kt`、`Memory.h`、`K2NStub.cpp`、`Memory.cpp`、`ContextUtils.kt`。其中 `EnterKotlinFromCpp.h`、`Memory.h` 是 CPF#3/#4 的锚定文件,但两条均已在 merge 前修复。
+- **411**:5 个文件 timeout:`SmallLoopSafepointsAnalysisUtils.kt`、`RemoveRedundantSafepoints.h/.cpp`、`LeafFunctionsAnalysis.kt`、`RemoveRedundantSafepointsPass.kt`。`LeafFunctionsAnalysis.kt` 是 CPF#4 的锚定文件,该条已在 head 修复。
+- **438**:9 个文件 timeout:`MemoryDump.cpp` 与全部 8 个 kdumputil 文件(`binary.kt`、`className.kt`、`converter.kt`、`model.kt`、`pretty.kt`、`reader.kt`、`util.kt`、`utils.kt`)。日志显示该组 Round-2 超时后 "keeping earlier findings"、随后 Review filter 失败;OCR#23-#37 仍被保留,但最终过滤未执行,438#2 的漏报可能部分源于该组未完成。
+- **CPF 快照差异**:398 的评论 API 快照只返回前 3 条 cpf-manager 评论,`pr398-cpf.json` 冻结了 5 条;#4/#5 的修复状态由 merge 代码回溯判定。
+
+### 9.7 Stage B 评审前已修复/补充的 12 条 CPF 评论
+
+| PR# | CPF 摘要 | 评审基准上的状态 | 证据 |
+|---|---|---|---|
+| 398#1 | FpUnwind.h 注释仍称 OHOS/Linux address-form | 已改为 value-form + `&marker != 0` 描述 | `2f1eb971681` `FpUnwind.h:46-62`(29bb3f) |
+| 398#2 | FpUnwind.cpp 注释引用不存在的 K2NStubMacOS/OHOS.cpp | 已改为单一 K2NStub.cpp | `2f1eb971681` `FpUnwind.cpp:99-100` |
+| 398#3 | EnterKotlinFromCpp.h 引用不存在的 OHOS/MacOS stub 文件 | 已改为单一 EnterKotlinFromCppStub.cpp | `2f1eb971681` `EnterKotlinFromCpp.h:33-35` |
+| 398#4 | Memory.h 引用不存在的 K2NStubMacOS/OHOS.cpp | 已改为 K2NStub.cpp | `2f1eb971681` `Memory.h:389` |
+| 411#1 | `TagStackMapCoversPC` 丢失 `return` | 已恢复 `return` | head `acb8c4f75a9b` `FpUnwind.cpp:408` |
+| 411#2 | CMS 根收集遍历 derived 槽位 | 已改 `getBaseLocations()` | head `acb8c4f75a9b` `ConcurrentMark.cpp:276` |
+| 411#4 | leaf 闭包迭代上限硬编码 10 | 已改 `leafFunctionsAnalysisIterationLimit` | head `acb8c4f75a9b` `LeafFunctionsAnalysis.kt:94` |
+| 411#5 | STW 热路径每帧 `dladdr` | 已加 `logging::enabled` 守卫 | head `acb8c4f75a9b` `ConcurrentMark.cpp:207-226` |
+| 411#6 | `Dl_info` 未初始化 / `dli_sname` NULL | 已 `Dl_info info{}` + 判空 | head `acb8c4f75a9b` `Utils.cpp:91-97` |
+| 452#1 | testData 第 45 行中文注释 | 已删除(文件 45→44 行) | `0363a1ada3f` `cStack_cDefinition_stackUseAfterReturn.kt` |
+| 452#2 | `assertTrue("62" in text || "62" in text)` 恒真 | 已改 Regex 精确匹配 | `0363a1ada3f` `SanitizerTbiStructTest.kt:66-69` |
+| 438#3 | 压缩级别注释 level 6 vs `Z_BEST_SPEED` | 已删除 level 6 注释块 | `879f4da2c95` `MemoryDump.cpp:372-381` |
+
+有效分母推导:16(全部)- 12(上表)= 4;其中 411#5、452#2 仍被 OCR 弱重合命中,保留在原始重合计数,但已从有效分母剔除。有效匹配 3 条(全部为强重合),有效 CPF-only 1 条(438#2)。
+
 ## 附:方法偏差说明
 
 - pr408 首轮用已合并 commit 的 M^1..M range 评审(与 PR diff 逐文件等价,已核对 20 文件清单一致);2026-10-29 在最终 merge diff c4244058501 上重跑(含 konan/target 营救)。
@@ -337,6 +507,7 @@ CPF 评论针对的是 PR 中间状态,而非最终 merge diff。`52fcab` 在最
 - 2026-10-23 修正轮:经增强版 OCR 对本报告自审(15 条发现)后修正:OCR-only 计数闭合(66=25+12+29,剔除 3 条误入的重合对应评论)、pr408 误杀占比口径(该 PR 的 50%)、pr408 token 数(实际 2.2M)、pr426 主题标注、needs_confirmation 计数(9 条)、§0/§4/§5 多处表述;匹配判定与结论不变。
 - 2026-10-29 重跑轮:pr408 对齐 c4244058501,标记 52fcab 已修复的 5 条(有效分母剔除 #3/#5/#12/#13、保留 #6),刷新总 recall;konan/target 营救与 synthetic diff 验证结果见 §8。
 - 2026-10-29 Stage A 轮:431/419/447 按 merge commit `^1..merge` 评审,440 按 merge-base..head 评审;匹配时额外回溯 merge/head 代码判定 CPF 缺陷是否仍存在,9 条评审前已修复/补充的评论单列(§9.4),同时保留原始口径与有效口径。447 的 CPF 快照为 6 条冻结集,API 中第 7 条(10-19)未计入主口径。
+- 2026-10-29 Stage B 轮:398/452/438 按 merge commit `^1..merge` 评审,411 为 open PR,按 merge-base `7050c74e..head acb8c4f75a9b` 评审;12 条评审前已修复/补充的评论单列(§9.7)。398 因 token 预算、411/438 因 timeout 均为 `partial`,OCR-only 存在低估;438 的 `MemoryDump.cpp` 组在 Round-2 超时后保留早期发现但最终过滤未执行,438#2 的漏报归因保留「评审未完成」的不确定性。
 
 ## 附录 A:OCR-only 逐条性质表(66 条)
 
