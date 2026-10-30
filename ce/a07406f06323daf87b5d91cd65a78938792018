@@ -1,0 +1,68 @@
+OCR增强待办.md
+  s_edeb902e453197::t_c29f24512d3313 161
+  s_edeb902e453197::t_418bd249d27fb2 353
+  s_edeb902e453197::t_09086f7021ccd2 392
+  s_edeb902e453197::t_ce12a13071d90e 105-118
+  s_edeb902e453197::t_b538199c7855cb 287
+  s_edeb902e453197::t_8cee7095e23d14 591
+  s_edeb902e453197::t_06ec904e37a96b 567,573
+  s_edeb902e453197::t_c87e1b6a51c06e 425
+  s_edeb902e453197::t_ff7c4d73edf11a 194
+  s_edeb902e453197::t_a1b5d5691540f5 257
+  s_edeb902e453197::t_c71f78c3562a2b 316
+  s_edeb902e453197::t_9807fe0d6a2ad0 640-646
+  s_edeb902e453197::t_6c380b50696596 1-23,26-104,119-120,122-160,162-193,195-256,258-286,288-315,317-352,354-391,393-424,426-467,469-495,497-566,568-572,574-590,592-639,647-749
+  s_edeb902e453197::t_8b3e3ab4e1796a 24-25
+  s_edeb902e453197::t_ce97f347f312bd 468
+  s_edeb902e453197::t_5d73477941db66 121
+  s_edeb902e453197::t_498ed9bf0003bf 496
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "cea07406f06323daf87b5d91cd65a78938792018",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_edeb902e453197": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e758711b5ffeRWbXC4gsPxe08X",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 764,
+      "total_deletions": 15,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_06ec904e37a96b": "volcengine/deepseek-v4.1-flash",
+        "t_09086f7021ccd2": "volcengine/deepseek-v4.1-flash",
+        "t_418bd249d27fb2": "volcengine/deepseek-v4.1-flash",
+        "t_498ed9bf0003bf": "volcengine/deepseek-v4.1-flash",
+        "t_5d73477941db66": "volcengine/deepseek-v4.1-flash",
+        "t_6c380b50696596": "volcengine/deepseek-v4.1-flash",
+        "t_8b3e3ab4e1796a": "volcengine/deepseek-v4.1-flash",
+        "t_8cee7095e23d14": "volcengine/deepseek-v4.1-flash",
+        "t_9807fe0d6a2ad0": "volcengine/deepseek-v4.1-flash",
+        "t_a1b5d5691540f5": "volcengine/deepseek-v4.1-flash",
+        "t_b538199c7855cb": "volcengine/deepseek-v4.1-flash",
+        "t_c29f24512d3313": "volcengine/deepseek-v4.1-flash",
+        "t_c71f78c3562a2b": "volcengine/deepseek-v4.1-flash",
+        "t_c87e1b6a51c06e": "volcengine/deepseek-v4.1-flash",
+        "t_ce12a13071d90e": "volcengine/deepseek-v4.1-flash",
+        "t_ce97f347f312bd": "volcengine/deepseek-v4.1-flash",
+        "t_ff7c4d73edf11a": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 764,
+          "deletions": 15
+        }
+      }
+    }
+  }
+}
