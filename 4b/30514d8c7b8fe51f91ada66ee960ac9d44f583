@@ -1,0 +1,144 @@
+internal/prmeta/providers.go
+  s_9720e603d5d198::t_b742677fb8a4d3 1-104,108-122,126-215,219-240,244-324,328-342,346-415,419-433,435-437,439,441-474
+  s_9720e603d5d198::t_8fe4ff64a6e313 105-107,123-125,216-218,241-243,325-327,343-345,416-418
+  s_9720e603d5d198::t_e91f9af5979e1d 434,438,440
+pages/src/content/docs/ru/cli-reference.md
+  s_9720e603d5d198::t_03cc8cd86068f5 124,726-748
+pages/src/content/docs/zh/cli-reference.md
+  s_9720e603d5d198::t_03cc8cd86068f5 119,761-779
+pages/src/content/docs/ko/cli-reference.md
+  s_9720e603d5d198::t_03cc8cd86068f5 123,795-814
+pages/src/content/docs/ja/cli-reference.md
+  s_9720e603d5d198::t_03cc8cd86068f5 118,748-768
+internal/agent/util_test.go
+  s_9720e603d5d198::t_62dd6bafc8c9a4 195-224
+pages/src/content/docs/en/architecture.md
+  s_9720e603d5d198::t_c06dd0a7461205 359
+pages/src/content/docs/en/cli-reference.md
+  s_9720e603d5d198::t_03cc8cd86068f5 124,143-161
+  s_9720e603d5d198::t_c677079e2fb012 162
+internal/prmeta/prmeta.go
+  s_9720e603d5d198::t_f90ec8149f7abf 32-41,597,600,625,627,636
+  s_9720e603d5d198::t_6749756ef50006 1-14,16-21,23-24,42-54,58,68-95,100-132,134-203,206-235,237-493,499-596,598-599,601-624,626,628-635,637-656
+  s_9720e603d5d198::t_749e78192c8f05 236
+  s_9720e603d5d198::t_0537e28f58d7b4 133,204-205
+  s_9720e603d5d198::t_ad88b4bcbf81f9 15
+  s_9720e603d5d198::t_caad0f4a883c73 55-57,59-60
+  s_9720e603d5d198::t_1f32df257dc733 494-498
+  s_9720e603d5d198::t_22b9120102a274 22,25-31,61-67,96-99
+pages/src/content/docs/ko/architecture.md
+  s_9720e603d5d198::t_c06dd0a7461205 345
+internal/prmeta/prmeta_test.go
+  s_9720e603d5d198::t_88b09e3b7372d6 9,239,245,247,537-540
+  s_9720e603d5d198::t_097c3e8557243a 1-8,10-220,222-238,240-244,246,248-292,294,296-466,468-469,471-476,486-528,531-536,541-555
+  s_9720e603d5d198::t_44c22e214224c9 467,477-485
+  s_9720e603d5d198::t_9082790ced912c 470
+  s_9720e603d5d198::t_35baf1984b84f2 221
+  s_9720e603d5d198::t_b0e803efe6df36 556-641
+  s_9720e603d5d198::t_f90ec8149f7abf 293,295,529-530
+cmd/opencodereview/flags_test.go
+  s_9720e603d5d198::t_e0d3c4c3ca96e2 399-423
+cmd/opencodereview/shared_flags.go
+  s_9720e603d5d198::t_7ff078dd06bca5 12
+  s_9720e603d5d198::t_8ba8791220eba3 222
+  s_9720e603d5d198::t_0e35bfb38f0815 164-168
+pages/src/content/docs/zh/architecture.md
+  s_9720e603d5d198::t_c06dd0a7461205 292
+internal/agent/util.go
+  s_9720e603d5d198::t_c0d891bae0c24a 33-46
+pages/src/content/docs/ru/architecture.md
+  s_9720e603d5d198::t_c06dd0a7461205 356
+pages/src/content/docs/ja/architecture.md
+  s_9720e603d5d198::t_c06dd0a7461205 223
+internal/config/template/prompts/main_task_system.md
+  s_9720e603d5d198::t_c9bb153185d1b8 48-55
+cmd/opencodereview/review_cmd.go
+  s_9720e603d5d198::t_e18d1908c1e664 24
+  s_9720e603d5d198::t_a8d11c0a0cd98d 101-104
+  s_9720e603d5d198::t_f42dea597d28b4 169-170
+  s_9720e603d5d198::t_996ddd4472baaf 22
+  s_9720e603d5d198::t_1d2fcd05550f20 46
+  s_9720e603d5d198::t_fcb5969990faf9 252
+  s_9720e603d5d198::t_8e876b8ae6dea3 521-541
+  s_9720e603d5d198::t_7ff203c8408ef9 520
+internal/agent/agent.go
+  s_9720e603d5d198::t_9417d4fda9de39 123-127
+  s_9720e603d5d198::t_52dffe69fa3497 1324-1327
+internal/config/template/prompts/main_task_user.md
+  s_9720e603d5d198::t_f906c29701831c 13-15
+internal/agent/prmeta_test.go
+  s_9720e603d5d198::t_62dd6bafc8c9a4 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "4b30514d8c7b8fe51f91ada66ee960ac9d44f583",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_9720e603d5d198": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e74b5c7c9ffeyhbHWCfErrahNR",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 2191,
+      "total_deletions": 109,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_03cc8cd86068f5": "volcengine/deepseek-v4.1-flash",
+        "t_0537e28f58d7b4": "volcengine/deepseek-v4.1-flash",
+        "t_097c3e8557243a": "volcengine/deepseek-v4.1-flash",
+        "t_0b90486bfcf6ad": "volcengine/deepseek-v4.1-flash",
+        "t_0e35bfb38f0815": "volcengine/deepseek-v4.1-flash",
+        "t_161bbef14e4f85": "volcengine/deepseek-v4.1-flash",
+        "t_1d2fcd05550f20": "volcengine/deepseek-v4.1-flash",
+        "t_1f32df257dc733": "volcengine/deepseek-v4.1-flash",
+        "t_22b9120102a274": "volcengine/deepseek-v4.1-flash",
+        "t_35baf1984b84f2": "volcengine/deepseek-v4.1-flash",
+        "t_44c22e214224c9": "volcengine/deepseek-v4.1-flash",
+        "t_52dffe69fa3497": "volcengine/deepseek-v4.1-flash",
+        "t_62dd6bafc8c9a4": "volcengine/deepseek-v4.1-flash",
+        "t_6749756ef50006": "volcengine/deepseek-v4.1-flash",
+        "t_69d78c166ac997": "volcengine/deepseek-v4.1-flash",
+        "t_6da42d112e91c3": "volcengine/deepseek-v4.1-flash",
+        "t_749e78192c8f05": "volcengine/deepseek-v4.1-flash",
+        "t_7ff078dd06bca5": "volcengine/deepseek-v4.1-flash",
+        "t_88b09e3b7372d6": "volcengine/deepseek-v4.1-flash",
+        "t_8ba8791220eba3": "volcengine/deepseek-v4.1-flash",
+        "t_8e876b8ae6dea3": "volcengine/deepseek-v4.1-flash",
+        "t_8fe4ff64a6e313": "volcengine/deepseek-v4.1-flash",
+        "t_9082790ced912c": "volcengine/deepseek-v4.1-flash",
+        "t_9417d4fda9de39": "volcengine/deepseek-v4.1-flash",
+        "t_996ddd4472baaf": "volcengine/deepseek-v4.1-flash",
+        "t_a8d11c0a0cd98d": "volcengine/deepseek-v4.1-flash",
+        "t_aa2104c57571f1": "volcengine/deepseek-v4.1-flash",
+        "t_ad88b4bcbf81f9": "volcengine/deepseek-v4.1-flash",
+        "t_b0e803efe6df36": "volcengine/deepseek-v4.1-flash",
+        "t_b742677fb8a4d3": "volcengine/deepseek-v4.1-flash",
+        "t_c06dd0a7461205": "volcengine/deepseek-v4.1-flash",
+        "t_c0d891bae0c24a": "volcengine/deepseek-v4.1-flash",
+        "t_c9bb153185d1b8": "volcengine/deepseek-v4.1-flash",
+        "t_caad0f4a883c73": "volcengine/deepseek-v4.1-flash",
+        "t_e0d3c4c3ca96e2": "volcengine/deepseek-v4.1-flash",
+        "t_e18d1908c1e664": "volcengine/deepseek-v4.1-flash",
+        "t_e91f9af5979e1d": "volcengine/deepseek-v4.1-flash",
+        "t_f42dea597d28b4": "volcengine/deepseek-v4.1-flash",
+        "t_f906c29701831c": "volcengine/deepseek-v4.1-flash",
+        "t_f90ec8149f7abf": "volcengine/deepseek-v4.1-flash",
+        "t_fcb5969990faf9": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 2191,
+          "deletions": 109
+        }
+      }
+    }
+  }
+}
