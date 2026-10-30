@@ -1,0 +1,110 @@
+internal/tool/code_comment_test.go
+  s_2d4cb5e8f6f522::t_0d3538fe72b75e 312,314,316
+  s_2d4cb5e8f6f522::t_fd26f922d62696 12
+  s_2d4cb5e8f6f522::t_94f8a27300b352 300-311,313,315,317-372
+  s_2d4cb5e8f6f522::t_b00c4598991269 373-416
+internal/config/rulecatalog/catalog.json
+  s_2d4cb5e8f6f522::t_cb891aa3314be3 1-5466
+internal/config/rulecatalog/catalog_test.go
+  s_2d4cb5e8f6f522::t_18ae831edf3eea 1-317
+scripts/build-rule-catalog.go
+  s_2d4cb5e8f6f522::t_c1dfa5403c0cf2 1-792
+internal/tool/code_comment.go
+  s_2d4cb5e8f6f522::t_221c3a37a4b47c 100
+  s_2d4cb5e8f6f522::t_b0a3dd836bde22 78
+  s_2d4cb5e8f6f522::t_3361e13bfbea22 103-107
+  s_2d4cb5e8f6f522::t_6e296046c164c6 117,121
+  s_2d4cb5e8f6f522::t_c689ce3a56d97b 65,68
+  s_2d4cb5e8f6f522::t_00bacbfede8eb5 184-191
+  s_2d4cb5e8f6f522::t_353efb2b1f5b6e 13
+  s_2d4cb5e8f6f522::t_5cc7cb32b5d74e 101-102
+cmd/opencodereview/shared.go
+  s_2d4cb5e8f6f522::t_6b9a6f75c8fd8d 20,40-45,142-146,148-154
+cmd/opencodereview/review_cmd.go
+  s_2d4cb5e8f6f522::t_9ccaf75da4cabc 18
+  s_2d4cb5e8f6f522::t_72f628804995bf 209,614,620
+cmd/opencodereview/scan_cmd.go
+  s_2d4cb5e8f6f522::t_72f628804995bf 207
+scripts/verify-english-only.go
+  s_2d4cb5e8f6f522::t_359dd9f02d0eac 81
+internal/config/rulecatalog/catalog.go
+  s_2d4cb5e8f6f522::t_2ca83fc6bceb1f 1-96,106-343
+  s_2d4cb5e8f6f522::t_d4bb4ab6aff3c3 97-105
+.github/workflows/ci.yml
+  s_2d4cb5e8f6f522::t_359dd9f02d0eac 43-45
+internal/config/template/prompts/main_task_system.md
+  s_2d4cb5e8f6f522::t_d122e0ef73c85b 57,59-67
+  s_2d4cb5e8f6f522::t_be7c94ba3e9275 58
+internal/llmloop/loop.go
+  s_2d4cb5e8f6f522::t_3361e13bfbea22 727
+cmd/opencodereview/manual_e2e_retry_test.go
+  s_2d4cb5e8f6f522::t_72f628804995bf 64
+internal/model/review.go
+  s_2d4cb5e8f6f522::t_6f26bac87befea 32-33
+internal/config/toolsconfig/tools.json
+  s_2d4cb5e8f6f522::t_6f26bac87befea 99
+cmd/opencodereview/git_test.go
+  s_2d4cb5e8f6f522::t_72f628804995bf 183
+Makefile
+  s_2d4cb5e8f6f522::t_359dd9f02d0eac 1,74,89-93
+  s_2d4cb5e8f6f522::t_ed35c3de406deb 94
+internal/tool/definitions.go
+  s_2d4cb5e8f6f522::t_3361e13bfbea22 105-107,109-118
+  s_2d4cb5e8f6f522::t_a68f3854d8b693 10-11,108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "e3f538c6a5546c5b0f2b12539f36de716da58105",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_2d4cb5e8f6f522": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e75023d6affeOkxnAuWzhtRDHD",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 7141,
+      "total_deletions": 42,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_00bacbfede8eb5": "volcengine/deepseek-v4.1-flash",
+        "t_0d3538fe72b75e": "volcengine/deepseek-v4.1-flash",
+        "t_18ae831edf3eea": "volcengine/deepseek-v4.1-flash",
+        "t_221c3a37a4b47c": "volcengine/deepseek-v4.1-flash",
+        "t_2ca83fc6bceb1f": "volcengine/deepseek-v4.1-flash",
+        "t_3361e13bfbea22": "volcengine/deepseek-v4.1-flash",
+        "t_353efb2b1f5b6e": "volcengine/deepseek-v4.1-flash",
+        "t_359dd9f02d0eac": "volcengine/deepseek-v4.1-flash",
+        "t_6b9a6f75c8fd8d": "volcengine/deepseek-v4.1-flash",
+        "t_6e296046c164c6": "volcengine/deepseek-v4.1-flash",
+        "t_6f26bac87befea": "volcengine/deepseek-v4.1-flash",
+        "t_72f628804995bf": "volcengine/deepseek-v4.1-flash",
+        "t_94f8a27300b352": "volcengine/deepseek-v4.1-flash",
+        "t_9ccaf75da4cabc": "volcengine/deepseek-v4.1-flash",
+        "t_a68f3854d8b693": "volcengine/deepseek-v4.1-flash",
+        "t_b00c4598991269": "volcengine/deepseek-v4.1-flash",
+        "t_b0a3dd836bde22": "volcengine/deepseek-v4.1-flash",
+        "t_be7c94ba3e9275": "volcengine/deepseek-v4.1-flash",
+        "t_c1dfa5403c0cf2": "volcengine/deepseek-v4.1-flash",
+        "t_c689ce3a56d97b": "volcengine/deepseek-v4.1-flash",
+        "t_cb891aa3314be3": "volcengine/deepseek-v4.1-flash",
+        "t_d122e0ef73c85b": "volcengine/deepseek-v4.1-flash",
+        "t_d4bb4ab6aff3c3": "volcengine/deepseek-v4.1-flash",
+        "t_fd26f922d62696": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 7141,
+          "deletions": 42
+        }
+      }
+    }
+  }
+}
