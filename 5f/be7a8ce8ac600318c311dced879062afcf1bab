@@ -1,0 +1,148 @@
+OCR增强待办.md
+  s_3c5b05ffdf3631::t_6bb895868752c8 441-446,449-466
+  s_3c5b05ffdf3631::t_bf6f4bd413532c 653
+  s_3c5b05ffdf3631::t_5120e5319528bb 97-98
+  s_3c5b05ffdf3631::t_667539a9edf432 654-655
+  s_3c5b05ffdf3631::t_decbe5990c1757 764
+  s_3c5b05ffdf3631::t_5be9b7c3bc8e98 447-448
+  s_3c5b05ffdf3631::t_98986aa186ac84 287,316,351
+  s_3c5b05ffdf3631::t_2ea6c2aa369d94 670
+  s_3c5b05ffdf3631::t_1c544624780836 113-114
+  s_3c5b05ffdf3631::t_5e6539debf2721 785
+  s_3c5b05ffdf3631::t_55c44c2b173022 103
+  s_3c5b05ffdf3631::t_64e6fec7f6354a 6
+  s_3c5b05ffdf3631::t_e5cbb44ded25a8 724
+  s_3c5b05ffdf3631::t_9985c6b86c405a 734-736
+  s_3c5b05ffdf3631::t_a0f5801c6ef87a 717
+  s_3c5b05ffdf3631::t_c46be00d825d5d 685-711
+  s_3c5b05ffdf3631::t_e80d3b6e5ee754 392-408
+  s_3c5b05ffdf3631::t_1a1b161bfc1430 361-368
+OCR-vs-CPF实测对比.md
+  s_3c5b05ffdf3631::t_24566c0092b3a0 175
+  s_3c5b05ffdf3631::t_3e4f11483e3bc9 451
+  s_3c5b05ffdf3631::t_3e81aa6e3d20e4 6
+  s_3c5b05ffdf3631::t_bac81f401a97de 16-19
+  s_3c5b05ffdf3631::t_4832eeaf064984 636
+  s_3c5b05ffdf3631::t_ad859432386d81 54
+  s_3c5b05ffdf3631::t_8e6f1941ff8176 41
+  s_3c5b05ffdf3631::t_7463e7a5b4d11a 145,148,150
+  s_3c5b05ffdf3631::t_f5a96e71dbeadb 169
+  s_3c5b05ffdf3631::t_1b7b53cc14384b 293,298,301
+  s_3c5b05ffdf3631::t_061e0acbbdd69c 404-411,413
+  s_3c5b05ffdf3631::t_0a86b37fbd9897 38
+  s_3c5b05ffdf3631::t_6d4fb968dd82d8 434
+  s_3c5b05ffdf3631::t_018d5424d7fc23 102-105
+  s_3c5b05ffdf3631::t_fe0841113d46f2 492,495-528
+  s_3c5b05ffdf3631::t_d04f029fd02d10 3
+  s_3c5b05ffdf3631::t_00322203156c92 558-559
+  s_3c5b05ffdf3631::t_eaef32cb66cfbe 173
+  s_3c5b05ffdf3631::t_327b84e5e31aec 160,167-168
+  s_3c5b05ffdf3631::t_be7442c401c886 479
+  s_3c5b05ffdf3631::t_c02807a18e847b 627
+  s_3c5b05ffdf3631::t_c5080b5908a762 49
+  s_3c5b05ffdf3631::t_d0165a0b486e3b 161
+  s_3c5b05ffdf3631::t_28ad1395e50e02 166
+  s_3c5b05ffdf3631::t_509b833e5c9208 97-99
+  s_3c5b05ffdf3631::t_01f1ff9bb271fe 152
+  s_3c5b05ffdf3631::t_c3cb82964d1443 170
+  s_3c5b05ffdf3631::t_7ea01bd7be59c1 34
+  s_3c5b05ffdf3631::t_93616f51e8d95b 400-401
+  s_3c5b05ffdf3631::t_b71cfcacf39761 417
+  s_3c5b05ffdf3631::t_5f1f0514022dc4 459
+  s_3c5b05ffdf3631::t_428e627539295d 356
+  s_3c5b05ffdf3631::t_d9b0fdffdb4642 373
+  s_3c5b05ffdf3631::t_a3452ab81ca144 398
+  s_3c5b05ffdf3631::t_947f3a6cc5311f 483-488
+  s_3c5b05ffdf3631::t_a10c98a61824ec 382
+  s_3c5b05ffdf3631::t_3d808074a4cd26 443
+  s_3c5b05ffdf3631::t_99794ad8e87510 303
+  s_3c5b05ffdf3631::t_949037224c3f3b 174,529
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "5fbe7a8ce8ac600318c311dced879062afcf1bab",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_3c5b05ffdf3631": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e74cfb40cffed9qE8fdwtRVxmg",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 204,
+      "total_deletions": 86,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_00322203156c92": "volcengine/deepseek-v4.1-flash",
+        "t_018d5424d7fc23": "volcengine/deepseek-v4.1-flash",
+        "t_01f1ff9bb271fe": "volcengine/deepseek-v4.1-flash",
+        "t_061e0acbbdd69c": "volcengine/deepseek-v4.1-flash",
+        "t_0a86b37fbd9897": "volcengine/deepseek-v4.1-flash",
+        "t_1a1b161bfc1430": "volcengine/deepseek-v4.1-flash",
+        "t_1b7b53cc14384b": "volcengine/deepseek-v4.1-flash",
+        "t_1c544624780836": "volcengine/deepseek-v4.1-flash",
+        "t_24566c0092b3a0": "volcengine/deepseek-v4.1-flash",
+        "t_28ad1395e50e02": "volcengine/deepseek-v4.1-flash",
+        "t_2ea6c2aa369d94": "volcengine/deepseek-v4.1-flash",
+        "t_327b84e5e31aec": "volcengine/deepseek-v4.1-flash",
+        "t_3d808074a4cd26": "volcengine/deepseek-v4.1-flash",
+        "t_3e4f11483e3bc9": "volcengine/deepseek-v4.1-flash",
+        "t_3e81aa6e3d20e4": "volcengine/deepseek-v4.1-flash",
+        "t_428e627539295d": "volcengine/deepseek-v4.1-flash",
+        "t_4832eeaf064984": "volcengine/deepseek-v4.1-flash",
+        "t_509b833e5c9208": "volcengine/deepseek-v4.1-flash",
+        "t_5120e5319528bb": "volcengine/deepseek-v4.1-flash",
+        "t_55c44c2b173022": "volcengine/deepseek-v4.1-flash",
+        "t_5be9b7c3bc8e98": "volcengine/deepseek-v4.1-flash",
+        "t_5e6539debf2721": "volcengine/deepseek-v4.1-flash",
+        "t_5f1f0514022dc4": "volcengine/deepseek-v4.1-flash",
+        "t_64e6fec7f6354a": "volcengine/deepseek-v4.1-flash",
+        "t_667539a9edf432": "volcengine/deepseek-v4.1-flash",
+        "t_6bb895868752c8": "volcengine/deepseek-v4.1-flash",
+        "t_6d4fb968dd82d8": "volcengine/deepseek-v4.1-flash",
+        "t_7463e7a5b4d11a": "volcengine/deepseek-v4.1-flash",
+        "t_7ea01bd7be59c1": "volcengine/deepseek-v4.1-flash",
+        "t_8e6f1941ff8176": "volcengine/deepseek-v4.1-flash",
+        "t_93616f51e8d95b": "volcengine/deepseek-v4.1-flash",
+        "t_947f3a6cc5311f": "volcengine/deepseek-v4.1-flash",
+        "t_98986aa186ac84": "volcengine/deepseek-v4.1-flash",
+        "t_99794ad8e87510": "volcengine/deepseek-v4.1-flash",
+        "t_9985c6b86c405a": "volcengine/deepseek-v4.1-flash",
+        "t_a0f5801c6ef87a": "volcengine/deepseek-v4.1-flash",
+        "t_a10c98a61824ec": "volcengine/deepseek-v4.1-flash",
+        "t_a3452ab81ca144": "volcengine/deepseek-v4.1-flash",
+        "t_ad859432386d81": "volcengine/deepseek-v4.1-flash",
+        "t_b71cfcacf39761": "volcengine/deepseek-v4.1-flash",
+        "t_bac81f401a97de": "volcengine/deepseek-v4.1-flash",
+        "t_be7442c401c886": "volcengine/deepseek-v4.1-flash",
+        "t_bf6f4bd413532c": "volcengine/deepseek-v4.1-flash",
+        "t_c02807a18e847b": "volcengine/deepseek-v4.1-flash",
+        "t_c3cb82964d1443": "volcengine/deepseek-v4.1-flash",
+        "t_c46be00d825d5d": "volcengine/deepseek-v4.1-flash",
+        "t_c5080b5908a762": "volcengine/deepseek-v4.1-flash",
+        "t_d0165a0b486e3b": "volcengine/deepseek-v4.1-flash",
+        "t_d04f029fd02d10": "volcengine/deepseek-v4.1-flash",
+        "t_d9b0fdffdb4642": "volcengine/deepseek-v4.1-flash",
+        "t_decbe5990c1757": "volcengine/deepseek-v4.1-flash",
+        "t_e5cbb44ded25a8": "volcengine/deepseek-v4.1-flash",
+        "t_e80d3b6e5ee754": "volcengine/deepseek-v4.1-flash",
+        "t_eaef32cb66cfbe": "volcengine/deepseek-v4.1-flash",
+        "t_f5a96e71dbeadb": "volcengine/deepseek-v4.1-flash",
+        "t_fe0841113d46f2": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 204,
+          "deletions": 86
+        }
+      }
+    }
+  }
+}
