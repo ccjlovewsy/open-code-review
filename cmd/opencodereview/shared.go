@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/alibaba/open-code-review/internal/agent"
+	"github.com/alibaba/open-code-review/internal/config/domainroute"
 	"github.com/alibaba/open-code-review/internal/config/rulecatalog"
 	"github.com/alibaba/open-code-review/internal/config/rules"
 	"github.com/alibaba/open-code-review/internal/config/template"
@@ -42,6 +43,7 @@ type commonContext struct {
 	Resolver    rules.Resolver
 	FileFilter  *rules.FileFilter
 	RuleCatalog *rulecatalog.Catalog
+	DomainRoute *domainroute.Router
 	GitRunner   *gitcmd.Runner
 	// IsGitRepo reports whether RepoDir is inside a git repository. Always
 	// true when requireGit was set; may be false when scan accepts non-git
@@ -144,12 +146,18 @@ func loadCommonContext(repoDirInput, rulePath, contentRef string, maxTools, maxG
 		return nil, fmt.Errorf("load rule catalog: %w", err)
 	}
 
+	domainRouter, err := domainroute.Load(repoDir)
+	if err != nil {
+		return nil, fmt.Errorf("load domain routes: %w", err)
+	}
+
 	return &commonContext{
 		Template:    tpl,
 		RepoDir:     repoDir,
 		Resolver:    resolver,
 		FileFilter:  fileFilter,
 		RuleCatalog: catalog,
+		DomainRoute: domainRouter,
 		GitRunner:   gitRunner,
 		IsGitRepo:   isGit,
 	}, nil

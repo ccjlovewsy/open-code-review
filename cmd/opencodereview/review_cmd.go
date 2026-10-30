@@ -51,6 +51,7 @@ type reviewOptions struct {
 	maxTokensBudget       int
 	effort                string
 	noFilter              bool
+	noDomainRouting       bool
 	preview               bool
 }
 
@@ -139,6 +140,9 @@ func executeReviewContext(ctx context.Context, opts reviewOptions) (retErr error
 	if err != nil {
 		return err
 	}
+	if opts.noDomainRouting {
+		cc.DomainRoute = nil
+	}
 	applyCLIExcludes(cc, splitPaths(opts.excludes))
 
 	// Security (#112): reject ref-option injection before any git invocation.
@@ -224,6 +228,7 @@ func executeReviewContext(ctx context.Context, opts reviewOptions) (retErr error
 		Template:              *cc.Template,
 		SystemRule:            cc.Resolver,
 		FileFilter:            cc.FileFilter,
+		DomainRoute:           cc.DomainRoute,
 		LLMClient:             rt.Client,
 		Tools:                 tools,
 		PlanToolDefs:          rt.PlanToolDefs,
@@ -399,15 +404,16 @@ func validateResumeIdentity(ctx context.Context, cc *commonContext, opts reviewO
 		return nil, nil
 	}
 	sealed, err := agent.ResolveIdentity(ctx, agent.Args{
-		RepoDir:    cc.RepoDir,
-		From:       opts.from,
-		To:         opts.to,
-		Commit:     opts.commit,
-		ReviewMode: reviewModeFromOptions(opts),
-		Template:   *cc.Template,
-		SystemRule: cc.Resolver,
-		FileFilter: cc.FileFilter,
-		GitRunner:  cc.GitRunner,
+		RepoDir:     cc.RepoDir,
+		From:        opts.from,
+		To:          opts.to,
+		Commit:      opts.commit,
+		ReviewMode:  reviewModeFromOptions(opts),
+		Template:    *cc.Template,
+		SystemRule:  cc.Resolver,
+		FileFilter:  cc.FileFilter,
+		DomainRoute: cc.DomainRoute,
+		GitRunner:   cc.GitRunner,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("resolve current input identity: %w", err)

@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alibaba/open-code-review/internal/config/domainroute"
 	"github.com/alibaba/open-code-review/internal/config/template"
 	"github.com/alibaba/open-code-review/internal/llm"
 	"github.com/alibaba/open-code-review/internal/llmloop"
@@ -561,4 +562,41 @@ func TestScanAgent_WaitBackground_NoLeakOnRun(t *testing.T) {
 	if lastRec["type"] != "session_end" {
 		t.Errorf("last session JSONL record type = %q, want session_end", lastRec["type"])
 	}
+}
+
+func TestResolveSystemRuleDomainRouting(t *testing.T) {
+	router, err := domainroute.LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault domain routes: %v", err)
+	}
+
+	t.Run("nil router keeps the path rule", func(t *testing.T) {
+		a := newAgentForTest(t, makeTemplateWithFullScan())
+		it := model.ScanItem{Path: "a.cpp", Content: "int main() {}"}
+		if got := a.resolveSystemRule(it); got != "" {
+			t.Errorf("got %q, want empty", got)
+		}
+	})
+
+	t.Run("domain block is appended", func(t *testing.T) {
+		a := newAgentForTest(t, makeTemplateWithFullScan())
+		a.args.DomainRoute = router
+		it := model.ScanItem{
+			Path:    "native/utils/src/org/jetbrains/kotlin/konan/target/Linker.kt",
+			Content: "val target = Family.OHOS",
+		}
+		got := a.resolveSystemRule(it)
+		if !strings.Contains(got, "<domain_knowledge") || !strings.Contains(got, "ohos-platform") {
+			t.Errorf("domain block missing:\n%s", got)
+		}
+	})
+
+	t.Run("no match leaves an empty rule", func(t *testing.T) {
+		a := newAgentForTest(t, makeTemplateWithFullScan())
+		a.args.DomainRoute = router
+		it := model.ScanItem{Path: "README.md", Content: "docs"}
+		if got := a.resolveSystemRule(it); got != "" {
+			t.Errorf("got %q, want empty", got)
+		}
+	})
 }

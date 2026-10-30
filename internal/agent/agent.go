@@ -13,6 +13,7 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"os"
 	"runtime/debug"
 	"slices"
 	"sort"
@@ -22,6 +23,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/alibaba/open-code-review/internal/config/domainroute"
 	"github.com/alibaba/open-code-review/internal/config/rules"
 	"github.com/alibaba/open-code-review/internal/config/template"
 	"github.com/alibaba/open-code-review/internal/config/toolsconfig"
@@ -73,6 +75,10 @@ type Args struct {
 
 	// SystemRule holds path-based review rules loaded from a JSON config.
 	SystemRule rules.Resolver
+
+	// DomainRoute selects domain-specific checks for a review group. Nil keeps
+	// the pre-routing behavior unchanged.
+	DomainRoute *domainroute.Router
 
 	// FileFilter holds user-configured include/exclude path patterns from rule.json.
 	// When nil, only the default extension and path filters apply.
@@ -1068,6 +1074,7 @@ func (a *Agent) ruleConfigSHA256() string {
 			fields = append(fields, "exclude", exc)
 		}
 	}
+	fields = append(fields, a.args.DomainRoute.CanonicalConfig()...)
 	return hashFields(fields...)
 }
 
@@ -1684,10 +1691,6 @@ func (a *Agent) buildChangeFilesExceptGroup(groupDiffs []model.Diff) string {
 // whose files share a language — returns that rule text bare, so the rendered
 // prompt stays byte-identical to the untagged form.
 func (a *Agent) resolveGroupSystemRule(diffs []model.Diff) string {
-	if a.args.SystemRule == nil {
-		return ""
-	}
-
 	// Sorted by path so both block order and the paths inside a block are
 	// deterministic. diffs arrives in the grouping LLM's response order, which
 	// varies between runs and would otherwise churn the prompt prefix that
@@ -1697,6 +1700,22 @@ func (a *Agent) resolveGroupSystemRule(diffs []model.Diff) string {
 		return strings.Compare(x.NewPath, y.NewPath)
 	})
 
+	ruleText := ""
+	if a.args.SystemRule != nil {
+		ruleText = a.resolveRuleBlocks(sorted)
+	}
+	domainText := a.domainKnowledge(sorted)
+	switch {
+	case ruleText == "":
+		return domainText
+	case domainText == "":
+		return ruleText
+	default:
+		return ruleText + "\n\n" + domainText
+	}
+}
+
+func (a *Agent) resolveRuleBlocks(sorted []model.Diff) string {
 	type ruleBlock struct {
 		rule  string
 		paths []string
@@ -1735,6 +1754,27 @@ func (a *Agent) resolveGroupSystemRule(diffs []model.Diff) string {
 		sb.WriteString("\n</rules>")
 	}
 	return sb.String()
+}
+
+// domainKnowledge renders the domain-specific checks selected for a group.
+// It returns "" when routing is disabled or nothing matches, so prompts stay
+// byte-identical to the pre-routing version in those cases.
+func (a *Agent) domainKnowledge(diffs []model.Diff) string {
+	if a.args.DomainRoute == nil {
+		return ""
+	}
+	files := make([]domainroute.File, 0, len(diffs))
+	for _, d := range diffs {
+		files = append(files, domainroute.File{Path: d.NewPath, Content: d.Diff})
+	}
+	result := a.args.DomainRoute.Route(files)
+	if result.Rendered == "" {
+		return ""
+	}
+	if os.Getenv("OCR_DOMAIN_ROUTE_DEBUG") == "1" {
+		fmt.Fprintf(stdout.Writer(), "[ocr] domain route: %s (~%d tokens)\n", result.Summary(), result.Tokens)
+	}
+	return result.Rendered
 }
 
 // executeGroupPlanPhase runs the plan phase for a file group.

@@ -1,0 +1,387 @@
+{
+  "schema": "ocr-domain-routes/v1",
+  "max_domains": 2,
+  "token_budget": 1200,
+  "domains": [
+    {
+      "id": "ohos-platform",
+      "catalog_domains": [
+        "ohos-platform",
+        "native-compiler-backend"
+      ],
+      "priority": 100,
+      "paths": [
+        "kotlin-native/konan/**",
+        "kotlin-native/platformLibs/**",
+        "**/ohos/**",
+        "**/*ohos*/**",
+        "native/utils/src/org/jetbrains/kotlin/konan/target/**"
+      ],
+      "keywords": [
+        "OHOS_ARM64",
+        "OHOS_X64",
+        "Family.OHOS",
+        "OhosConfigurables",
+        "additionalTargetSysRoot",
+        "ohosArm64",
+        "ohosX64",
+        "hilog_ndk"
+      ],
+      "sources": [
+        "agent-skills/kmp-ohos-platform",
+        "kotlin-pr-review/references/custom/kotlin-ohos-platform.md"
+      ],
+      "checks": [
+        "P1-001: New or changed Konan targets use Family.OHOS with the ELF shared-library suffix (dynamicSuffix = \"so\").",
+        "P1-002: KonanTarget registers only OHOS_ARM64 and OHOS_X64; names match targetTriple.* in konan.properties.",
+        "P1-003: Do not handle OHOS through Family.LINUX or Family.ANDROID; use Family.OHOS or OhosConfigurables.",
+        "P2-001: OHOS targets configure both the main sysroot and additionalTargetSysRoot.ohos (HMS).",
+        "P2-003: Sysroot version changes keep dependencies.*-ohos_arm64 tarball names in sync with both sysroot properties.",
+        "P3-002: targetCpuFeatures.ohos_arm64 must not reintroduce the removed +sve feature.",
+        "P3-003: OHOS clang resolution goes through targetToolchain.ohos_arm64 or absoluteTargetToolchain, not generic absoluteLlvmHome.",
+        "P4-001: OHOS stub assembly compiles with -target aarch64-linux-ohos on non-Apple hosts; do not restrict it to macOS.",
+        "B3-001: Linker stub-object special paths cover OHOS_ARM64 alongside other targets, not only macOS or Linux defaults.",
+        "B3-002: OHOS linking uses the dedicated ohosLlvmTool (clang++) path; falling back to host clang produces a wrong triple.",
+        "B4-001: New family dispatch branches that affect unwind, GC, sanitizer, or linker behavior include Family.OHOS.",
+        "B4-002: Do not fold OHOS into Linux and drop OHOS-only linker flags such as hilog_ndk.",
+        "B2-001: OHOS ELF functions without gc.statepoint clear the GC collector to avoid undefined compressed-stackmap symbols.",
+        "G1-001: Public DSL ohosArm64 and ohosX64 map to same-name presets; a new preset updates KotlinArtifactsExtensionImpl target constants.",
+        "R1-001: OHOS stub object files are copied to dist/konan/targets/ohos_arm64/stubs_objs."
+      ]
+    },
+    {
+      "id": "crt",
+      "catalog_domains": [
+        "native-runtime",
+        "native-compiler-backend"
+      ],
+      "priority": 95,
+      "paths": [
+        "kotlin-native/runtime/src/main/cpp/crt/**",
+        "**/common-rt/**",
+        "**/crt/**",
+        "**/libcrt/**",
+        "**/CRTStubs*"
+      ],
+      "keywords": [
+        "CRT_Pin",
+        "CRT_UnPin",
+        "libcrt",
+        "KNFinalizationInterface",
+        "checkUseCRT",
+        "BaseObjectPinned"
+      ],
+      "sources": [
+        "agent-skills/kmp-native-compiler-runtime/references/knowledge/crt-finalizer-shutdown.md",
+        "agent-skills/kmp-native-compiler-runtime/references/knowledge/ohos-native-linking-and-abi.md",
+        "agent-skills/kmp-native-compiler-runtime/references/knowledge/pinning-and-gc-region.md"
+      ],
+      "checks": [
+        "R1-001: OHOS stub object files are copied to dist/konan/targets/ohos_arm64/stubs_objs.",
+        "R1-002: New stub .s files join aarch64_linux_ohos_stubs and are compiled through compileStubFiles.",
+        "R2-003: Runtime C and C++ code must not manage Kotlin object lifetime with raw malloc or free.",
+        "CRT finalizer startup is two-phase: NotifyStarted precedes attachCurrentThread, and finalizerThreadIsRunning_ is not a live-thread probe.",
+        "Stopping GC work, destroying the runtime, and waiting for finalizers are distinct shutdown steps; a checked-shutdown count includes the finalizer.",
+        "CRT_Pin and CRT_UnPin are gated by checkUseCRT; non-CRT targets are intentional no-ops, so a new pin entry must update the CRTStubs no-op stub.",
+        "Pin granularity is a GC region, not a single object; a pin prevents region evacuation but is not itself a GC root.",
+        "Latin1 String pinning may replace the object with a UTF-16 copy; GCPin, get/addressOf, and GCUnpin must all use the same object.",
+        "A static archive must not embed libcrt.so; the final executable or shared library links CRT, and static-archive consumers add that dependency."
+      ]
+    },
+    {
+      "id": "gc",
+      "catalog_domains": [
+        "native-runtime"
+      ],
+      "priority": 90,
+      "paths": [
+        "kotlin-native/runtime/src/main/cpp/gc/**",
+        "**/common-rt/**/gc/**",
+        "**/gc/**/collector/**",
+        "**/*barrier*"
+      ],
+      "keywords": [
+        "MarkingCollector",
+        "GCPhase",
+        "SatbBuffer",
+        "RawPointer",
+        "rawPtrCnt",
+        "CMC",
+        "CMS"
+      ],
+      "sources": [
+        "agent-skills/kmp-gc/references/knowledge/cmc-kn-integration-invariants.md",
+        "agent-skills/kmp-gc/references/knowledge/cmc-collector-architecture.md",
+        "agent-skills/kmp-gc/references/workflows/moving-gc-no-copy-audit.md"
+      ],
+      "checks": [
+        "R2-003: Never manage Kotlin object lifetime with raw malloc or free; allocate through runtime APIs.",
+        "CMC write barriers shade the new reference, but atomic paths enqueue the old value; classify coverage by entry point, not by the SatbBuffer name.",
+        "Stack references are intentionally unbarriered while global and heap references need barriers. Removing slot healing or a read barrier requires proving every reader of each GC-visible slot is still covered.",
+        "A raw-pointer region is exempt from evacuation while its pin count is non-zero; one pin blocks the whole region, and unpinning only restores collection candidacy.",
+        "Moving-GC no-copy defects: re-derive string and array data pointers after any allocation or safepoint; a stale pointer can read from-space data and still exit 0.",
+        "Weak references are a tag bit under CMC, and a weak read goes through a safepoint-capable read barrier that may park; Kotlin-to-runtime weak entries need boundary coverage.",
+        "CMC phase transitions are driven only by MarkingCollector::TransitionToGCPhase, and each phase installs its own barrier; a phase mismatch silently disables the intended barrier.",
+        "Never infer barrier behavior from a symbol or buffer name; verify the concrete access path and, for emitted code, the final IR or disassembly."
+      ]
+    },
+    {
+      "id": "interop",
+      "catalog_domains": [
+        "interop-platformlibs"
+      ],
+      "priority": 80,
+      "paths": [
+        "kotlin-native/platformLibs/**",
+        "**/*.def",
+        "**/Interop/**",
+        "**/interop/**"
+      ],
+      "keywords": [
+        "cinterop",
+        "NAPI",
+        "TSFN",
+        "StableRef",
+        "AKInterop",
+        "enableUndefinedApiProtection",
+        "headerFilter"
+      ],
+      "sources": [
+        "agent-skills/kmp-ffi-akinterop",
+        "kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md"
+      ],
+      "checks": [
+        "I1-001: Every .def declares package, headers, and headerFilter; C++ APIs set language = C++ and appropriate compilerOpts.",
+        "I1-003: linkerOpts -l* entries resolve in both OHOS and HMS sysroots; a new library requires dual-sysroot verification.",
+        "I2-001: Manual depends edits match header include relationships; extend the generator rules JSON instead of hand-editing the graph.",
+        "I2-003: Deleting a .def requires confirming that no KLIB or test still references the module.",
+        "I3-001: After an SDK update, rerun ohos-def-generator and check_def_consistency.sh before committing generated bindings.",
+        "I3-002: Generated output stays under platformLibs/src/platform/ohos/ and matches the checked-in layout.",
+        "I4-001: Do not hand-write large external fun blocks that should come from cinterop .def generation.",
+        "I5-001: Platform-library builds keep fixed extraOpts such as -no-default-libs and -Xpurge-user-libs.",
+        "NAPI, TSFN, and StableRef changes verify ArkTS-to-Kotlin thread and lifetime contracts; do not add a second libentry.so or a duplicate-symbol archive."
+      ]
+    },
+    {
+      "id": "gradle",
+      "catalog_domains": [
+        "gradle-kmp",
+        "kotlin-standard"
+      ],
+      "priority": 70,
+      "paths": [
+        "libraries/tools/kotlin-gradle-plugin/**",
+        "**/*.gradle.kts",
+        "**/settings.gradle",
+        "**/settings.gradle.kts"
+      ],
+      "keywords": [
+        "KotlinNativeTargetPreset",
+        "nativeDebuginfoMinify",
+        "ohosArm64",
+        "ohosX64",
+        "SwiftImport"
+      ],
+      "sources": [
+        "kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "kotlin-pr-review/references/kotlin-standard.md"
+      ],
+      "checks": [
+        "G1-001: ohosArm64 and ohosX64 DSL names map to same-name presets; a new preset updates KotlinArtifactsExtensionImpl KonanTarget constants.",
+        "G1-003: Hierarchy conventions such as ohos and ohosArm64Main match generated code and hand-written DSL.",
+        "G2-001: nativeDebuginfoMinify is documented and implemented as OHOS-only; passing it for other families must warn.",
+        "G2-003: Do not apply Apple-only debuginfo handling to Family.OHOS.",
+        "G3-001: kotlin-gradle-plugin version stays compatible with defaultSnapshotVersion and kotlin.build.gradlePlugin.version.",
+        "G4-001: ABI validation enumerates OHOS klib targets.",
+        "G4-002: Published plugin artifact versions align with the libraries/pom.xml parent POM.",
+        "KC9-001: Build scripts must not hard-code host absolute paths such as DevEco or SDK directories; use rootProject or providers.",
+        "KC9-003: Dependency and version constants align with the single source of truth in gradle.properties or the BOM.",
+        "Plugin code that iterates targets, compilations, or source sets must handle the new family consistently."
+      ]
+    },
+    {
+      "id": "architecture",
+      "catalog_domains": [
+        "architecture"
+      ],
+      "priority": 60,
+      "paths": [
+        "compiler/fir/**",
+        "compiler/frontend/**",
+        "core/descriptors/**",
+        "compiler/backend/**",
+        "analysis/**",
+        "compiler/ir/**"
+      ],
+      "keywords": [
+        "FirSymbol",
+        "IrSymbol",
+        "FirPlugin",
+        "IrGenerationExtension"
+      ],
+      "sources": [
+        "kotlin-pr-review/references/custom/kotlin-architecture.md"
+      ],
+      "checks": [
+        "A1-001: core/* must not depend on compiler/* or kotlin-native/*.",
+        "A1-003: analysis/* stays decoupled from the compiler; avoid dependency cycles.",
+        "A2-001: Platform-neutral logic belongs in compiler.common or core/compiler.common; platform extensions live in .jvm, .js, .native, and .wasm modules.",
+        "A2-002: OHOS-specific code is concentrated in Family.OHOS, OhosConfigurables, or platform/ohos, not scattered through JVM modules.",
+        "A3-001: FIR diagnostics and transformations stay in compiler/fir/; do not repeat frontend semantics in a backend.",
+        "A3-003: Complete Native code generation happens in kotlin-native/backend.native, not in the lightweight IR backend.",
+        "A4-001: New compiler plugins register as separate plugins/ modules through the compiler-plugin mechanism, not by editing FIR core.",
+        "A5-002: Native black-box tests stay in native/native.tests/ and do not share JVM test configuration."
+      ]
+    },
+    {
+      "id": "build-release",
+      "catalog_domains": [
+        "build-release"
+      ],
+      "priority": 55,
+      "paths": [
+        "gradle.properties",
+        "**/konan.properties",
+        "dependencies/**",
+        "**/pom.xml",
+        "scripts/**",
+        "**/*.sh",
+        "native/utils/src/org/jetbrains/kotlin/konan/util/**"
+      ],
+      "keywords": [
+        "defaultSnapshotVersion",
+        "bootstrap.kotlin.default.version",
+        "verification-metadata",
+        "compilerVersion",
+        "teamcity"
+      ],
+      "sources": [
+        "kotlin-pr-review/references/custom/kotlin-build-release.md"
+      ],
+      "checks": [
+        "V1-001: Release version changes update defaultSnapshotVersion, kotlinLanguageVersion, every pom.xml, and KotlinVersion.kt.",
+        "V1-002: bootstrap.kotlin.default.version stays compatible with the compiler bootstrap; upgrades document TeamCity and local bootstrap steps.",
+        "V1-004: The konan.properties compilerVersion is a build-time placeholder; do not hard-code a static version.",
+        "V2-001: Production dependency changes update verification-metadata.xml or explain why lenient mode is used.",
+        "V2-003: K/N dependency mirror changes verify that the OHOS sysroot and LLVM packages are downloadable.",
+        "V3-001: CI jobs that build Kotlin/Native enable kotlin.native.enabled explicitly.",
+        "V3-002: TeamCity builds pass -Pteamcity=true.",
+        "V3-003: Do not relax kotlin.jvm.target.validation.mode=error without justification.",
+        "V5-001: New third-party native libraries are registered under license/third_party/."
+      ]
+    },
+    {
+      "id": "memory",
+      "catalog_domains": [
+        "native-compiler-backend",
+        "native-runtime"
+      ],
+      "priority": 50,
+      "paths": [
+        "kotlin-native/backend.native/**",
+        "compiler/ir/backend.native/**",
+        "kotlin-native/runtime/**",
+        "**/konan.properties",
+        "native/utils/src/org/jetbrains/kotlin/konan/target/**",
+        "native/utils/src/org/jetbrains/kotlin/konan/*.kt"
+      ],
+      "keywords": [
+        "ObjHeader",
+        "TypeInfo",
+        "RootSet",
+        "SafePoint",
+        "stackmap",
+        "statepoint",
+        "ObjHolder",
+        "EnterPinScope",
+        "KotlinStubGV",
+        "usePinned",
+        "addressOf",
+        "LLVM",
+        "Linker"
+      ],
+      "sources": [
+        "agent-skills/kmp-native-compiler-runtime/references/knowledge/gc-addrspace-statepoint-model.md",
+        "agent-skills/kmp-native-compiler-runtime/references/knowledge/pinning-and-gc-region.md",
+        "agent-skills/kmp-native-compiler-runtime/references/knowledge/ohos-native-linking-and-abi.md",
+        "agent-skills/kmp-native-compiler-runtime/references/knowledge/runtime-hotpaths-and-platform-trace.md"
+      ],
+      "checks": [
+        "B2-001: OHOS ELF functions without gc.statepoint clear the GC collector; otherwise compressed stackmaps reference an undefined symbol.",
+        "B2-004: When OHOS clangFlags enable compressed bitmap stackmaps, backend symbol emission and link-stage naming must agree.",
+        "B3-001: Linker stub-object special paths cover OHOS_ARM64 alongside the macOS and Linux branches.",
+        "B3-002: OHOS uses the dedicated ohosLlvmTool (clang++) path rather than host default clang.",
+        "B4-001: New when(family) branches that affect unwind, GC, sanitizer, or linking include Family.OHOS.",
+        "B2-002: Changes to LlvmCallable or GC collector naming regress the Family.OHOS branch.",
+        "A reference that crosses a safepoint stays in addrspace(1); address-space casts stay inseparable from their use, and helpers must not default to AS0.",
+        "ObjHolder keeps a root alive but does not keep cached string or array data addresses stable; re-derive interior pointers after allocation or pin with EnterPinScope.",
+        "RUNTIME_SWITCH selects SAFEPOINT_EXPANSION_NONE; do not describe retained prologue and loop-body stubs as one PrologueStub, and do not add a second K2R boundary around an expanded safepoint.",
+        "Verify declared symbols, IR, object files, and final dynamic symbols separately; a source definition or used attribute does not prove ABI visibility or that LTO and DCE kept the symbol."
+      ]
+    },
+    {
+      "id": "cpp",
+      "catalog_domains": [
+        "cpp-standard"
+      ],
+      "priority": 10,
+      "paths": [
+        "**/*.cpp",
+        "**/*.cc",
+        "**/*.cxx",
+        "**/*.h",
+        "**/*.hpp",
+        "**/*.hxx"
+      ],
+      "keywords": [],
+      "sources": [
+        "agent-skills/cpf-kmp-product-repository-management/references/code-review-cpp-safety.md",
+        "kotlin-pr-review/references/cpp-standard.md"
+      ],
+      "checks": [
+        "CXX1-001: Default to RAII; use unique_ptr for ownership and shared_ptr only for genuinely shared lifetimes.",
+        "CXX1-002: Business logic avoids raw new and delete; every early return path releases acquired resources.",
+        "CXX2-001: string_view and span do not own data; the owner must outlive the view.",
+        "CXX2-002: Never return a string_view or span into a temporary or an object that dies at return.",
+        "CXX2-003: A lambda that escapes its scope captures by value, not by reference to a dying local.",
+        "CXX3-001: Resource-owning types follow the Rule of 0/3/5; prefer standard containers to express ownership.",
+        "CXX3-002: Non-copyable resources such as sockets explicitly delete copy construction and copy assignment.",
+        "CXX5-001: Destructors are noexcept; exceptions must not escape a destructor.",
+        "CXX6-001: Shared mutable state is guarded by std::mutex with lock_guard or by std::atomic.",
+        "CXX6-003: Multiple locks use one consistent acquisition order.",
+        "CXX7-001: Reserve known sizes for vector and string growth in hot paths.",
+        "Validate signed-to-size_t conversion, multiplication overflow, alignment, and element count before allocation or indexing.",
+        "Trace each acquired resource to its matching release on normal, error, early-return, and half-initialized paths."
+      ]
+    },
+    {
+      "id": "kotlin",
+      "catalog_domains": [
+        "kotlin-standard"
+      ],
+      "priority": 5,
+      "paths": [
+        "**/*.kt",
+        "**/*.kts"
+      ],
+      "keywords": [],
+      "sources": [
+        "kotlin-pr-review/references/kotlin-standard.md"
+      ],
+      "checks": [
+        "KC1-001: Do not abuse the null assertion operator; prefer safe calls, Elvis, require/check, or early return.",
+        "KC3-001: Keep compiler internals internal or private; do not expose compiler-only types as public API.",
+        "KC3-002: New public API considers binary compatibility for KGP, IDE, and plugins; breaking changes document migration.",
+        "KC4-002: when over a sealed type is exhaustive, and a new subtype updates every related when.",
+        "KC5-002: IR visitors and transformers visit the whole subtree they claim to handle; missed children silently lose semantics.",
+        "KC5-003: After an IR transform, maintain parent-child links and transformChildren consistency; do not retain detached nodes.",
+        "KC6-001: Shared mutable caches in parallel compilation use thread-safe structures or explicit synchronization.",
+        "KC6-002: Avoid coarse synchronized blocks on compilation hot paths; narrow the critical section.",
+        "KC7-001: Never swallow Throwable or Exception; record context or convert the failure to a compiler diagnostic.",
+        "KC8-001: Compiler and IDE test changes update golden txt/fir/ir data; do not change implementation without expected output.",
+        "KC8-002: New diagnostics include positive and negative test cases.",
+        "KC10-003: Use the project logger; no println or System.out on hot paths."
+      ]
+    }
+  ]
+}

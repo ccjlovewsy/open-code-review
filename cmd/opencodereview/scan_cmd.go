@@ -42,6 +42,7 @@ type scanOptions struct {
 	noPlan                bool
 	noDedup               bool
 	noSummary             bool
+	noDomainRouting       bool
 	batch                 string
 	maxTokens             int
 	maxTokensBudget       int
@@ -126,6 +127,9 @@ func executeScanContext(ctx context.Context, opts scanOptions) (retErr error) {
 	cc, err := loadCommonContext(opts.repoDir, opts.rulePath, "", opts.maxTools, opts.maxGitProcs, false)
 	if err != nil {
 		return err
+	}
+	if opts.noDomainRouting {
+		cc.DomainRoute = nil
 	}
 	applyCLIExcludes(cc, splitPaths(opts.excludes))
 
@@ -212,6 +216,7 @@ func executeScanContext(ctx context.Context, opts scanOptions) (retErr error) {
 		Template:              *scanTpl,
 		SystemRule:            cc.Resolver,
 		FileFilter:            cc.FileFilter,
+		DomainRoute:           cc.DomainRoute,
 		LLMClient:             rt.Client,
 		Tools:                 tools,
 		MainToolDefs:          scanToolDefs,

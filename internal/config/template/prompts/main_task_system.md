@@ -65,6 +65,9 @@ Rules for using IDs:
 - Cite a `rule_id` only after checking the finding against that rule. The ID is an audit trail, not decoration.
 - If no catalog entry matches, omit `rule_id`. If the finding is otherwise plausible, set `disposition=needs_confirmation` and state what the maintainer should verify. The comment tool drops unknown IDs and records that disposition, so a guessed ID cannot reach the report as confirmed evidence.
 
+## Domain Knowledge Routing
+When a `<domain_knowledge>` block is present, it lists domain-specific checks selected from the changed paths and diff keywords. Apply each domain's checks to the files that triggered it; they supplement the project and system rules above and never override them. When no block is present, no domain knowledge matched - do not invent domain rules.
+
 ## Comment Structure
 Every comment's `content` must stand on its own with these five elements. Weave them into a short narrative — do not print the labels — but do not drop an element:
 1. **Location** — the precise file, line, and symbol, using `file:line` references.

@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/alibaba/open-code-review/internal/config/domainroute"
 	"github.com/alibaba/open-code-review/internal/config/rules"
 	"github.com/alibaba/open-code-review/internal/config/template"
 	"github.com/alibaba/open-code-review/internal/llm"
@@ -764,4 +765,66 @@ func TestGroupChurn(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestResolveGroupSystemRuleDomainRouting(t *testing.T) {
+	router, err := domainroute.LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault domain routes: %v", err)
+	}
+	target := model.Diff{
+		NewPath: "native/utils/src/org/jetbrains/kotlin/konan/target/Linker.kt",
+		Diff:    "@@ -1 +1 @@\n+val target = Family.OHOS\n",
+	}
+	plain := model.Diff{NewPath: "README.md", Diff: "@@ -1 +1 @@\n+docs\n"}
+
+	t.Run("nil router keeps the old output", func(t *testing.T) {
+		a := New(Args{})
+		if got := a.resolveGroupSystemRule([]model.Diff{target}); got != "" {
+			t.Errorf("got %q, want empty", got)
+		}
+	})
+
+	t.Run("domain block is appended to the rule text", func(t *testing.T) {
+		resolver := &rules.SystemRule{DefaultRule: "BASE RULE"}
+		a := New(Args{SystemRule: resolver, DomainRoute: router})
+		got := a.resolveGroupSystemRule([]model.Diff{target})
+		if !strings.HasPrefix(got, "BASE RULE") {
+			t.Errorf("rule text missing from output:\n%s", got)
+		}
+		if !strings.Contains(got, "<domain_knowledge") || !strings.Contains(got, "ohos-platform") {
+			t.Errorf("domain block missing from output:\n%s", got)
+		}
+	})
+
+	t.Run("domain block stands alone without a resolver", func(t *testing.T) {
+		a := New(Args{DomainRoute: router})
+		got := a.resolveGroupSystemRule([]model.Diff{target})
+		if !strings.HasPrefix(got, "<domain_knowledge") {
+			t.Errorf("got %q, want a domain block", got)
+		}
+	})
+
+	t.Run("no match keeps the prompt unchanged", func(t *testing.T) {
+		resolver := &rules.SystemRule{DefaultRule: "BASE RULE"}
+		a := New(Args{SystemRule: resolver, DomainRoute: router})
+		if got := a.resolveGroupSystemRule([]model.Diff{plain}); got != "BASE RULE" {
+			t.Errorf("got %q, want the bare rule", got)
+		}
+	})
+
+	t.Run("mixed group rule tags precede the domain block", func(t *testing.T) {
+		resolver := &rules.SystemRule{PathRules: []rules.PathRule{
+			{Pattern: "**/*.kt", Rule: "KT RULE"},
+			{Pattern: "**/*.go", Rule: "GO RULE"},
+		}}
+		a := New(Args{SystemRule: resolver, DomainRoute: router})
+		got := a.resolveGroupSystemRule([]model.Diff{target, {NewPath: "main.go", Diff: "x"}})
+		if !strings.Contains(got, "<rules for=") || !strings.Contains(got, "<domain_knowledge") {
+			t.Errorf("mixed group missing tagged rules or domain block:\n%s", got)
+		}
+		if strings.Index(got, "<rules for=") > strings.Index(got, "<domain_knowledge") {
+			t.Errorf("domain block rendered before rule blocks:\n%s", got)
+		}
+	})
 }

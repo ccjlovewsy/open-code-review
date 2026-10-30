@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alibaba/open-code-review/internal/config/domainroute"
 	"github.com/alibaba/open-code-review/internal/config/rules"
 	"github.com/alibaba/open-code-review/internal/model"
 )
@@ -74,6 +75,18 @@ func TestRuleConfigSHA256(t *testing.T) {
 	})
 	if a.ruleConfigSHA256() == withFilter.ruleConfigSHA256() {
 		t.Error("adding a file filter did not change rule_config_sha256")
+	}
+}
+
+func TestRuleConfigSHA256_DomainRoute(t *testing.T) {
+	base := New(Args{})
+	router, err := domainroute.LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault domain routes: %v", err)
+	}
+	withRoute := New(Args{DomainRoute: router})
+	if base.ruleConfigSHA256() == withRoute.ruleConfigSHA256() {
+		t.Error("domain routing config did not change rule_config_sha256")
 	}
 }
 

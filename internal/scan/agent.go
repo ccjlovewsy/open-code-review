@@ -15,6 +15,7 @@ import (
 	"time"
 
 	allowedext "github.com/alibaba/open-code-review/internal/config/allowlist"
+	"github.com/alibaba/open-code-review/internal/config/domainroute"
 	"github.com/alibaba/open-code-review/internal/config/rules"
 	"github.com/alibaba/open-code-review/internal/config/template"
 	"github.com/alibaba/open-code-review/internal/gitcmd"
@@ -45,6 +46,7 @@ type Args struct {
 	Paths                 []string // empty = whole repo
 	Template              template.ScanTemplate
 	SystemRule            rules.Resolver
+	DomainRoute           *domainroute.Router
 	FileFilter            *rules.FileFilter
 	LLMClient             llm.LLMClient
 	Tools                 *tool.Registry
@@ -785,6 +787,26 @@ func (a *Agent) dispatchBatch(ctx context.Context, batchIdx int, batch []model.S
 	return dispatched, budgetHit, checkpoints, nil
 }
 
+// resolveSystemRule resolves the path rule and appends any domain knowledge
+// selected for this file. Nil components are skipped, so a run without routing
+// renders exactly the same rule text as before.
+func (a *Agent) resolveSystemRule(it model.ScanItem) string {
+	rule := ""
+	if a.args.SystemRule != nil {
+		rule = a.args.SystemRule.Resolve(it.Path)
+	}
+	if a.args.DomainRoute != nil {
+		result := a.args.DomainRoute.Route([]domainroute.File{{Path: it.Path, Content: it.Content}})
+		if result.Rendered != "" {
+			if rule != "" {
+				rule += "\n\n"
+			}
+			rule += result.Rendered
+		}
+	}
+	return rule
+}
+
 // executeSubtask runs the scan pipeline for one file:
 //  1. Optional PLAN_TASK: produce a JSON checklist of focus areas.
 //  2. MAIN_TASK: review the file with the plan's checkpoints embedded as
@@ -804,10 +826,7 @@ func (a *Agent) executeSubtask(ctx context.Context, it model.ScanItem) (bool, st
 		return false, "", ctx.Err()
 	}
 
-	rule := ""
-	if a.args.SystemRule != nil {
-		rule = a.args.SystemRule.Resolve(it.Path)
-	}
+	rule := a.resolveSystemRule(it)
 
 	planGuidance := a.maybeRunPlan(ctx, it, rule)
 
