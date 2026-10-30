@@ -30,6 +30,20 @@ func stripEmptyPlanBlock(content string) string {
 	return planBlockPattern.ReplaceAllString(content, "")
 }
 
+// prMetadataBlockPattern matches the "PR Metadata" section in a MAIN_TASK
+// template user message: a header line beginning with "### " whose text
+// contains "PR Metadata", the {{pr_metadata}} placeholder on its own line, and
+// one trailing blank line.
+var prMetadataBlockPattern = regexp.MustCompile(
+	`(?m)^### [^\n]*PR Metadata[^\n]*\n\{\{pr_metadata\}\}\n\n?`)
+
+// stripEmptyPRMetadataBlock removes the PR metadata section when no --pr-url
+// was supplied, keeping diff-only prompts byte-identical to the previous
+// template. Must run before ReplaceAll of {{pr_metadata}}.
+func stripEmptyPRMetadataBlock(content string) string {
+	return prMetadataBlockPattern.ReplaceAllString(content, "")
+}
+
 // confirmedBlockPattern matches the "Previously Confirmed Findings" section:
 // a header line containing "Confirmed Findings", the {{confirmed_comments}}
 // placeholder on its own line, and one trailing blank line.

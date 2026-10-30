@@ -19,7 +19,9 @@ import (
 	"github.com/alibaba/open-code-review/internal/diff"
 	"github.com/alibaba/open-code-review/internal/llm"
 	"github.com/alibaba/open-code-review/internal/mcp"
+	"github.com/alibaba/open-code-review/internal/prmeta"
 	"github.com/alibaba/open-code-review/internal/session"
+	"github.com/alibaba/open-code-review/internal/stdout"
 	"github.com/alibaba/open-code-review/internal/telemetry"
 	"github.com/alibaba/open-code-review/internal/tool"
 	"github.com/spf13/cobra"
@@ -41,6 +43,7 @@ type reviewOptions struct {
 	outputPath            string
 	background            string
 	backgroundFile        string
+	prURL                 string
 	provider              string
 	model                 string
 	concurrency           int
@@ -95,7 +98,10 @@ var reviewCmd = &cobra.Command{
 
   # Provide requirement/business context inline or from a Markdown file
   ocr review --background "Adding rate limiting to the login API"
-  ocr review --background-file ./docs/requirements.md`,
+  ocr review --background-file ./docs/requirements.md
+
+  # Include PR description, commits, and CI checks in process review
+  ocr review --pr-url https://gitcode.com/owner/repo/merge_requests/123 --commit abc123`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := validateReviewOptions(&reviewOpts); err != nil {
 			return err
@@ -159,6 +165,8 @@ func executeReviewContext(ctx context.Context, opts reviewOptions) (retErr error
 	if opts.preview {
 		return runPreviewContext(ctx, cc, opts, out)
 	}
+
+	prMetadata := loadPRMetadata(ctx, opts.prURL)
 
 	resumeState, err := loadReviewResumeState(cc.RepoDir, opts)
 	if err != nil {
@@ -241,6 +249,7 @@ func executeReviewContext(ctx context.Context, opts reviewOptions) (retErr error
 		Provider:              rt.Provider,
 		EndpointSource:        rt.Source,
 		Background:            opts.background,
+		PRMetadata:            prMetadata,
 		GitRunner:             cc.GitRunner,
 		Resume:                resumeState,
 		SealedInput:           sealedInput,
@@ -507,6 +516,28 @@ func validateReviewRefs(repoDir string, opts reviewOptions) error {
 		}
 	}
 	return nil
+}
+
+// loadPRMetadata fetches the PR snapshot for --pr-url. Any failure is reported
+// as a warning and degrades to a diff-only review: PR metadata is supplemental
+// input, so an unreachable API or an expired token must not block the review.
+func loadPRMetadata(ctx context.Context, prURL string) string {
+	if prURL == "" {
+		return ""
+	}
+	ref, err := prmeta.ParseURL(prURL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[ocr] warning: %v; continuing without PR metadata\n", err)
+		return ""
+	}
+	meta, err := prmeta.Fetch(ctx, ref, prmeta.Options{Token: prmeta.TokenFromEnv(ref.Provider)})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[ocr] warning: fetch PR metadata: %v; continuing without PR metadata\n", err)
+		return ""
+	}
+	fmt.Fprintf(stdout.Writer(), "[ocr] PR metadata: %s/%s#%d (%d commits, body %d chars, %d checks)\n",
+		ref.Owner, ref.Repo, ref.Number, len(meta.Commits), len([]rune(meta.Body)), len(meta.Checks))
+	return prmeta.Render(meta)
 }
 
 func runPreviewContext(ctx context.Context, cc *commonContext, opts reviewOptions, out io.Writer) error {

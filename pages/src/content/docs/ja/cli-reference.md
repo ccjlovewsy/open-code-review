@@ -115,6 +115,7 @@ ocr r      [flags]   (alias)
 | `--audience <who>` | — | `human` | `human` は進捗行をストリーム出力します（`--format` が `json`/`sarif` の場合は stderr に出力し、stdout は解析可能な単一ドキュメントのままになります）。`agent` は進捗行を完全に抑制し、最終サマリー / JSON のみを出力します。 |
 | `--background <text>` | `-b` | — | plan + main prompt に注入する、任意の要件 / 業務コンテキスト。 |
 | `--background-file <path>` | `-B` | — | レビューの背景として使用する Markdown ファイルのパス。`--background` も指定した場合は両方を結合します。 |
+| `--pr-url <url>` | — | — | GitHub / GitCode の PR URL。PR のタイトル・本文、コミット、変更ファイル、関連 issue、DCO、CI/チェック結果、レビュー件数を読み取り、`<pr_metadata>` プロンプトブロックに注入します。既定では無効で、取得失敗時は警告のみで diff レビューを継続します。 |
 | `--exclude <patterns>` | — | — | 除外する gitignore 形式のパターン（カンマ区切り）。`rule.json` の excludes とマージされます。 |
 | `--concurrency <n>` | — | `8` | 並行してレビューするサブタスクの最大数。 |
 | `--timeout <minutes>` | — | `15` | LLM 呼び出し、ツール実行、再試行の待機を含むサブタスクごとの制限時間。`0` でタスクの期限を無効化しますが、リクエストのタイムアウトは無効化しません。リクエスト単位のタイムアウトは `OCR_LLM_TIMEOUT` または provider の `timeout_sec` で独立して設定し、秒単位です（デフォルト `300`）。effort のレビューラウンド数に応じて線形にスケールします（例: low/medium/high で 15/30/45 分）。 |
@@ -744,3 +745,24 @@ ocr completion powershell > ocr.ps1
 - [設定](../configuration/): 引数の背後にある環境変数と config key。
 - [レビュールール](../review-rules/): `--rule` 引数とルールの解決。
 - [連携](../integrations/agent-skill/): agent と CI から `ocr review` を呼び出します。
+
+### PR メタデータ（`--pr-url`）
+
+`--pr-url` は GitHub の `https://github.com/<owner>/<repo>/pull/<n>` または
+GitCode の `https://gitcode.com/<owner>/<repo>/merge_requests/<n>` URL を受け付けます。
+PR のタイトルと本文、作成者、base/head SHA、コミット、変更ファイル、関連 issue、
+DCO の証跡、CI/チェック結果、レビュー/コメント件数を読み取り、
+`<pr_metadata>` ブロックとしてメインのレビュープロンプトに注入します。プロセス
+チェックはこのブロックがある場合だけ実行されます。
+
+トークンは環境変数からのみ読み取り、URL やコマンドライン引数には書きません。
+
+- GitHub: `GITHUB_TOKEN`、次に `GH_TOKEN`、最後に `OCR_PR_TOKEN`。
+- GitCode: `GITCODE_TOKEN`、次に `GITCODE_ACCESS_TOKEN`、最後に `OCR_PR_TOKEN`。
+
+取得はベストエフォートです。API に到達できない場合、トークンがない場合、
+401/403 の場合は警告のみで diff のみのレビューを継続します。PR 本文は 12,000
+文字で切り詰められ、`--resume` が使うローカルセッション記録にのみ保存されます。
+レビュー出力や manifest には書き込みません。PR 本文は信頼できない入力として
+扱い、プロセスチェック用のデータであり指示ではないものとします。
+

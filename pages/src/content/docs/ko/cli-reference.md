@@ -120,6 +120,7 @@ ocr r      [flags]   (alias)
 | `--audience <who>` | — | `human` | `human`은 진행 상황을 흘려보냅니다(`--format`이 `json`/`sarif`이면 stderr로 보내 stdout이 파싱 가능한 문서 하나로 유지됩니다). `agent`는 진행 상황을 아예 끄고 최종 요약이나 JSON만 출력합니다. |
 | `--background <text>` | `-b` | — | plan과 main 프롬프트에 넣을 요구사항 또는 비즈니스 맥락(선택). |
 | `--background-file <path>` | `-B` | — | 리뷰 배경으로 쓸 Markdown 파일 경로. `--background`와 함께 지정하면 이쪽이 우선합니다. |
+| `--pr-url <url>` | — | — | GitHub 또는 GitCode PR URL. PR 제목/본문, 커밋, 변경 파일, 연결된 issue, DCO, CI/검사 결과, 리뷰 수를 읽어 `<pr_metadata>` 프롬프트 블록에 주입합니다. 기본값은 꺼짐이며, 가져오기 실패 시 경고만 남기고 diff 리뷰를 계속합니다. |
 | `--exclude <patterns>` | — | — | 제외할 gitignore 형식 패턴(쉼표 구분). `rule.json`의 `excludes` 항목과 합쳐집니다. |
 | `--concurrency <n>` | — | `8` | 병렬로 리뷰할 서브태스크의 최대 개수. |
 | `--timeout <minutes>` | — | `15` | LLM 호출, 도구 실행, 재시도 대기를 포함한 서브태스크별 시간 예산. `0`이면 태스크 기한을 비활성화하지만 요청 타임아웃은 끄지 않습니다. 개별 요청 타임아웃은 `OCR_LLM_TIMEOUT` 또는 프로바이더의 `timeout_sec`로 독립적으로 설정하며 초 단위입니다(기본값 `300`). effort의 리뷰 라운드 수에 비례해 선형 확장됩니다(예: low/medium/high에서 15/30/45분). |
@@ -791,3 +792,23 @@ PowerShell 프로필에 `ocr.ps1`을 점으로 불러오는 줄을 추가하세�
 - [리뷰 규칙](../review-rules/) — `--rule` 플래그와 규칙 해석 방식입니다.
 - [연동](../integrations/agent-skill/) — Agent와 CI에서 `ocr review`를 호출하는
   방법입니다.
+
+### PR 메타데이터 (`--pr-url`)
+
+`--pr-url`은 GitHub `https://github.com/<owner>/<repo>/pull/<n>` 또는 GitCode
+`https://gitcode.com/<owner>/<repo>/merge_requests/<n>` URL을 받습니다. OCR은
+PR 제목과 본문, 작성자, base/head SHA, 커밋, 변경 파일, 연결된 issue, DCO 증거,
+CI/검사 결과, 리뷰/댓글 수를 읽어 `<pr_metadata>` 블록으로 메인 리뷰 프롬프트에
+주입합니다. 프로세스 검사는 이 블록이 있을 때만 실행됩니다.
+
+토큰은 환경 변수에서만 읽으며 URL이나 명령줄 인자에 기록하지 않습니다.
+
+- GitHub: `GITHUB_TOKEN`, 그다음 `GH_TOKEN`, 마지막 `OCR_PR_TOKEN`.
+- GitCode: `GITCODE_TOKEN`, 그다음 `GITCODE_ACCESS_TOKEN`, 마지막 `OCR_PR_TOKEN`.
+
+가져오기는 최선 노력 방식입니다. API에 연결할 수 없거나 토큰이 없거나 401/403이
+반환되면 경고만 남기고 diff 전용 리뷰를 계속합니다. PR 본문은 12,000자에서
+잘리며 `--resume`이 사용하는 로컬 세션 기록에만 저장됩니다. 리뷰 출력이나
+manifest에는 기록하지 않습니다. PR 본문은 신뢰할 수 없는 입력으로 취급하며,
+프로세스 체크용 데이터이지 지시가 아닙니다.
+

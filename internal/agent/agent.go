@@ -120,6 +120,11 @@ type Args struct {
 	// injected into plan and main_task prompts via {{requirement_background}}.
 	Background string
 
+	// PRMetadata is the rendered <pr_metadata> block loaded from a pull
+	// request. It is injected into the main_task prompt via {{pr_metadata}};
+	// empty means the block is stripped so diff-only prompts stay unchanged.
+	PRMetadata string
+
 	// Model is the resolved model name used by every LLM request this run
 	// makes. The template carries no per-phase model override, so plan,
 	// main_task, memory compression, re-location and review filter all send
@@ -1316,6 +1321,10 @@ func (a *Agent) buildMainTaskMessages(rule, changeFiles, diffs, planResult, conf
 		content = strings.ReplaceAll(content, "{{change_files}}", changeFiles)
 		content = strings.ReplaceAll(content, "{{diffs}}", diffs)
 		content = strings.ReplaceAll(content, "{{requirement_background}}", a.args.Background)
+		if a.args.PRMetadata == "" {
+			content = stripEmptyPRMetadataBlock(content)
+		}
+		content = strings.ReplaceAll(content, "{{pr_metadata}}", a.args.PRMetadata)
 		if planResult == "" {
 			content = stripEmptyPlanBlock(content)
 		}

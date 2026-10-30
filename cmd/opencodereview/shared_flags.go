@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/alibaba/open-code-review/internal/config/template"
+	"github.com/alibaba/open-code-review/internal/prmeta"
 	"github.com/spf13/cobra"
 )
 
@@ -160,6 +161,11 @@ func validateReviewOptions(opts *reviewOptions) error {
 			return fmt.Errorf("--effort: %w", err)
 		}
 	}
+	if opts.prURL != "" {
+		if _, err := prmeta.ParseURL(opts.prURL); err != nil {
+			return fmt.Errorf("--pr-url: %w", err)
+		}
+	}
 	return nil
 }
 
@@ -213,6 +219,7 @@ func registerReviewFlags(cmd *cobra.Command, opts *reviewOptions) {
 	addOutputPathFlag(cmd, &opts.outputPath)
 	addConcurrencyFlags(cmd, &opts.concurrency, &opts.concurrentTaskTimeout, &opts.maxTools, &opts.maxGitProcs, &opts.maxTokens, &opts.maxTokensBudget)
 	addBackgroundFlags(cmd, &opts.background, &opts.backgroundFile)
+	cmd.Flags().StringVar(&opts.prURL, "pr-url", "", "GitHub or GitCode pull-request URL; loads PR body, commits, and CI checks into the review prompt")
 	addProviderFlag(cmd, &opts.provider)
 	addModelFlag(cmd, &opts.model)
 	cmd.Flags().StringVar(&opts.effort, "effort", "", "review effort preset: low | medium | high (\"\" = configured or default medium)")

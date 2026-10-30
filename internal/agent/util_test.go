@@ -192,3 +192,33 @@ func TestReviewModeString(t *testing.T) {
 		}
 	}
 }
+
+func TestStripEmptyPRMetadataBlock(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{
+			name:  "pr metadata section is removed",
+			input: "header\n### PR Metadata\n{{pr_metadata}}\n\ntail",
+			want:  "header\ntail",
+		},
+		{
+			name:  "no section present is a no-op",
+			input: "header\ntail",
+			want:  "header\ntail",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := stripEmptyPRMetadataBlock(tt.input)
+			if got != tt.want {
+				t.Errorf("stripEmptyPRMetadataBlock() = %q, want %q", got, tt.want)
+			}
+			if strings.Contains(got, "{{pr_metadata}}") || strings.Contains(got, "PR Metadata") {
+				t.Errorf("stripEmptyPRMetadataBlock() left metadata section in output: %q", got)
+			}
+		})
+	}
+}

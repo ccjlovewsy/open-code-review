@@ -10,6 +10,9 @@ Other files changed in this update (not in this review group):
 Current time in the real world: {{current_system_date_time}}
 
 <user_task>
+### PR Metadata
+{{pr_metadata}}
+
 ### Requirement Background (Optional)
 {{requirement_background}}
 

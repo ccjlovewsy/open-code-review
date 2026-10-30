@@ -220,6 +220,7 @@ if countMessagesTokens(messages) > tokenLimit {
 | `{{confirmed_comments}}` | 前のラウンドで確定した指摘。1 ラウンド目は空で削除されます。 |
 | `{{plan_tools}}` | plan 段階のツール定義のプレーンテキスト（`formatToolDefs` でレンダリング）。`PLAN_TASK` の system prompt に使用されます。 |
 | `{{requirement_background}}` | `--background` または `--background-file` の有効な内容（ファイルが優先）。 |
+| `{{pr_metadata}}` | `--pr-url` からレンダリングされた `<pr_metadata>` ブロック。フラグがない場合は削除されます。 |
 | `{{current_system_date_time}}` | 実行時のローカルタイムスタンプ。形式は `YYYY-MM-DD HH:MM`（秒やタイムゾーンなし）。 |
 | `{{context}}` | （圧縮時のみ）要約対象の XML レンダリング済みメッセージ。 |
 | `{{path}}` | グループのキー（グループ内のファイルパスをカンマ区切りで連結）。`REVIEW_FILTER_TASK` に使用されます。 |

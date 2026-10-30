@@ -289,6 +289,7 @@ if countMessagesTokens(messages) > tokenLimit {
 | `{{confirmed_comments}}` | 前几轮已确认的发现；第 1 轮为空并被移除。 |
 | `{{plan_tools}}` | plan 阶段工具定义的纯文本（由 `formatToolDefs` 渲染），用于 `PLAN_TASK` system prompt。 |
 | `{{requirement_background}}` | `--background` 或 `--background-file` 的有效内容（文件优先）。 |
+| `{{pr_metadata}}` | 由 `--pr-url` 渲染的 `<pr_metadata>` 块；未提供该参数时整段移除。 |
 | `{{current_system_date_time}}` | 运行的本地时间戳，格式 `YYYY-MM-DD HH:MM`（无秒或时区）。 |
 | `{{context}}` | （仅压缩）要摘要的 XML 渲染消息。 |
 | `{{path}}` | 组的 key（组内文件路径，逗号分隔），用于 `REVIEW_FILTER_TASK`。 |

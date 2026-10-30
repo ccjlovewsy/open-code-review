@@ -356,6 +356,7 @@ per-group:
 | `{{confirmed_comments}}` | Findings confirmed by earlier review rounds (empty on round 1). |
 | `{{plan_tools}}` | Plan-phase tool definitions as plain text (rendered by `formatToolDefs`), used in the `PLAN_TASK` system prompt. |
 | `{{requirement_background}}` | The effective background from `--background` or `--background-file` (file takes precedence). |
+| `{{pr_metadata}}` | Rendered `<pr_metadata>` block from `--pr-url`; removed when the flag is absent. |
 | `{{current_system_date_time}}` | Local timestamp for the run, formatted `YYYY-MM-DD HH:MM` (no seconds or timezone). |
 | `{{file_list}}` | (grouping only) file metadata — path, status, `+/-` counts. |
 | `{{context}}` | (compression only) the XML-rendered messages to summarise. |

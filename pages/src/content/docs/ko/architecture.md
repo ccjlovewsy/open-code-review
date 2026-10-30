@@ -342,6 +342,7 @@ OCR은 이 검사로 괴물 같은 diff(자동 생성된 lock 파일, 수천 줄
 | `{{confirmed_comments}}` | 앞선 리뷰 라운드에서 확정된 지적(1라운드에서는 비어 있음). |
 | `{{plan_tools}}` | plan 단계 도구 정의를 평문으로 렌더링한 것(`formatToolDefs`). `PLAN_TASK` 시스템 프롬프트에 쓰입니다. |
 | `{{requirement_background}}` | `--background` 또는 `--background-file`로 정해진 실제 배경(파일 쪽이 우선). |
+| `{{pr_metadata}}` | `--pr-url`에서 렌더링된 `<pr_metadata>` 블록. 플래그가 없으면 제거됩니다. |
 | `{{current_system_date_time}}` | 실행 시각의 로컬 타임스탬프. `YYYY-MM-DD HH:MM` 형식(초·시간대 없음). |
 | `{{file_list}}` | (그룹화 전용) 파일 메타데이터 — 경로, 상태, `+/-` 줄 수. |
 | `{{context}}` | (압축 전용) 요약할 메시지를 XML로 렌더링한 것. |

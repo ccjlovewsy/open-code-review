@@ -396,3 +396,28 @@ func TestScanMaxToolsFlagUsageUsesSubtask(t *testing.T) {
 		}
 	}
 }
+
+func TestParseReviewFlagsPRURL(t *testing.T) {
+	const prURL = "https://gitcode.com/CPF-KMP-CMP/kotlin/merge_requests/408"
+	opts, err := parseReviewFlags([]string{"--pr-url", prURL})
+	if err != nil {
+		t.Fatalf("parseReviewFlags: %v", err)
+	}
+	if opts.prURL != prURL {
+		t.Fatalf("prURL = %q, want %q", opts.prURL, prURL)
+	}
+}
+
+func TestParseReviewFlagsRejectsInvalidPRURL(t *testing.T) {
+	for _, raw := range []string{
+		"http://github.com/acme/widgets/pull/7",
+		"https://example.com/acme/widgets/pull/7",
+		"https://gitcode.com/acme/widgets/issues/7",
+	} {
+		t.Run(raw, func(t *testing.T) {
+			if _, err := parseReviewFlags([]string{"--pr-url", raw}); err == nil {
+				t.Fatalf("parseReviewFlags(%q) succeeded, want error", raw)
+			}
+		})
+	}
+}

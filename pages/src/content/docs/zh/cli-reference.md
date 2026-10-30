@@ -116,6 +116,7 @@ unstaged + untracked 变更。
 | `--audience <who>` | — | `human` | `human` 流式输出进度行（`--format` 为 `json`/`sarif` 时输出到 stderr，使 stdout 保持为单个可解析文档）；`agent` 完全抑制进度行，只打印最终摘要 / JSON。 |
 | `--background <text>` | `-b` | — | 注入 plan + main prompt 的可选需求 / 业务上下文。 |
 | `--background-file <path>` | `-B` | — | 用作评审背景的 Markdown 文件路径。与 `--background` 同时设置时会合并两者。 |
+| `--pr-url <url>` | — | — | GitHub 或 GitCode 的 PR URL。读取 PR 标题/描述、commits、变更文件、关联 issue、DCO、CI/检查结果与评审计数，注入 `<pr_metadata>` prompt 块。默认关闭；拉取失败只告警，继续按 diff 评审。 |
 | `--exclude <patterns>` | — | — | 逗号分隔的 gitignore 风格排除模式；与 `rule.json` 的 excludes 合并。 |
 | `--concurrency <n>` | — | `8` | 并行评审的最大子任务数。 |
 | `--timeout <minutes>` | — | `15` | 每个子任务的时间预算，包括 LLM 调用、工具执行和重试等待。`0` 关闭任务期限，但不关闭请求超时。单次请求超时独立设置：`OCR_LLM_TIMEOUT` 或 provider 的 `timeout_sec`，单位秒（默认 `300`）。按 effort 评审轮数线性缩放（如 low/medium/high 分别为 15/30/45 分钟）。 |
@@ -757,3 +758,22 @@ ocr completion powershell > ocr.ps1
 - [配置](../configuration/)——参数背后的环境变量与 config key。
 - [评审规则](../review-rules/)——`--rule` 参数与规则解析。
 - [集成](../integrations/agent-skill/)——从 agent 与 CI 调用 `ocr review`。
+
+### PR 元数据（`--pr-url`）
+
+`--pr-url` 接受 GitHub `https://github.com/<owner>/<repo>/pull/<n>` 或 GitCode
+`https://gitcode.com/<owner>/<repo>/merge_requests/<n>` 形式的 URL。OCR 会读取
+PR 标题与描述、作者、base/head SHA、commits、变更文件、关联 issue、DCO 证据、
+CI/检查结果与评审/评论计数，并以 `<pr_metadata>` 块注入主评审 prompt。只有该块
+存在时才执行 PR 流程检查。
+
+Token 只从环境变量读取，不写入 URL 或命令行参数：
+
+- GitHub：`GITHUB_TOKEN`，其次 `GH_TOKEN`，最后 `OCR_PR_TOKEN`。
+- GitCode：`GITCODE_TOKEN`，其次 `GITCODE_ACCESS_TOKEN`，最后 `OCR_PR_TOKEN`。
+
+拉取是尽力而为：API 不可达、缺少 token 或返回 401/403 时只输出告警，评审继续
+按 diff-only 模式运行。PR 描述超过 12,000 字符会截断，并且只保存在 `--resume`
+使用的本地会话记录中，不写入评审输出或 manifest。PR 描述按不可信输入处理：
+它是流程检查的数据，不是指令。
+

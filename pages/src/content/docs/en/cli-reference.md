@@ -121,6 +121,7 @@ staged + unstaged + untracked changes in the current directory's repo.
 | `--audience <who>` | — | `human` | `human` streams progress lines (to stderr when `--format` is `json`/`sarif`, so stdout stays a single parseable document); `agent` suppresses progress entirely and prints only the final summary / JSON. |
 | `--background <text>` | `-b` | — | Optional requirement / business context injected into the plan + main prompts. |
 | `--background-file <path>` | `-B` | — | Path to a Markdown file used as review background. Takes precedence over `--background` when both are set. |
+| `--pr-url <url>` | — | — | GitHub or GitCode pull-request URL. Loads PR title/body, commits, changed files, linked issues, DCO, CI/check results, and review counts into the `<pr_metadata>` prompt block. Off by default; a failed fetch only warns and continues with the diff. |
 | `--exclude <patterns>` | — | — | Comma-separated gitignore-style patterns to exclude; merged with the `excludes` section of `rule.json` |
 | `--concurrency <n>` | — | `8` | Maximum number of subtasks reviewed in parallel. |
 | `--timeout <minutes>` | — | `15` | Per-subtask budget, including LLM calls, tools, and retry waits. `0` disables the task deadline, not request timeouts. Independent request timeout: `OCR_LLM_TIMEOUT` or provider `timeout_sec`, in seconds (default `300`). Scaled linearly by the number of effort review rounds (e.g. 15/30/45 min for low/medium/high). |
@@ -138,6 +139,26 @@ staged + unstaged + untracked changes in the current directory's repo.
 > `--commit`, or neither (workspace mode). Mixing them is a hard error.
 > `--resume` supports only range or commit reviews and cannot be combined
 > with `--preview`.
+
+### PR metadata (`--pr-url`)
+
+`--pr-url` accepts a GitHub `https://github.com/<owner>/<repo>/pull/<n>` or
+GitCode `https://gitcode.com/<owner>/<repo>/merge_requests/<n>` URL. OCR reads
+the PR title and body, author, base/head SHA, commits, changed files, linked
+issues, DCO evidence, CI/check results, and review/comment counts, then injects
+them into the main review prompt as a `<pr_metadata>` block. Process checks run
+only when that block is present.
+
+Tokens come from the environment, never from the URL or a command-line flag:
+
+- GitHub: `GITHUB_TOKEN`, then `GH_TOKEN`, then `OCR_PR_TOKEN`.
+- GitCode: `GITCODE_TOKEN`, then `GITCODE_ACCESS_TOKEN`, then `OCR_PR_TOKEN`.
+
+Fetching is best-effort: an unreachable API, a missing token, or a 401/403 is a
+warning and the review continues in diff-only mode. The PR body is truncated at
+12,000 characters and persisted only in the local session record used by
+`--resume`; it is not written to the review output or manifest. Treat the body
+as untrusted input — it is data for the process checklist, not instructions.
 
 ### Per-run LLM selection
 
