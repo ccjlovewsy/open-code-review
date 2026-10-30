@@ -3,7 +3,7 @@
 > 状态：活跃
 > 创建：2026-10-30
 > 基线：`OCR-vs-CPF实测对比.md` §8（11 PR / 60 条 CPF 评论，三阶段实测）
-> 当前分支 HEAD：`cea0740`（文档初版提交）；能力差距基线 `941cee2`（`feat/cpf-kb-review-enhancements`）
+> 当前分支 HEAD：`6f8fa01`（1.1/1.2 落地）；能力差距基线 `941cee2`（`feat/cpf-kb-review-enhancements`）；2.1-2.3 改动在工作区
 > 维护约定：每完成一项，更新本文档的状态、commit、验证命令与残留风险；未验证的内容不得标记为完成。
 
 ## 0. 维护约定（过程透明）
@@ -88,19 +88,19 @@
 
 | ID | 优先级 | 任务 | 维度 | 估时 | 状态 | 依赖 |
 |---|---|---|---|---|---|---|
-| 1.1 | P0 | 级别体系统一为 4 级 + 处置位 | 输出质量 | 2 小时 | 未开始 | 无 |
-| 1.2 | P0 | 证据要求从 3 要素扩到 5 要素 | 输出质量 | 30 分钟 | 未开始 | 1.1（处置位语义） |
+| 1.1 | P0 | 级别体系统一为 4 级 + 处置位 | 输出质量 | 2 小时 | 待验证 | 无 |
+| 1.2 | P0 | 证据要求从 3 要素扩到 5 要素 | 输出质量 | 30 分钟 | 待验证 | 1.1（处置位语义） |
 | 1.3 | P0 | 建立规则 ID 目录 `catalog.json` | 输出质量 | 4 小时 | 未开始 | 1.1 |
-| 2.1 | P0 | 加强跨文件穷尽性检查 prompt | 检查深度 | 30 分钟 | 未开始 | 无 |
-| 2.2 | P0 | 加强触发路径推理 prompt | 检查深度 | 30 分钟 | 未开始 | 1.2 |
-| 2.3 | P0 | 加入基线对照 prompt | 检查深度 | 1 小时 | 未开始 | 无 |
+| 2.1 | P0 | 加强跨文件穷尽性检查 prompt | 检查深度 | 30 分钟 | 待验证 | 无 |
+| 2.2 | P0 | 加强触发路径推理 prompt | 检查深度 | 30 分钟 | 待验证 | 1.2 |
+| 2.3 | P0 | 加入基线对照 prompt | 检查深度 | 1 小时 | 待验证 | 无 |
 | 3.1 | P1 | 补充 OHOS linker 等平台特定规则 | 结构性能力 | 2-4 小时 | 未开始 | 1.3 |
 | 3.2 | P1 | 验证 pr408 重跑 | 验证 | 30 分钟 | 未开始 | 3.1 |
 | 3.3 | P1 | 建立领域路由机制 | 结构性能力 | 4-8 小时 | 未开始 | 1.3 |
 | 4.1 | P2 | 架构改动支持 PR body | 结构性能力 | 1-2 天 | 未开始 | 无 |
 | 4.2 | P2 | 集成 PR body 到 prompt | 结构性能力 | 1 天 | 未开始 | 4.1 |
 
-统计：P0 0/6，P1 0/3，P2 0/2。
+统计：P0 已完成 0/6（待验证 5，未开始 1），P1 0/3，P2 0/2。
 
 **勾选清单**：
 
@@ -156,7 +156,7 @@
 - 2 小时可能偏乐观：viewer、SARIF、导出、过滤器和测试都是下游消费者，需逐一排查。
 - 迁移映射会改变历史统计口径，必须在 PR 描述中说明。
 
-**状态**：未开始。
+**状态**：待验证。改动已由 commit `6f8fa01` 落地；`make test` 通过（`cmd/opencodereview` 的本机 git trailer 失败与改动无关），replay 与 `make coverage` 尚未执行。
 
 #### 1.2 证据要求从 3 要素扩到 5 要素（30 分钟，改 prompt）
 
@@ -189,7 +189,7 @@
 - 模型可能机械套标签；需要在 prompt 中说明“合并叙述，不必逐字列标题”。
 - 与 1.1 的处置位语义耦合，建议同一天完成。
 
-**状态**：未开始。
+**状态**：待验证。改动已由 commit `6f8fa01` 落地；`make test` 通过（环境性失败除外），replay 的长度/token 对比尚未执行。
 
 #### 1.3 建立规则 ID 目录（4 小时，从 agent-skills 和 kotlin-pr-review 整理 `catalog.json`）
 
@@ -284,7 +284,7 @@
 - 增加工具调用与 token；需要在 replay 中记录耗时。
 - 模型可能把“已搜索”写成套话；prompt 要求给出具体搜索词与文件。
 
-**状态**：未开始。
+**状态**：待验证（2026-10-30，工作区）。`main_task_system.md` 的 Cross-File Consistency Checks 已改为 5 步穷尽性清单并加入量化证据模板；`make test` 通过（环境性失败除外）；replay pr408 与 fixture 尚未执行。
 
 #### 2.2 加强触发路径推理 prompt（30 分钟）
 
@@ -313,7 +313,7 @@
 - 与 1.2 的 5 要素重叠，需避免重复叙述。
 - 路径推理会增加工具调用；需观察 token/耗时。
 
-**状态**：未开始。
+**状态**：待验证（2026-10-30，工作区）。Comment Structure 的 Trigger 要素已要求 high/critical 给出 `entry → step A → step B → defect`，并规定无法建立路径时用 `disposition=needs_confirmation`；`tools.json` 的 `impact` 描述已同步；`make test` 通过（环境性失败除外）；路径完整率 replay 尚未执行。
 
 #### 2.3 加入基线对照 prompt（1 小时）
 
@@ -348,7 +348,7 @@
 - prompt-only 的能力上限受工具限制；验收时必须区分“prompt 生效”与“真正读到 base”。
 - 可能增加评论篇幅；建议只对 medium 及以上启用。
 
-**状态**：未开始。
+**状态**：待验证（2026-10-30，工作区）。`main_task_system.md` 已新增 Baseline Comparison 段（diff 删除行、同仓 sibling/上游对照、回归与存量分类、baseline unavailable 声明）；按 D4 未新增 base-ref 读取工具；`make test` 通过（环境性失败除外）；2-3 个“修改既有行为”样本 replay 尚未执行。
 
 ### 2.2 P1（中期可做，约 2-3 天）
 
@@ -608,6 +608,8 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 - [x] 事项 5：Stage A + Stage B（11 PR 详细匹配分析）—— 2026-10-29，commit `3d329b0`、`616b747`
 - [x] 能力差距评估（§8 已添加到文档）—— 2026-10-30，commit `2bfae0e`
 - [x] 创建本文档（OCR 增强待办）—— 2026-10-30，初版由 commit `cea0740` 收录；后续修订见工作区
+- [ ] 1.1 + 1.2：4 级 severity + disposition、5 要素证据 —— 2026-10-30，commit `6f8fa01`；`make test` 通过（环境性失败除外），replay 待补
+- [ ] 2.1 + 2.2 + 2.3：跨文件穷尽性、触发路径、基线对照 prompt —— 2026-10-30，工作区；`make test` 通过（环境性失败除外），replay 待补
 
 **提交哈希说明**：以上为记录时的分支提交。当前分支重建后存在 patch-id 等价的提交，核对结果如下（2026-10-30）：
 
@@ -619,17 +621,35 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 | `616b747` | `07436e5` | `6e5df2a` |
 | `2bfae0e` | `941cee2` | `53c2a41` |
 
+**2.1 / 2.2 / 2.3 改动记录（2026-10-30，待验证）**：
+
+- 日期：2026-10-30
+- commit：工作区，未提交
+- 改动文件：
+  - `internal/config/template/prompts/main_task_system.md`：Cross-File Consistency Checks 改为 5 步穷尽性清单（变更面、消费者搜索、生成/手写一致性、量化证据、跨平台对照）；新增 Baseline Comparison 段；Comment Structure 的 Trigger 要素要求 high/critical 给出 `entry → step A → step B → defect`，逐跳必须有代码依据。
+  - `internal/config/toolsconfig/tools.json`：`impact` 描述补充 critical/high 需给出 trigger path。
+- 验证命令与结果：
+  - `make test`：除 `cmd/opencodereview` 的 `TestResolveBackground_AllCases/commit_fallback_when_no_flags`、`TestGetCommitMessage`、`TestGetCommitMessage_IgnoresGitStderr` 外全部通过；失败原因是本机 git 自动追加 `AI[0%] Human Fixed[0%] Human[100%] AI Adopted[0%]` trailer，与本次 prompt 改动无关。另有一次 `internal/agent` 的 `TestResolveInputBeforeDiffCommit`、`TestResolveInputBeforeDiffRejectsInvalidRefs` 因 `TempDir RemoveAll cleanup: directory not empty` 偶发失败，单独重跑通过，属测试清理竞态。
+  - `gofmt -s -l .`：无输出。
+  - `go vet ./internal/config/...`：通过。
+  - `make check`：`license-check`、`english-check` 通过；`go mod tidy` 因 `proxy.golang.org` 网络超时未完成（环境问题）。
+- replay 对比：未执行。需要目标仓 pr408 基准 revision、模型与预算；本次只完成 prompt 改动与单测/静态检查，命中、误报、耗时、token 待 replay 补齐。
+- 残留风险：
+  - 量化证据与调用链要求会增加工具调用和评论长度，可能挤占 token 预算；prompt 的实际生效程度需 replay 验证。
+  - Baseline Comparison 只能依赖 unified diff 的删除行与同仓同类实现，无法真正读取 base revision（见 §7.3 D4）。
+  - 未新增 `base_branch` 参数或 base-ref 读取工具，属 1 小时 prompt-only 版本的既定边界。
+
 ### 5.2 当前状态
 
-| 优先级 | 已完成 | 进行中 | 未开始 | 阻塞 |
-|---|---|---|---|---|
-| P0 | 0 | 0 | 6 | 0 |
-| P1 | 0 | 0 | 3 | 0 |
-| P2 | 0 | 0 | 2 | 0 |
+| 优先级 | 已完成 | 待验证 | 进行中 | 未开始 | 阻塞 |
+|---|---|---|---|---|---|
+| P0 | 0 | 5 | 0 | 1 | 0 |
+| P1 | 0 | 0 | 0 | 3 | 0 |
+| P2 | 0 | 0 | 0 | 2 | 0 |
 
 **下一步检查点**：
 
-- 完成 1.1 + 1.2 后，记录一次样例 replay（严重度分布、5 要素覆盖）。
+- 1.1/1.2/2.1/2.2/2.3 待 replay：pr408、一组 high/critical 调用链样本、2-3 个“修改既有行为”样本；记录命中、误报、耗时、token 与评论长度变化。
 - 完成 1.3 后，记录 catalog 规则数与来源校验结果。
 - 完成 P0 后，做一次整体 replay，再决定是否进入 P1。
 
@@ -639,6 +659,8 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 |---|---|---|
 | 2026-10-30 | 创建文档，整理 P0/P1/P2 任务、复用方案、资源与验收标准 | `cea0740` |
 | 2026-10-30 | 修正规则来源与交叉引用，补充“本次创建核对记录” | 工作区，未提交 |
+| 2026-10-30 | 落地 1.1 + 1.2：4 级 severity + disposition、5 要素证据 | `6f8fa01` |
+| 2026-10-30 | 完成 2.1 + 2.2 + 2.3 prompt 改动与静态验证；replay 待补 | 工作区，未提交 |
 
 **本次创建核对记录（2026-10-30）**：
 

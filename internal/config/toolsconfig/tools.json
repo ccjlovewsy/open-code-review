@@ -92,7 +92,7 @@
                 },
                 "impact": {
                   "type": "string",
-                  "description": "Optional impact statement: the concrete consequence if the issue is real, including severity rationale and the trigger path when the chain from entry point to failure is non-obvious."
+                  "description": "Optional impact statement: the concrete consequence if the issue is real, including the severity rationale. For critical/high findings, include the trigger path as `entry -> step A -> step B -> defect`, with each hop backed by code evidence."
                 },
                 "rule_id": {
                   "type": "string",
