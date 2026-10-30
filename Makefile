@@ -1,4 +1,4 @@
-.PHONY: build test clean run help fmt vet check coverage \
+.PHONY: build test clean run help fmt vet check coverage catalog-check catalog-generate \
 	build-all dist sha256sum version-info \
 	build-linux-amd64 build-linux-arm64 build-darwin-amd64 build-darwin-arm64 \
 	build-windows-amd64 build-windows-arm64 \
@@ -71,7 +71,7 @@ fmt:
 vet:
 	LC_ALL=C $(GO) vet $(PACKAGES)
 
-check: license-check english-check
+check: license-check english-check catalog-check
 	$(GO) mod tidy
 	gofmt -s -w .
 	LC_ALL=C $(GO) vet $(PACKAGES)
@@ -85,6 +85,12 @@ english-check:
 
 license-add:
 	@bash scripts/add-license.sh
+
+catalog-generate:
+	$(GO) run scripts/build-rule-catalog.go
+
+catalog-check:
+	$(GO) run scripts/build-rule-catalog.go -verify
 
 # ── Cross-platform targets ───────────────────────────────────────────────────
 build-linux-amd64:

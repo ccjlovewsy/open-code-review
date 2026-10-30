@@ -724,7 +724,7 @@ func (r *Runner) executeToolCall(ctx context.Context, taskKey string, call llm.T
 		telemetry.PrintToolCallStarted(t.Name(), args)
 		_, toolSpan := telemetry.StartToolSpan(ctx, t.Name())
 
-		comments, repair, errMsg := tool.ParseCommentsWithPath(args, taskKey)
+		comments, repair, errMsg := tool.ParseCommentsWithPathAndCatalog(args, taskKey, r.deps.Tools.RuleCatalog())
 		if repair != nil {
 			// The model sees a plain success, so this warning is the only record
 			// that its `comments` violated the array schema — without it the

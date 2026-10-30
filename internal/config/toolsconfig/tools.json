@@ -96,7 +96,7 @@
                 },
                 "rule_id": {
                   "type": "string",
-                  "description": "Optional identifier of the team rule-catalog entry this finding is checked against."
+                  "description": "Exact ID from the rule catalog (comma-separated when one finding violates multiple catalog rules); never invented. IDs outside the catalog are dropped and the finding is downgraded to disposition=needs_confirmation."
                 },
                 "path": {
                   "type": "string",

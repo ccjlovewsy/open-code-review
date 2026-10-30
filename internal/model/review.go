@@ -29,8 +29,8 @@ type LlmComment struct {
 	// Impact states the consequence when the finding is real. Empty when the
 	// content already makes the impact obvious.
 	Impact string `json:"impact,omitempty"`
-	// RuleID references an upstream rule identifier the finding was checked
-	// against (e.g. a team rule-catalog id). Empty for ad-hoc findings.
+	// RuleID references a rule-catalog entry the finding was checked against.
+	// Empty for ad-hoc findings or when the supplied ID is not in the catalog.
 	RuleID string `json:"rule_id,omitempty"`
 }
 

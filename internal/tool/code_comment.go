@@ -10,6 +10,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/alibaba/open-code-review/internal/config/rulecatalog"
 	"github.com/alibaba/open-code-review/internal/model"
 )
 
@@ -61,8 +62,10 @@ var validCodeCommentDispositions = map[string]struct{}{
 const CommentNoneUsableMsg = "Error: none of the 'comments' entries could be filed; each entry needs a non-empty 'content' and a 'path' (or the reviewed file's path). Re-send the finding with those fields."
 
 // CodeCommentProvider submits review comments to the per-Agent CommentCollector.
+// An optional Catalog rejects rule IDs that are not in the rule directory.
 type CodeCommentProvider struct {
 	Collector *CommentCollector
+	Catalog   *rulecatalog.Catalog
 }
 
 func (p *CodeCommentProvider) Tool() Tool { return CodeComment }
@@ -72,7 +75,7 @@ func (p *CodeCommentProvider) Execute(_ context.Context, args map[string]any) (s
 		return "Error: comment collector is not configured", nil
 	}
 
-	comments, errMsg := ParseComments(args)
+	comments, _, errMsg := parseCommentsInner(args, "", p.Catalog)
 	if errMsg != "" {
 		return errMsg, nil
 	}
@@ -94,7 +97,14 @@ func (p *CodeCommentProvider) Execute(_ context.Context, args map[string]any) (s
 // schema violation, not a change to the findings: a repair is accepted only when
 // no recovered value looks cut short.
 func ParseCommentsWithPath(args map[string]any, defaultPath string) (comments []model.LlmComment, repair *CommentRepair, errMsg string) {
-	return parseCommentsInner(args, defaultPath)
+	return parseCommentsInner(args, defaultPath, nil)
+}
+
+// ParseCommentsWithPathAndCatalog is ParseCommentsWithPath with catalog-backed
+// rule_id validation. The main tool loop uses it so the provider's catalog is
+// enforced even when that loop parses the arguments itself.
+func ParseCommentsWithPathAndCatalog(args map[string]any, defaultPath string, catalog *rulecatalog.Catalog) (comments []model.LlmComment, repair *CommentRepair, errMsg string) {
+	return parseCommentsInner(args, defaultPath, catalog)
 }
 
 // ParseComments extracts LlmComment entries from tool call arguments without writing
@@ -104,11 +114,11 @@ func ParseCommentsWithPath(args map[string]any, defaultPath string) (comments []
 // today. A future caller that starts carrying real traffic should switch to
 // ParseCommentsWithPath rather than inherit silent repairs.
 func ParseComments(args map[string]any) ([]model.LlmComment, string) {
-	comments, _, errMsg := parseCommentsInner(args, "")
+	comments, _, errMsg := parseCommentsInner(args, "", nil)
 	return comments, errMsg
 }
 
-func parseCommentsInner(args map[string]any, defaultPath string) ([]model.LlmComment, *CommentRepair, string) {
+func parseCommentsInner(args map[string]any, defaultPath string, catalog *rulecatalog.Catalog) ([]model.LlmComment, *CommentRepair, string) {
 	var rawComments []any
 	var repair *CommentRepair
 	if arr, ok := args["comments"].([]any); ok && len(arr) > 0 {
@@ -171,7 +181,14 @@ func parseCommentsInner(args map[string]any, defaultPath string) ([]model.LlmCom
 			cm.Impact = impact
 		}
 		if ruleID, ok := obj["rule_id"].(string); ok {
-			cm.RuleID = ruleID
+			ruleID = strings.TrimSpace(ruleID)
+			if ruleID != "" {
+				if catalog == nil || catalog.HasRule(ruleID) {
+					cm.RuleID = ruleID
+				} else {
+					cm.Disposition = codeCommentDispositionNeedsConfirmation
+				}
+			}
 		}
 		if pathVal, ok := obj["path"].(string); ok && pathVal != "" {
 			cm.Path = normalizeCommentPath(pathVal)

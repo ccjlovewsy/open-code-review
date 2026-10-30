@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/alibaba/open-code-review/internal/agent"
+	"github.com/alibaba/open-code-review/internal/config/rulecatalog"
 	"github.com/alibaba/open-code-review/internal/config/rules"
 	"github.com/alibaba/open-code-review/internal/config/template"
 	"github.com/alibaba/open-code-review/internal/config/toolsconfig"
@@ -36,11 +37,12 @@ import (
 // LLM session: a validated template, the resolved repo path, review rules,
 // and a shared git subprocess limiter.
 type commonContext struct {
-	Template   *template.Template
-	RepoDir    string
-	Resolver   rules.Resolver
-	FileFilter *rules.FileFilter
-	GitRunner  *gitcmd.Runner
+	Template    *template.Template
+	RepoDir     string
+	Resolver    rules.Resolver
+	FileFilter  *rules.FileFilter
+	RuleCatalog *rulecatalog.Catalog
+	GitRunner   *gitcmd.Runner
 	// IsGitRepo reports whether RepoDir is inside a git repository. Always
 	// true when requireGit was set; may be false when scan accepts non-git
 	// directories.
@@ -137,13 +139,19 @@ func loadCommonContext(repoDirInput, rulePath, contentRef string, maxTools, maxG
 		return nil, fmt.Errorf("load rules: %w", err)
 	}
 
+	catalog, err := rulecatalog.Load(repoDir)
+	if err != nil {
+		return nil, fmt.Errorf("load rule catalog: %w", err)
+	}
+
 	return &commonContext{
-		Template:   tpl,
-		RepoDir:    repoDir,
-		Resolver:   resolver,
-		FileFilter: fileFilter,
-		GitRunner:  gitRunner,
-		IsGitRepo:  isGit,
+		Template:    tpl,
+		RepoDir:     repoDir,
+		Resolver:    resolver,
+		FileFilter:  fileFilter,
+		RuleCatalog: catalog,
+		GitRunner:   gitRunner,
+		IsGitRepo:   isGit,
 	}, nil
 }
 

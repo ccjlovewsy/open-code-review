@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/alibaba/open-code-review/internal/config/rulecatalog"
 	"github.com/alibaba/open-code-review/internal/model"
 )
 
@@ -293,6 +294,123 @@ func TestParseComments_LegacySeverityMigration(t *testing.T) {
 				t.Errorf("disposition = %q, want %q", got, tt.wantDisposition)
 			}
 		})
+	}
+}
+
+func TestParseComments_RuleCatalogValidation(t *testing.T) {
+	cat, err := rulecatalog.LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault() error: %v", err)
+	}
+	for _, tt := range []struct {
+		name            string
+		ruleID          string
+		catalog         *rulecatalog.Catalog
+		wantRuleID      string
+		wantDisposition string
+	}{
+		{"known ID is kept", "P1-001", cat, "P1-001", "confirmed"},
+		{"unknown ID is dropped and downgraded", "P9-999", cat, "", "needs_confirmation"},
+		{"comma-separated known IDs are kept", "P2-001, KC5-002", cat, "P2-001, KC5-002", "confirmed"},
+		{"one unknown ID drops the whole list", "P2-001, P9-999", cat, "", "needs_confirmation"},
+		{"no catalog keeps the ID", "P9-999", nil, "P9-999", "confirmed"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			obj := map[string]any{
+				"content":       "finding",
+				"existing_code": "x := 1",
+				"severity":      "high",
+				"disposition":   "confirmed",
+				"rule_id":       tt.ruleID,
+				"path":          "main.go",
+			}
+			comments, _, errMsg := parseCommentsInner(map[string]any{"comments": []any{obj}}, "", tt.catalog)
+			if errMsg != "" {
+				t.Fatalf("unexpected error message: %s", errMsg)
+			}
+			if len(comments) != 1 {
+				t.Fatalf("expected 1 comment, got %d", len(comments))
+			}
+			if got := comments[0].RuleID; got != tt.wantRuleID {
+				t.Errorf("rule_id = %q, want %q", got, tt.wantRuleID)
+			}
+			if got := comments[0].Disposition; got != tt.wantDisposition {
+				t.Errorf("disposition = %q, want %q", got, tt.wantDisposition)
+			}
+		})
+	}
+}
+
+func TestCodeCommentProvider_CatalogValidation(t *testing.T) {
+	cat, err := rulecatalog.LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault() error: %v", err)
+	}
+	collector := NewCommentCollector()
+	p := &CodeCommentProvider{Collector: collector, Catalog: cat}
+	args := map[string]any{"comments": []any{map[string]any{
+		"content":       "finding",
+		"existing_code": "x := 1",
+		"severity":      "high",
+		"rule_id":       "P9-999",
+		"path":          "main.go",
+	}}}
+	if _, err := p.Execute(context.Background(), args); err != nil {
+		t.Fatalf("Execute() error: %v", err)
+	}
+	comments := collector.Comments()
+	if len(comments) != 1 {
+		t.Fatalf("comments = %d, want 1", len(comments))
+	}
+	if comments[0].RuleID != "" {
+		t.Errorf("rule_id = %q, want empty", comments[0].RuleID)
+	}
+	if comments[0].Disposition != "needs_confirmation" {
+		t.Errorf("disposition = %q, want needs_confirmation", comments[0].Disposition)
+	}
+}
+
+func TestRegistryRuleCatalog(t *testing.T) {
+	cat, err := rulecatalog.LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault() error: %v", err)
+	}
+	reg := NewRegistry()
+	if got := reg.RuleCatalog(); got != nil {
+		t.Error("empty registry RuleCatalog() != nil")
+	}
+	reg.Register(&CodeCommentProvider{Collector: NewCommentCollector(), Catalog: cat})
+	if got := reg.RuleCatalog(); got != cat {
+		t.Error("registry did not return the provider catalog")
+	}
+	reg2 := NewRegistry()
+	reg2.Register(&FileReadProvider{})
+	if got := reg2.RuleCatalog(); got != nil {
+		t.Error("non-comment provider RuleCatalog() != nil")
+	}
+}
+
+func TestParseCommentsWithPathAndCatalog(t *testing.T) {
+	cat, err := rulecatalog.LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault() error: %v", err)
+	}
+	args := map[string]any{"comments": []any{map[string]any{
+		"content":       "finding",
+		"existing_code": "x := 1",
+		"severity":      "high",
+		"rule_id":       "NOT-IN-CATALOG",
+		"path":          "main.go",
+	}}}
+	comments, repair, errMsg := ParseCommentsWithPathAndCatalog(args, "", cat)
+	if errMsg != "" || repair != nil {
+		t.Fatalf("unexpected parse result: errMsg=%q repair=%+v", errMsg, repair)
+	}
+	if len(comments) != 1 {
+		t.Fatalf("comments = %d, want 1", len(comments))
+	}
+	if comments[0].RuleID != "" || comments[0].Disposition != "needs_confirmation" {
+		t.Errorf("comment = %+v, want dropped rule ID and needs_confirmation", comments[0])
 	}
 }
 

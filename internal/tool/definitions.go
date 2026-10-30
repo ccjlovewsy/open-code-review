@@ -7,6 +7,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/alibaba/open-code-review/internal/config/rulecatalog"
 )
 
 // Tool represents a single review tool.
@@ -98,6 +100,20 @@ func (r *Registry) Register(p Provider) {
 func (r *Registry) Get(name string) (Provider, bool) {
 	p, ok := r.providers[name]
 	return p, ok
+}
+
+// RuleCatalog returns the catalog attached to the code comment provider, or
+// nil when the provider has none.
+func (r *Registry) RuleCatalog() *rulecatalog.Catalog {
+	p, ok := r.providers[CodeComment.name]
+	if !ok {
+		return nil
+	}
+	provider, ok := p.(*CodeCommentProvider)
+	if !ok {
+		return nil
+	}
+	return provider.Catalog
 }
 
 // Freeze prevents further mutations. Call once setup is complete.

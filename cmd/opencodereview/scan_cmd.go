@@ -204,7 +204,7 @@ func executeScanContext(ctx context.Context, opts scanOptions) (retErr error) {
 		Mode:    tool.ModeWorkspace,
 		Runner:  cc.GitRunner,
 	}
-	tools := buildToolRegistry(rt.Collector, fileReader)
+	tools := buildToolRegistry(rt.Collector, fileReader, cc.RuleCatalog)
 
 	ag := scan.NewAgent(scan.Args{
 		RepoDir:               cc.RepoDir,

@@ -180,7 +180,7 @@ func TestValidateReviewRefs_EmptySkipped(t *testing.T) {
 }
 
 func TestBuildToolRegistry(t *testing.T) {
-	reg := buildToolRegistry(nil, nil)
+	reg := buildToolRegistry(nil, nil, nil)
 	if reg == nil {
 		t.Fatal("expected non-nil registry")
 	}

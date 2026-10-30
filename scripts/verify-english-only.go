@@ -78,6 +78,7 @@ var allowedPrefixes = []struct{ prefix, reason string }{
 	{"extensions/frontend/src/shared/i18n.ts", "translated UI copy for the extension webview"},
 	{"extensions/idea/src/main/kotlin/com/alibaba/opencodereview/idea/model/HostStrings.kt", "host-side mirror of the webview i18n table"},
 	{"cpf-ai-review-comments.json", "raw CPF review comments used to reverse-engineer the knowledge base"},
+	{"internal/config/rulecatalog/catalog.json", "generated rule catalog preserves upstream rule text verbatim"},
 }
 
 // exemptMarker on a line suppresses the report for that line. The trailing

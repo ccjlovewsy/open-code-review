@@ -1,0 +1,5466 @@
+{
+  "schema": "ocr-rule-catalog/v1",
+  "version": "2026-10-30",
+  "generated_by": "scripts/build-rule-catalog.go",
+  "content_hash": "4f286b82e5927ec0b26b868a4409f45ebbaf0e5d92517520e98b3ab1f59bd062",
+  "sources": [
+    {
+      "name": "kotlin-pr-review",
+      "repo": "https://gitcode.com/LPJ_2026/CPF-KMP-CMP-AI.git",
+      "commit": "9aafffb80e244dacfde4af54acaa130be3d8a06c",
+      "license": "Apache-2.0",
+      "path": "skills/kotlin-pr-review/references"
+    },
+    {
+      "name": "agent-skills",
+      "repo": "https://gitcode.com/CPF-KMP-CMP/agent-skills",
+      "commit": "0c3dc40885bc6c1be1efd7800d8c94429e4b7ae3",
+      "license": "Apache-2.0",
+      "path": "skills"
+    },
+    {
+      "name": "ocr-reverse-map",
+      "commit": "worktree",
+      "license": "Apache-2.0",
+      "path": "规则映射表.md"
+    }
+  ],
+  "namespaces": {
+    "cpf": {
+      "description": "Upstream CPF compiler-review rule IDs. These are the only valid rule_id values for CPF rule mappings.",
+      "prefixes": {
+        "A": "architecture",
+        "B": "native-compiler-backend",
+        "C": "c-standard",
+        "CXX": "cpp-standard",
+        "G": "gradle-kmp",
+        "I": "interop-platformlibs",
+        "J": "java-standard",
+        "KC": "kotlin-standard",
+        "P": "ohos-platform",
+        "R": "native-runtime",
+        "V": "build-release"
+      }
+    },
+    "ocr": {
+      "description": "OCR project rule IDs from the target repository rule set. These are separate from the CPF namespace.",
+      "prefixes": {
+        "K": "project-rule"
+      }
+    }
+  },
+  "counts": {
+    "rules": 212,
+    "cpf": 207,
+    "ocr": 5,
+    "references": 84,
+    "reference_catalogs": 10,
+    "by_prefix": {
+      "A": 13,
+      "B": 14,
+      "C": 22,
+      "CXX": 27,
+      "G": 10,
+      "I": 15,
+      "J": 27,
+      "K": 5,
+      "KC": 38,
+      "P": 15,
+      "R": 10,
+      "V": 16
+    }
+  },
+  "rules": [
+    {
+      "id": "A1-001",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "分层与依赖方向",
+      "domain": "architecture",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`core/*` 不得依赖 `compiler/*` 或 `kotlin-native/*`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 28
+      },
+      "status": "active"
+    },
+    {
+      "id": "A1-003",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "分层与依赖方向",
+      "domain": "architecture",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`analysis/*` 与编译器解耦，避免循环依赖",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 29
+      },
+      "status": "active"
+    },
+    {
+      "id": "A1-004",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "分层与依赖方向",
+      "domain": "architecture",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "生成器（`generators/`）生成结果提交后，手写逻辑不应再维护两份真相",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 30
+      },
+      "status": "active"
+    },
+    {
+      "id": "A2-001",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "平台正交性",
+      "domain": "architecture",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "平台无关逻辑放在 `compiler.common` / `core/compiler.common`，平台扩展放在 `.jvm`、`.js`、`.native`、`.wasm` 子模块",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 36
+      },
+      "status": "active"
+    },
+    {
+      "id": "A2-002",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "平台正交性",
+      "domain": "architecture",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "OHOS 特化代码须集中在 `Family.OHOS` / `OhosConfigurables` / `platform/ohos`，避免散落 JVM 模块",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 37
+      },
+      "status": "active"
+    },
+    {
+      "id": "A2-003",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "平台正交性",
+      "domain": "architecture",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "修改 `compiler.common.web` 时评估对 JS+Wasm 共用路径的影响",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 38
+      },
+      "status": "active"
+    },
+    {
+      "id": "A3-001",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "编译器管线阶段",
+      "domain": "architecture",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "FIR 阶段诊断与转换在 `compiler/fir/`；勿在 backend 重复前端语义",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 44
+      },
+      "status": "active"
+    },
+    {
+      "id": "A3-002",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "编译器管线阶段",
+      "domain": "architecture",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "IR 序列化/actualization 变更须对照对应 `serialization.*`、`ir.actualization` 模块约定",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 45
+      },
+      "status": "active"
+    },
+    {
+      "id": "A3-003",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "编译器管线阶段",
+      "domain": "architecture",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "Native 完整代码生成仅在 Konan 第二阶段（`kotlin-native/backend.native`）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 46
+      },
+      "status": "active"
+    },
+    {
+      "id": "A4-001",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "插件与编译器交互",
+      "domain": "architecture",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "新编译器插件在 `plugins/` 独立模块注册，通过 `compiler-plugin` 机制接入，不直接改 FIR 核心",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 52
+      },
+      "status": "active"
+    },
+    {
+      "id": "A4-002",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "插件与编译器交互",
+      "domain": "architecture",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`plugins/compose` 变更需评估对 KMP OHOS 下游 compose-multiplatform 的影响",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 53
+      },
+      "status": "active"
+    },
+    {
+      "id": "A5-001",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "测试与基础设施",
+      "domain": "architecture",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "编译器测试数据变更遵循 `compiler/test-infrastructure` 约定",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 59
+      },
+      "status": "active"
+    },
+    {
+      "id": "A5-002",
+      "namespace": "cpf",
+      "prefix": "A",
+      "title": "测试与基础设施",
+      "domain": "architecture",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "Native 黑盒测试放在 `native/native.tests/`，勿与 JVM `tests/` 混用配置",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-architecture.md",
+        "line": 60
+      },
+      "status": "active"
+    },
+    {
+      "id": "B1-001",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "模块边界与依赖方向",
+      "domain": "native-compiler-backend",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`compiler/ir/backend.native` 不得引入 `kotlin-native/backend.native` 或 LLVM 重依赖",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 11
+      },
+      "status": "active"
+    },
+    {
+      "id": "B1-002",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "模块边界与依赖方向",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "平台相关 LLVM 逻辑应落在 `kotlin-native/backend.native`，避免复制到 FIR/JVM 模块",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 12
+      },
+      "status": "active"
+    },
+    {
+      "id": "B2-001",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "OHOS LLVM 与 GC Stackmap",
+      "domain": "native-compiler-backend",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "OHOS ELF 上无 `gc.statepoint` 的简易函数（如 type getter）须 `clearGcCollector()`，避免 compressed-stackmap 引用未定义符号",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 18
+      },
+      "status": "active"
+    },
+    {
+      "id": "B2-002",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "OHOS LLVM 与 GC Stackmap",
+      "domain": "native-compiler-backend",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "修改 `LlvmCallable` / GC collector 命名逻辑时，须回归 OHOS `Family.OHOS` 分支",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 19
+      },
+      "status": "active"
+    },
+    {
+      "id": "B2-003",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "OHOS LLVM 与 GC Stackmap",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`DebugInfoGCCompressPhase` 仅在 `Family.OHOS` + dynamic + debug + 增量编译 + minify 时运行",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 20
+      },
+      "status": "active"
+    },
+    {
+      "id": "B2-004",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "OHOS LLVM 与 GC Stackmap",
+      "domain": "native-compiler-backend",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`clangFlags.ohos_arm64` 含 `-mllvm -enable-compressed-bitmap-stackmap` 时，后端 stackmap 符号须与链接阶段一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 21
+      },
+      "status": "active"
+    },
+    {
+      "id": "B3-001",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "链接与 Bitcode 编译",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`Linker` 中与 stub 对象相关的特殊路径须覆盖 `OHOS_ARM64`（与 `MACOS_ARM64` 并列）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 27
+      },
+      "status": "active"
+    },
+    {
+      "id": "B3-002",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "链接与 Bitcode 编译",
+      "domain": "native-compiler-backend",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "OHOS 使用专用 `ohosLlvmTool`（clang++）路径时，勿回退到 host 默认 clang 导致 triple 错误",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 28
+      },
+      "status": "active"
+    },
+    {
+      "id": "B3-003",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "链接与 Bitcode 编译",
+      "domain": "native-compiler-backend",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`KonanConfig` 中 `OHOS_ARM64` 的 `splitBCfile` 默认值与注释行为一致，修改需有性能/体积数据",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 29
+      },
+      "status": "active"
+    },
+    {
+      "id": "B3-004",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "链接与 Bitcode 编译",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "默认平台库包名 `org.jetbrains.kotlin.native.platform.ohos` 与 platformLibs 产出一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 30
+      },
+      "status": "active"
+    },
+    {
+      "id": "B4-001",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "目标族分支完整性",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "新增 `when (family)` 分支时，若影响 unwind/GC/sanitizer，须包含 `Family.OHOS`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 36
+      },
+      "status": "active"
+    },
+    {
+      "id": "B4-002",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "目标族分支完整性",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "勿将 OHOS 与 Linux 分支合并而省略 OHOS 特有 linker 标志（如 `hilog_ndk.z`）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 37
+      },
+      "status": "active"
+    },
+    {
+      "id": "B5-001",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "编译器产品与矩阵",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`kotlin-native/build.gradle` 产品矩阵变更须保留 `ohos_arm64` 的 `kexe`/`dynamic` 条目",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 43
+      },
+      "status": "active"
+    },
+    {
+      "id": "B5-002",
+      "namespace": "cpf",
+      "prefix": "B",
+      "title": "编译器产品与矩阵",
+      "domain": "native-compiler-backend",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "LLVM 版本升级须附带 smoke/编译测试说明",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-compiler-native-backend.md",
+        "line": 44
+      },
+      "status": "active"
+    },
+    {
+      "id": "C1-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "指针与缓冲区安全",
+      "domain": "c-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "缓冲区须携带显式 size 参数，写入前校验目标容量",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 13
+      },
+      "status": "active"
+    },
+    {
+      "id": "C1-002",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "指针与缓冲区安全",
+      "domain": "c-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "禁止 `gets`、`strcpy`、`sprintf` 等无界 API；优先 `snprintf`、`fgets` 与显式边界检查",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 14
+      },
+      "status": "active"
+    },
+    {
+      "id": "C1-003",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "指针与缓冲区安全",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "内存区域重叠时使用 `memmove`，不得使用 `memcpy`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 15
+      },
+      "status": "active"
+    },
+    {
+      "id": "C2-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "所有权与资源管理",
+      "domain": "c-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "一次分配对应一次释放；所有错误路径须释放已分配资源（如 cleanup label 模式）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 21
+      },
+      "status": "active"
+    },
+    {
+      "id": "C3-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "未定义行为",
+      "domain": "c-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "禁止 use-after-free",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 27
+      },
+      "status": "active"
+    },
+    {
+      "id": "C3-002",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "未定义行为",
+      "domain": "c-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "禁止未初始化变量读取",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 28
+      },
+      "status": "active"
+    },
+    {
+      "id": "C3-003",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "未定义行为",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止有符号整数溢出",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 29
+      },
+      "status": "active"
+    },
+    {
+      "id": "C3-004",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "未定义行为",
+      "domain": "c-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "禁止越过对象边界的指针算术与解引用",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 30
+      },
+      "status": "active"
+    },
+    {
+      "id": "C4-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "整数类型与溢出",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "有符号整数转 `size_t` 前须验证非负",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 36
+      },
+      "status": "active"
+    },
+    {
+      "id": "C4-002",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "整数类型与溢出",
+      "domain": "c-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`count * sizeof(T)` 等 size 计算前须检查乘法溢出",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 37
+      },
+      "status": "active"
+    },
+    {
+      "id": "C5-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "错误处理",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "须检查 `fread`、`fopen` 等 API 返回值并处理错误",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 43
+      },
+      "status": "active"
+    },
+    {
+      "id": "C5-002",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "错误处理",
+      "domain": "c-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "错误约定一致（如 0 表示成功、负值表示失败）；文档化成功/失败时的所有权规则",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 44
+      },
+      "status": "active"
+    },
+    {
+      "id": "C5-003",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "错误处理",
+      "domain": "c-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "使用 `errno` 时仅在真实失败路径设置",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 45
+      },
+      "status": "active"
+    },
+    {
+      "id": "C6-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "并发",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止用 `volatile` 作线程同步；共享标志应使用 C11 `_Atomic` / `atomic_*`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 51
+      },
+      "status": "active"
+    },
+    {
+      "id": "C6-002",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "并发",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "共享状态须用 `pthread_mutex_t` 或等价 mutex 保护",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 52
+      },
+      "status": "active"
+    },
+    {
+      "id": "C6-003",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "并发",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "持锁期间避免 I/O 等长时间阻塞操作",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 53
+      },
+      "status": "active"
+    },
+    {
+      "id": "C7-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "宏与预处理器",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "宏参数须加括号；含副作用的逻辑优先改用 `static inline` 函数",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 59
+      },
+      "status": "active"
+    },
+    {
+      "id": "C8-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "API 设计与 const",
+      "domain": "c-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "输入缓冲区使用 `const` 与显式 `size` 参数（const-correctness）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 65
+      },
+      "status": "active"
+    },
+    {
+      "id": "C8-002",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "API 设计与 const",
+      "domain": "c-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "文档化指针是否可为 NULL；可行时优先返回错误码而非 NULL",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 66
+      },
+      "status": "active"
+    },
+    {
+      "id": "C9-001",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "工具链与构建",
+      "domain": "c-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "构建须启用 `-Wall -Wextra -Werror -Wconversion -Wshadow -std=c11` 等警告",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 72
+      },
+      "status": "active"
+    },
+    {
+      "id": "C9-002",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "工具链与构建",
+      "domain": "c-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "关键代码路径须在 debug 构建中运行 AddressSanitizer / UndefinedBehaviorSanitizer",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 73
+      },
+      "status": "active"
+    },
+    {
+      "id": "C9-003",
+      "namespace": "cpf",
+      "prefix": "C",
+      "title": "工具链与构建",
+      "domain": "c-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "须处理 `clang-tidy`、`cppcheck` 静态分析结果",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/c-standard.md",
+        "line": 74
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX1-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "所有权与 RAII",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "默认使用 RAII；所有权默认 `std::unique_ptr`，仅共享生命周期时使用 `std::shared_ptr`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 13
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX1-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "所有权与 RAII",
+      "domain": "cpp-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "业务逻辑中禁止裸 `new`/`delete`；早返回路径须自动释放资源",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 14
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX1-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "所有权与 RAII",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "C 资源（如 `FILE*`）须用带自定义 deleter 的 `std::unique_ptr` 包装",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 15
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX2-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "生命周期与引用",
+      "domain": "cpp-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`std::string_view`、`std::span` 不拥有数据；须确保 owner 生命周期长于 view",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 21
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX2-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "生命周期与引用",
+      "domain": "cpp-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "禁止返回指向临时对象的 `string_view`；需要持久数据时返回 owning 类型",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 22
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX2-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "生命周期与引用",
+      "domain": "cpp-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "lambda 禁止引用捕获会逃逸出作用域的变量；逃逸场景须按值捕获",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 23
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX3-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "拷贝与移动语义",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "资源拥有型类型遵循 Rule of 0/3/5；优先用标准容器表达所有权",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 29
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX3-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "拷贝与移动语义",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "不可拷贝类型（如 socket）须显式 `delete` 拷贝构造/拷贝赋值",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 30
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX3-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "拷贝与移动语义",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "移动操作在资源转移场景应 `noexcept`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 31
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX4-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "const 正确性与 API 设计",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "只读成员与参数保持 const-correctness",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 37
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX4-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "const 正确性与 API 设计",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "单参数构造函数在需避免隐式转换处使用 `explicit`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 38
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX4-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "const 正确性与 API 设计",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "虚函数重写使用 `override`；必要时使用 `final`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 39
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX4-004",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "const 正确性与 API 设计",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "多态类型按引用或指针传递，禁止按值传递导致对象切片",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 40
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX5-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "错误处理与异常安全",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "析构函数须 `noexcept`，禁止在析构函数中抛异常",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 46
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX5-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "错误处理与异常安全",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "预期内的失败优先用 `std::optional` 或 expected 风格返回值，而非异常控制流",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 47
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX5-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "错误处理与异常安全",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "异常路径依赖 RAII 类型（如 `std::vector`）自动清理资源",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 48
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX6-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "并发",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "共享可变状态须用 `std::mutex` + `lock_guard` 或 `std::atomic` 保护",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 54
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX6-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "并发",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "持锁期间避免阻塞 I/O；锁粒度尽量小",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 55
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX6-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "并发",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "多锁场景须保持一致的加锁顺序",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 56
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX7-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "性能与分配",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`std::vector` / `std::string` 在已知大小时须 `reserve`，避免重复 reallocation",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 62
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX7-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "性能与分配",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "热路径避免不必要拷贝；优先移动语义",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 63
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX7-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "性能与分配",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "字符串拼接等场景预先计算总长度再 `reserve`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 64
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX8-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "模板与类型安全",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "泛型算法优先使用 C++20 `requires` / concepts 约束，避免过度泛化",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 70
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX8-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "模板与类型安全",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "模板不变量使用 `static_assert` 在编译期验证",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 71
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX9-001",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "工具链与构建",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "构建须启用 `-Wall -Wextra -Werror -Wconversion -Wshadow -std=c++20` 等警告",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 77
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX9-002",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "工具链与构建",
+      "domain": "cpp-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "关键代码路径须在 debug 构建中运行 AddressSanitizer / ThreadSanitizer",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 78
+      },
+      "status": "active"
+    },
+    {
+      "id": "CXX9-003",
+      "namespace": "cpf",
+      "prefix": "CXX",
+      "title": "工具链与构建",
+      "domain": "cpp-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "须处理 `clang-tidy` 静态分析结果",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/cpp-standard.md",
+        "line": 79
+      },
+      "status": "active"
+    },
+    {
+      "id": "G1-001",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "OHOS Target Preset",
+      "domain": "gradle-kmp",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "对外 DSL `ohosArm64`/`ohosX64` 须映射到 preset 名 `ohosArm64`/`ohosX64`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 9
+      },
+      "status": "active"
+    },
+    {
+      "id": "G1-002",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "OHOS Target Preset",
+      "domain": "gradle-kmp",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "新增 preset 须同步 `KotlinArtifactsExtensionImpl` 中 `KonanTarget` 常量",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 10
+      },
+      "status": "active"
+    },
+    {
+      "id": "G1-003",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "OHOS Target Preset",
+      "domain": "gradle-kmp",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "Hierarchy builder 暴露 `ohos`、`ohosArm64Main` 等约定时，codegen 与 hand-written DSL 须一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 11
+      },
+      "status": "active"
+    },
+    {
+      "id": "G2-001",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "链接与调试选项",
+      "domain": "gradle-kmp",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`nativeDebuginfoMinify` 文档与实现均标明 **仅 OHOS**；其他平台传参应 warn",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 17
+      },
+      "status": "active"
+    },
+    {
+      "id": "G2-002",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "链接与调试选项",
+      "domain": "gradle-kmp",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`konanDataDir` 传递到编译/链接参数，便于 CI 使用统一 dependencies 缓存",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 18
+      },
+      "status": "active"
+    },
+    {
+      "id": "G2-003",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "链接与调试选项",
+      "domain": "gradle-kmp",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "勿对 `Family.OHOS` 启用仅适用于 Apple 的 debuginfo 处理分支",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 19
+      },
+      "status": "active"
+    },
+    {
+      "id": "G3-001",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "与编译器版本协同",
+      "domain": "gradle-kmp",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`kotlin-gradle-plugin` 版本与根 `defaultSnapshotVersion`、`kotlin.build.gradlePlugin.version` 兼容",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 25
+      },
+      "status": "active"
+    },
+    {
+      "id": "G3-002",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "与编译器版本协同",
+      "domain": "gradle-kmp",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "集成测试新增 OHOS 场景须使用可下载的 konan 依赖或 mock，避免硬编码本机 DevEco 路径",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 26
+      },
+      "status": "active"
+    },
+    {
+      "id": "G4-001",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "ABI 与产物",
+      "domain": "gradle-kmp",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "ABI 验证工具枚举须包含 OHOS klib 目标",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 32
+      },
+      "status": "active"
+    },
+    {
+      "id": "G4-002",
+      "namespace": "cpf",
+      "prefix": "G",
+      "title": "ABI 与产物",
+      "domain": "gradle-kmp",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "发布到 Maven 的插件构件版本与 `libraries/pom.xml` 父 POM 对齐",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-gradle-kmp.md",
+        "line": 33
+      },
+      "status": "active"
+    },
+    {
+      "id": "I1-001",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "`.def` 文件结构与字段",
+      "domain": "interop-platformlibs",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "每个 `.def` 须声明 `package`、`headers`、`headerFilter`；C++ API 须设 `language = C++` 与合适 `compilerOpts`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 9
+      },
+      "status": "active"
+    },
+    {
+      "id": "I1-002",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "`.def` 文件结构与字段",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "需要限制未声明符号时保留 `enableUndefinedApiProtection = true`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 10
+      },
+      "status": "active"
+    },
+    {
+      "id": "I1-003",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "`.def` 文件结构与字段",
+      "domain": "interop-platformlibs",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`linkerOpts` 中的 `-l*` 须能在 OHOS/HMS sysroot 的 `usr/lib` 解析；新增库名需双 sysroot 验证",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 11
+      },
+      "status": "active"
+    },
+    {
+      "id": "I1-004",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "`.def` 文件结构与字段",
+      "domain": "interop-platformlibs",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "HMS 专属 API 须在注释或 `package` 中可辨识",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 12
+      },
+      "status": "active"
+    },
+    {
+      "id": "I2-001",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "依赖图与模块划分",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "手工修改 `depends` 时须与头文件 `#include` 关系一致；优先通过生成器 rules JSON 扩展",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 18
+      },
+      "status": "active"
+    },
+    {
+      "id": "I2-002",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "依赖图与模块划分",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止单个 `.def` 聚合过多无关 headers",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 19
+      },
+      "status": "active"
+    },
+    {
+      "id": "I2-003",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "依赖图与模块划分",
+      "domain": "interop-platformlibs",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "删除 `.def` 须确认无 klib/测试仍引用该模块",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 20
+      },
+      "status": "active"
+    },
+    {
+      "id": "I3-001",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "生成器与仓库一致性",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "批量更新 SDK 后应运行 `ohos-def-generator` 与 `check_def_consistency.sh` 再提交",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 26
+      },
+      "status": "active"
+    },
+    {
+      "id": "I3-002",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "生成器与仓库一致性",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "生成输出目录与检入路径 `platformLibs/src/platform/ohos/` 对齐",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 27
+      },
+      "status": "active"
+    },
+    {
+      "id": "I3-003",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "生成器与仓库一致性",
+      "domain": "interop-platformlibs",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "新 SDK 布局须改 `Main.kt`+`HeaderScanner`，勿复制一套生成逻辑",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 28
+      },
+      "status": "active"
+    },
+    {
+      "id": "I4-001",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "cinterop 与 C/C++ 绑定代码",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止在 Kotlin 中手写大段 `external fun` 替代应对应 `.def` 的 cinterop",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 34
+      },
+      "status": "active"
+    },
+    {
+      "id": "I4-002",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "cinterop 与 C/C++ 绑定代码",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`CWrapperGenerator` 等 OHOS 分支修改须保持与 ARM64 ABI 一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 35
+      },
+      "status": "active"
+    },
+    {
+      "id": "I4-003",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "cinterop 与 C/C++ 绑定代码",
+      "domain": "interop-platformlibs",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "C API 测试新增用例须能在 `OhosExecutor` 或模拟器配置下执行",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 36
+      },
+      "status": "active"
+    },
+    {
+      "id": "I5-001",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "构建任务",
+      "domain": "interop-platformlibs",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "platform lib 编译使用 `-no-default-libs`、`-Xpurge-user-libs` 等固定 `extraOpts`，勿随意移除",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 42
+      },
+      "status": "active"
+    },
+    {
+      "id": "I5-002",
+      "namespace": "cpf",
+      "prefix": "I",
+      "title": "构建任务",
+      "domain": "interop-platformlibs",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "Apple 专属 `-fmodules-cache-path` 不得误用于 OHOS 目标",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-interop-platformlibs.md",
+        "line": 43
+      },
+      "status": "active"
+    },
+    {
+      "id": "J1-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "现代 Java 特性（17/21+）",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "DTO/值对象优先使用 Record，减少样板代码并保持不可变",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 13
+      },
+      "status": "active"
+    },
+    {
+      "id": "J1-002",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "现代 Java 特性（17/21+）",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`switch` 优先使用表达式形式，避免传统 fall-through 漏写 `break`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 14
+      },
+      "status": "active"
+    },
+    {
+      "id": "J1-003",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "现代 Java 特性（17/21+）",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "SQL/JSON 等多行字符串使用文本块（Text Blocks）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 15
+      },
+      "status": "active"
+    },
+    {
+      "id": "J1-004",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "现代 Java 特性（17/21+）",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "避免使用已过时的 `Date`、`Calendar`、`SimpleDateFormat`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 16
+      },
+      "status": "active"
+    },
+    {
+      "id": "J2-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Stream API 与 Optional",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "简单循环场景不用 `stream().forEach`，优先 for-each",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 22
+      },
+      "status": "active"
+    },
+    {
+      "id": "J2-002",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Stream API 与 Optional",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "复杂 Stream 链拆分为可读步骤，避免难以调试的长链",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 23
+      },
+      "status": "active"
+    },
+    {
+      "id": "J2-003",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Stream API 与 Optional",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`Optional` 仅用于返回值，不用于方法参数或 Entity 字段",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 24
+      },
+      "status": "active"
+    },
+    {
+      "id": "J2-004",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Stream API 与 Optional",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "使用 `Optional` 时优先 `map`/`orElse` 等函数式 API，避免 `isPresent()` + `get()`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 25
+      },
+      "status": "active"
+    },
+    {
+      "id": "J3-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Spring Boot 最佳实践",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "依赖注入使用构造器注入，禁止字段 `@Autowired`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 31
+      },
+      "status": "active"
+    },
+    {
+      "id": "J3-002",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Spring Boot 最佳实践",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "配置项使用 `@ConfigurationProperties` 类型安全绑定，禁止硬编码或散落 `@Value`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 32
+      },
+      "status": "active"
+    },
+    {
+      "id": "J3-003",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Spring Boot 最佳实践",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "Controller 职责单一，业务逻辑下沉到 Service",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 33
+      },
+      "status": "active"
+    },
+    {
+      "id": "J3-004",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Spring Boot 最佳实践",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "全局异常处理使用 `@ControllerAdvice` 与 Spring Boot 3 `ProblemDetail`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 34
+      },
+      "status": "active"
+    },
+    {
+      "id": "J4-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "JPA 与数据库性能",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "避免 N+1 查询：禁止盲目 `FetchType.EAGER` 或在循环中触发懒加载",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 40
+      },
+      "status": "active"
+    },
+    {
+      "id": "J4-002",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "JPA 与数据库性能",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "需要关联数据时使用 `@EntityGraph` 或 `JOIN FETCH`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 41
+      },
+      "status": "active"
+    },
+    {
+      "id": "J4-003",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "JPA 与数据库性能",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "读操作显式标记 `@Transactional(readOnly = true)`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 42
+      },
+      "status": "active"
+    },
+    {
+      "id": "J4-004",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "JPA 与数据库性能",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`@Transactional` 须加在 Service 层 public 方法，禁止加在 private 方法或 Controller",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 43
+      },
+      "status": "active"
+    },
+    {
+      "id": "J4-005",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "JPA 与数据库性能",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "Entity 禁止 `@Data`；`equals`/`hashCode` 通常基于 ID 实现",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 44
+      },
+      "status": "active"
+    },
+    {
+      "id": "J5-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "并发与虚拟线程",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "I/O 密集型任务（Java 21+）考虑虚拟线程（如 `newVirtualThreadPerTaskExecutor`）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 50
+      },
+      "status": "active"
+    },
+    {
+      "id": "J5-002",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "并发与虚拟线程",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "多线程环境禁止共享 `SimpleDateFormat`；使用 `DateTimeFormatter`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 51
+      },
+      "status": "active"
+    },
+    {
+      "id": "J5-003",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "并发与虚拟线程",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "多线程共享 Map 使用 `ConcurrentHashMap`，禁止裸 `HashMap`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 52
+      },
+      "status": "active"
+    },
+    {
+      "id": "J5-004",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "并发与虚拟线程",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "锁粒度合理，避免在锁内进行 I/O 操作",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 53
+      },
+      "status": "active"
+    },
+    {
+      "id": "J6-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "Lombok 使用规范",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "关键业务对象使用 `@Builder` 时须保证必填字段校验，避免漏设不变量",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 59
+      },
+      "status": "active"
+    },
+    {
+      "id": "J7-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "异常处理",
+      "domain": "java-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止吞掉异常或仅 `e.printStackTrace()`；须向上抛出或通过全局处理器返回",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 65
+      },
+      "status": "active"
+    },
+    {
+      "id": "J8-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "测试规范",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "单元测试使用 Mockito（`@ExtendWith(MockitoExtension.class)`），避免 `@SpringBootTest` 启动全量 Context",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 71
+      },
+      "status": "active"
+    },
+    {
+      "id": "J8-002",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "测试规范",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "集成测试使用 Testcontainers 等隔离真实依赖",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 72
+      },
+      "status": "active"
+    },
+    {
+      "id": "J9-001",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "可维护性",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "日志使用 Slf4j，禁止 `System.out`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 78
+      },
+      "status": "active"
+    },
+    {
+      "id": "J9-002",
+      "namespace": "cpf",
+      "prefix": "J",
+      "title": "可维护性",
+      "domain": "java-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "魔法值提取为常量或枚举",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/java-standard.md",
+        "line": 79
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC1-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "空安全与契约",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止滥用 `!!`；优先 `?.`、`?:`、`require`/`check`/`requireNotNull` 或提前返回",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 13
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC1-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "空安全与契约",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "Java 互操作 API 返回值使用显式可空类型接收，禁止将平台类型当作非空",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 14
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC1-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "空安全与契约",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "公共编译器 API 的参数与返回值须文档化 nullability；内部不变量用 `require`/`check` 断言",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 15
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC1-004",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "空安全与契约",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`lateinit` 仅用于生命周期内保证初始化、且无法使用构造函数/委托表达的场景",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 16
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC2-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "不可变与集合",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "对外暴露只读视图：返回 `List`/`Set`/`Map` 或 `toList()` 快照，避免泄漏内部 `Mutable*`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 22
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC2-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "不可变与集合",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "热路径（FIR 解析、IR 变换、符号查询）避免不必要的中间集合；优先 `buildList`/`buildMap` 或复用现有结构",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 23
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC2-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "不可变与集合",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "禁止在循环中重复构造相同 `FqName`、`Name`、字符串键等可缓存对象",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 24
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC2-004",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "不可变与集合",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "需要持久化的 AST/IR 附加数据优先使用现有 `UserData`/`Metadata` 机制，勿随意挂全局 Map",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 25
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC3-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "API 边界与可见性",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "模块内部实现使用 `internal`/`private`；勿将仅供编译器内部使用的类型暴露为 public API",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 31
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC3-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "API 边界与可见性",
+      "domain": "kotlin-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "新增 public API 须考虑二进制兼容（KGP、IDE、插件）；破坏性变更须标注并说明迁移",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 32
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC3-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "API 边界与可见性",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "使用 `@OptIn(ExperimentalApi::class)` 时须局部、成对出现，并注释实验性依赖原因",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 33
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC3-004",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "API 边界与可见性",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "平台相关实现放在 `.jvm`/`.js`/`.native`/`.wasm` 等后缀模块，common 层保持平台无关",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 34
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC4-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "密封类与穷尽 when",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "编译器阶段、诊断类别、IR 节点变体等状态机优先用 `sealed class`/`sealed interface` 建模",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 40
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC4-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "密封类与穷尽 when",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "对 sealed 类型分支的 `when` 须穷尽；新增子类型时同步所有相关 `when`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 41
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC4-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "密封类与穷尽 when",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "禁止用多个独立布尔/可空字段组合表达互斥状态（易产生无效组合）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 42
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC5-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "FIR / IR 管线",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "前端语义（类型、解析、诊断）在 FIR 阶段完成；勿在 backend/IR lowering 重复前端逻辑",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 48
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC5-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "FIR / IR 管线",
+      "domain": "kotlin-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "IR 访问/变换遵循 visitor/transform 约定：该调用 `accept` 的子树须完整遍历，避免漏访问导致语义丢失",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 49
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC5-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "FIR / IR 管线",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "IR 变换后须维护父子链接与 `transformChildren` 一致性；禁止持有已 detach 节点的引用",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 50
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC5-004",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "FIR / IR 管线",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "符号与类型查询使用 `FirSymbol`/`IrSymbol` 等现有 API，禁止绕过符号表直接字符串比对 FQCN",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 51
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC5-005",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "FIR / IR 管线",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "诊断须通过 `DiagnosticReporter`/`KtDiagnosticFactory` 上报，禁止 `println` 或静默吞掉错误",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 52
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC6-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "并发与线程安全",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "并行编译共享的可变缓存须使用 `ConcurrentHashMap` 等线程安全结构或明确同步",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 58
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC6-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "并发与线程安全",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止在编译热路径上使用粗粒度 `synchronized` 包裹大段逻辑；缩小锁范围",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 59
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC6-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "并发与线程安全",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "协程/`suspend` 在编译器中的使用须明确调度器与取消传播；禁止 `GlobalScope`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 60
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC6-004",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "并发与线程安全",
+      "domain": "kotlin-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`CancellationException` 须重新抛出，不得在通用 `catch (Exception)` 中吞掉",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 61
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC6-005",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "并发与线程安全",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "线程局部状态（如 `ThreadLocal`）须文档化生命周期，避免跨请求/跨编译实例泄漏",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 62
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC7-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "异常与错误处理",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止捕获 `Throwable`/`Exception` 后静默忽略；至少记录上下文或转换为编译器诊断",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 68
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC7-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "异常与错误处理",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "用户可恢复的错误（如不支持的语法组合）应产出诊断而非 `error()` 崩溃，除非 invariant 违反",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 69
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC7-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "异常与错误处理",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`check`/`require`/`error` 消息须包含足够定位信息（阶段、节点、符号名）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 70
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC8-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "测试与测试数据",
+      "domain": "kotlin-standard",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "编译器/IDE 测试变更须更新对应 `.txt`/`.fir`/`.ir` 等 golden 数据，禁止只改实现不改期望",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 76
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC8-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "测试与测试数据",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "新增诊断须附带 `diagnostics/` 或 inline 测试用例，覆盖正负场景",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 77
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC8-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "测试与测试数据",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "测试工具类复用 `testInfrastructure`/`KotlinBaseTest` 等现有基类，勿复制启动/解析样板",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 78
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC8-004",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "测试与测试数据",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`@TestMetadata`、Data 目录路径与模块约定一致，避免硬编码绝对路径",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 79
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC9-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "Gradle Kotlin DSL（.kts）",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "构建脚本禁止硬编码本机绝对路径（DevEco、SDK 目录）；使用 `rootProject`/`providers` 配置",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 85
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC9-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "Gradle Kotlin DSL（.kts）",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "插件/任务注册 id 与现有命名空间一致，避免与上游 JetBrains 坐标冲突",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 86
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC9-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "Gradle Kotlin DSL（.kts）",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "修改依赖或版本常量时须与 `gradle.properties`/BOM 单一事实来源对齐",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 87
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC10-001",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "性能与资源",
+      "domain": "kotlin-standard",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "避免在每次编译请求中全量扫描 classpath/文件树；复用索引与增量结果",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 93
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC10-002",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "性能与资源",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "大文件/大 IR 方法变换注意内存峰值；必要时流式处理或分批",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 94
+      },
+      "status": "active"
+    },
+    {
+      "id": "KC10-003",
+      "namespace": "cpf",
+      "prefix": "KC",
+      "title": "性能与资源",
+      "domain": "kotlin-standard",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "日志使用项目统一 Logger，禁止热路径 `println`/`System.out`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/kotlin-standard.md",
+        "line": 95
+      },
+      "status": "active"
+    },
+    {
+      "id": "P1-001",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "目标模型与 Family 一致性",
+      "domain": "ohos-platform",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "新增/修改 Konan 目标时，`Family` 必须为 `OHOS` 且后缀与 ELF 动态库约定一致（`dynamicSuffix = \"so\"`）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 9
+      },
+      "status": "active"
+    },
+    {
+      "id": "P1-002",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "目标模型与 Family 一致性",
+      "domain": "ohos-platform",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`KonanTarget` 仅通过 `OHOS_ARM64` / `OHOS_X64` 注册，名称与 `konan.properties` 中 `targetTriple.*` 一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 10
+      },
+      "status": "active"
+    },
+    {
+      "id": "P1-003",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "目标模型与 Family 一致性",
+      "domain": "ohos-platform",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "平台分支禁止误用 `Family.LINUX` 或 `Family.ANDROID` 处理 OHOS；应使用 `Family.OHOS` 或 `OhosConfigurables`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 11
+      },
+      "status": "active"
+    },
+    {
+      "id": "P2-001",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "双 Sysroot（OpenHarmony + HMS）",
+      "domain": "ohos-platform",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`konan.properties` 中 OHOS 目标须同时配置主 sysroot（`targetSysRoot.ohos_*`）与 `additionalTargetSysRoot.ohos`（HMS）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 17
+      },
+      "status": "active"
+    },
+    {
+      "id": "P2-002",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "双 Sysroot（OpenHarmony + HMS）",
+      "domain": "ohos-platform",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`platformLibs/build.gradle.kts` 中 `Family.OHOS` 分支须为 def 编译注入额外 `-I` / `-L`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 18
+      },
+      "status": "active"
+    },
+    {
+      "id": "P2-003",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "双 Sysroot（OpenHarmony + HMS）",
+      "domain": "ohos-platform",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "修改 sysroot 版本号时，`dependencies.*-ohos_arm64` 列表须与 `targetSysRoot` / `additionalTargetSysRoot` tarball 名同步",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 19
+      },
+      "status": "active"
+    },
+    {
+      "id": "P2-004",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "双 Sysroot（OpenHarmony + HMS）",
+      "domain": "ohos-platform",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "勿删除「HarmonyOS only」双 sysroot 块；非 OHOS 分支不应引入 HMS 路径",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 20
+      },
+      "status": "active"
+    },
+    {
+      "id": "P3-001",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "工具链与 SDK 路径",
+      "domain": "ohos-platform",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "DevEco/OpenHarmony LLVM 路径通过 `ohosSdkHome`、`targetToolchain.ohos_arm64` 引用，变更需说明对本地/CI 的影响",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 26
+      },
+      "status": "active"
+    },
+    {
+      "id": "P3-002",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "工具链与 SDK 路径",
+      "domain": "ohos-platform",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "`targetCpuFeatures.ohos_arm64` 不得重新引入已移除的 `+sve`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 27
+      },
+      "status": "active"
+    },
+    {
+      "id": "P3-003",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "工具链与 SDK 路径",
+      "domain": "ohos-platform",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "OHOS 使用 DevEco 自带 clang 时，`ClangArgs` 对 OHOS 应走 `absoluteTargetToolchain` 而非通用 `absoluteLlvmHome`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 28
+      },
+      "status": "active"
+    },
+    {
+      "id": "P4-001",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "主机交叉编译与 Stub",
+      "domain": "ohos-platform",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "OHOS stub（`aarch64_linux_ohos_stubs/*.s`）须用 `-target aarch64-linux-ohos` 编译，且可在非 Apple 主机构建",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 34
+      },
+      "status": "active"
+    },
+    {
+      "id": "P4-002",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "主机交叉编译与 Stub",
+      "domain": "ohos-platform",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "勿将 OHOS stub 编译逻辑改为仅 macOS 可用（与 macOS Mach-O stub 分支区分）",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 35
+      },
+      "status": "active"
+    },
+    {
+      "id": "P4-003",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "主机交叉编译与 Stub",
+      "domain": "ohos-platform",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`ohos_arm64` 须列入各 host 的 `cacheableTargets`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 36
+      },
+      "status": "active"
+    },
+    {
+      "id": "P5-001",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "测试与设备执行",
+      "domain": "ohos-platform",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "黑盒/设备测试使用 `OhosExecutor` 时，须支持 `HDC_PATH`、`OHOS_LD_LIBRARY_PATH`、`OHOS_USE_SYSTEM_LIBS` 环境变量",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 42
+      },
+      "status": "active"
+    },
+    {
+      "id": "P5-002",
+      "namespace": "cpf",
+      "prefix": "P",
+      "title": "测试与设备执行",
+      "domain": "ohos-platform",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "测试编译 OHOS 目标时读取 `additionalTargetSysRoot.ohos` 的逻辑与生产一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-ohos-platform.md",
+        "line": 43
+      },
+      "status": "active"
+    },
+    {
+      "id": "R1-001",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "OHOS 运行时 Stub 与链接",
+      "domain": "native-runtime",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "OHOS stub `.o` 须复制到 `dist/konan/targets/ohos_arm64/stubs_objs/`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 9
+      },
+      "status": "active"
+    },
+    {
+      "id": "R1-002",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "OHOS 运行时 Stub 与链接",
+      "domain": "native-runtime",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "新增 stub `.s` 文件须加入 `aarch64_linux_ohos_stubs` 并由 `compileStubFiles` 编译",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 10
+      },
+      "status": "active"
+    },
+    {
+      "id": "R1-003",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "OHOS 运行时 Stub 与链接",
+      "domain": "native-runtime",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "stub 编译依赖 `nativeDependencies.targetDependency(OHOS_ARM64)`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 11
+      },
+      "status": "active"
+    },
+    {
+      "id": "R2-001",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "GC / 内存与鸿蒙系统 API",
+      "domain": "native-runtime",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "调用 `OH_HiAppEvent_*` 等框架内存异常 API 时，优先使用 **weak** 符号或运行时解析，避免链接期硬依赖导致旧 SDK 失败",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 17
+      },
+      "status": "active"
+    },
+    {
+      "id": "R2-002",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "GC / 内存与鸿蒙系统 API",
+      "domain": "native-runtime",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "OOM/内存异常上报路径修改须附带检查逻辑增强说明",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 18
+      },
+      "status": "active"
+    },
+    {
+      "id": "R2-003",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "GC / 内存与鸿蒙系统 API",
+      "domain": "native-runtime",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止在 runtime C/C++ 中直接 `malloc`/`free` 管理 Kotlin 对象生命周期；使用运行时分配 API",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 19
+      },
+      "status": "active"
+    },
+    {
+      "id": "R3-001",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "分配器与 unwind",
+      "domain": "native-runtime",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "修改 `custom_alloc` 或默认分配器时，须评估 OHOS `dynamicLinker.ohos_arm64` 配置",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 25
+      },
+      "status": "active"
+    },
+    {
+      "id": "R3-003",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "分配器与 unwind",
+      "domain": "native-runtime",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "Sanitizer 仅 `OHOS_ARM64` 声明 `ADDRESS` 时，启用条件不得扩散到未测试目标",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 26
+      },
+      "status": "active"
+    },
+    {
+      "id": "R4-002",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "标准库 Native 部分",
+      "domain": "native-runtime",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "Native 平台 API（如 `kotlin.native.Platform`）新增 OHOS 分支须文档化",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 32
+      },
+      "status": "active"
+    },
+    {
+      "id": "R5-002",
+      "namespace": "cpf",
+      "prefix": "R",
+      "title": "构建与 dist",
+      "domain": "native-runtime",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "Windows/macOS 主机交叉编译 OHOS 依赖主机矩阵完整；破坏矩阵须更新 README",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-native-runtime.md",
+        "line": 38
+      },
+      "status": "active"
+    },
+    {
+      "id": "V1-001",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "版本号单一事实来源",
+      "domain": "build-release",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "发布版本变更须同时检查：`defaultSnapshotVersion`、`kotlinLanguageVersion`、各 `pom.xml`、`KotlinVersion.kt`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 9
+      },
+      "status": "active"
+    },
+    {
+      "id": "V1-002",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "版本号单一事实来源",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`bootstrap.kotlin.default.version` 与编译器 bootstrap 兼容；升级须说明 TeamCity/本地 bootstrap 步骤",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 10
+      },
+      "status": "active"
+    },
+    {
+      "id": "V1-003",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "版本号单一事实来源",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`kotlinApiVersionForProjectsUsedInIntelliJKotlinPlugin` 不得高于 IDE 捆绑 stdlib",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 11
+      },
+      "status": "active"
+    },
+    {
+      "id": "V1-004",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "版本号单一事实来源",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`konan.properties` 中 `compilerVersion` 占位符由构建替换，勿手填静态版本",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 12
+      },
+      "status": "active"
+    },
+    {
+      "id": "V2-001",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "依赖与仓库安全",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "生产依赖变更须更新 `verification-metadata.xml` 或说明为何使用 `lenient`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 18
+      },
+      "status": "active"
+    },
+    {
+      "id": "V2-002",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "依赖与仓库安全",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "禁止未经评审将 `org.gradle.dependency.verification` 长期设为 `off`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 19
+      },
+      "status": "active"
+    },
+    {
+      "id": "V2-003",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "依赖与仓库安全",
+      "domain": "build-release",
+      "severity": "critical",
+      "source_severity": "阻断",
+      "check": "K/N 依赖镜像（如 `eazytec-cloud.com`）变更须验证 OHOS sysroot/LLVM 包可下载",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 20
+      },
+      "status": "active"
+    },
+    {
+      "id": "V2-004",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "依赖与仓库安全",
+      "domain": "build-release",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "`cacheRedirectorEnabled` 与 bootstrap 下载超时配置保持一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 21
+      },
+      "status": "active"
+    },
+    {
+      "id": "V3-001",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "构建开关与 CI 对齐",
+      "domain": "build-release",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "默认 `kotlin.native.enabled=false`；CI 构建 K/N 须在 job 或 `local.properties` 显式开启",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 27
+      },
+      "status": "active"
+    },
+    {
+      "id": "V3-002",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "构建开关与 CI 对齐",
+      "domain": "build-release",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "TeamCity 构建须使用 `-Pteamcity=true`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 28
+      },
+      "status": "active"
+    },
+    {
+      "id": "V3-003",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "构建开关与 CI 对齐",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "`kotlin.jvm.target.validation.mode=error` 勿随意放宽",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 29
+      },
+      "status": "active"
+    },
+    {
+      "id": "V3-004",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "构建开关与 CI 对齐",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "JDK toolchain 环境变量列表与 `repo/gradle-build-conventions/gradle.properties` 保持同步",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 30
+      },
+      "status": "active"
+    },
+    {
+      "id": "V4-001",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "Maven 子工程",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "改 `libraries/` Maven API 须跑对应 Maven 模块",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 36
+      },
+      "status": "active"
+    },
+    {
+      "id": "V4-002",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "Maven 子工程",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "Maven 插件测试 `kotlin-maven-plugin-test` 版本与 BOM 一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 37
+      },
+      "status": "active"
+    },
+    {
+      "id": "V5-001",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "许可证与第三方",
+      "domain": "build-release",
+      "severity": "high",
+      "source_severity": "严重",
+      "check": "新增第三方 native 库须登记 `license/third_party/`",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 43
+      },
+      "status": "active"
+    },
+    {
+      "id": "V5-002",
+      "namespace": "cpf",
+      "prefix": "V",
+      "title": "许可证与第三方",
+      "domain": "build-release",
+      "severity": "medium",
+      "source_severity": "一般",
+      "check": "新文件版权头须与项目 LICENSE 策略一致",
+      "source": {
+        "repo": "kotlin-pr-review",
+        "path": "skills/kotlin-pr-review/references/custom/kotlin-build-release.md",
+        "line": 44
+      },
+      "status": "active"
+    },
+    {
+      "id": "K1",
+      "namespace": "ocr",
+      "prefix": "K",
+      "title": "OCR project rule K1",
+      "domain": "build-release",
+      "severity": "unspecified",
+      "check": "跨 target 配置一致性、旧分发 fallback 一致性",
+      "applies_to": {
+        "paths": [
+          "kotlin-native/konan/konan.properties"
+        ]
+      },
+      "source": {
+        "repo": "ocr",
+        "path": "规则映射表.md",
+        "line": 108
+      },
+      "status": "active"
+    },
+    {
+      "id": "K2",
+      "namespace": "ocr",
+      "prefix": "K",
+      "title": "OCR project rule K2",
+      "domain": "native-runtime",
+      "severity": "unspecified",
+      "check": "热路径、跨线程状态、资源生命周期、JIT/NAPI、C++ 对象生命周期",
+      "applies_to": {
+        "paths": [
+          "kotlin-native/runtime/**"
+        ]
+      },
+      "source": {
+        "repo": "ocr",
+        "path": "规则映射表.md",
+        "line": 109
+      },
+      "status": "active"
+    },
+    {
+      "id": "K3",
+      "namespace": "ocr",
+      "prefix": "K",
+      "title": "OCR project rule K3",
+      "domain": "native-compiler-backend",
+      "severity": "unspecified",
+      "check": "子进程死锁、并行阶段、临时对象、llvm.used",
+      "applies_to": {
+        "paths": [
+          "**/{Bitcode,OptimizationPipeline,TopLevelPhases,CAPIExtensions}.{kt,cpp,h}"
+        ]
+      },
+      "source": {
+        "repo": "ocr",
+        "path": "规则映射表.md",
+        "line": 110
+      },
+      "status": "active"
+    },
+    {
+      "id": "K4",
+      "namespace": "ocr",
+      "prefix": "K",
+      "title": "OCR project rule K4",
+      "domain": "build-release",
+      "severity": "unspecified",
+      "check": "凭据、工作区清理、外部工具、CLI 语义、架构路径、英文消息",
+      "applies_to": {
+        "paths": [
+          "scripts/**"
+        ]
+      },
+      "source": {
+        "repo": "ocr",
+        "path": "规则映射表.md",
+        "line": 111
+      },
+      "status": "active"
+    },
+    {
+      "id": "K5",
+      "namespace": "ocr",
+      "prefix": "K",
+      "title": "OCR project rule K5",
+      "domain": "general",
+      "severity": "unspecified",
+      "check": "英文规范、换行、注释准确性、失败路径、死代码、质量门禁、常量",
+      "applies_to": {
+        "paths": [
+          "**"
+        ]
+      },
+      "source": {
+        "repo": "ocr",
+        "path": "规则映射表.md",
+        "line": 112
+      },
+      "status": "active"
+    }
+  ],
+  "references": [
+    {
+      "id": "collaboration.two-agent-discussion",
+      "module": "two-agent-collaboration",
+      "domain": "collaboration",
+      "audience": "ai",
+      "path": "skills/two-agent-collaboration/references/two-agent-discussion.md",
+      "keywords": [
+        "启动协作模式",
+        "继续使用当前通信文档",
+        "复用通信文档",
+        "双 Agent 协作",
+        "两个 Agent 执行评审",
+        "Codex 执行 Claude 评审",
+        "Claude 执行 Codex 评审",
+        "共享 Markdown 双 Agent",
+        "双方达成一致后闭环",
+        "协作 procedure",
+        "协作协议维护",
+        "协作协议的维护",
+        "双 Agent 协作方法维护"
+      ]
+    },
+    {
+      "id": "devtools.coldstart-trace-collection",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/workflows/coldstart-trace-collection.md",
+      "keywords": [
+        "冷启动数据采集",
+        "多应用冷启动",
+        "coldstart-trace-collection",
+        "reboot_policy",
+        "batch-once",
+        "per-app",
+        "Ready barrier",
+        "RECENTS_NOT_CLEARED",
+        "AGENT_REVIEW_REQUIRED",
+        "PERFILE2",
+        "IconStart",
+        "RSJankStats::ReportEventFirstFrame",
+        "NO_VISIBLE_PERF_LOSS_SIGNAL",
+        "db_semantics_valid"
+      ]
+    },
+    {
+      "id": "devtools.fault-responsibility-attribution",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-devtools/references/workflows/fault-responsibility-attribution.md",
+      "keywords": [
+        "责任归属",
+        "责任归因",
+        "责任层",
+        "渲染层还是 runtime",
+        "谁的锅",
+        "primary owner",
+        "trigger",
+        "amplifier",
+        "死亡机制",
+        "Uncaught Kotlin exception",
+        "THREAD_BLOCK_6S",
+        "APP_INPUT_BLOCK",
+        "主线程卡死归属",
+        "冻屏定责",
+        "faultlog Reason 行",
+        "LastFatalMessage 截断",
+        "证据截断",
+        "MIXED 判定",
+        "未排除项",
+        "runtime 还是业务"
+      ]
+    },
+    {
+      "id": "devtools.fusion-page-first-frame",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/tools/fusion-page-first-frame.md",
+      "keywords": [
+        "统一渲染页面首帧耗时",
+        "统一渲染页面加载耗时",
+        "页面跳转耗时",
+        "点击到首帧",
+        "click-to-first-frame",
+        "首帧耗时",
+        "首帧时长",
+        "ArkTS 跳转 Compose 页面",
+        "跳转渲染耗时",
+        "测量耗时",
+        "uitest uiInput click",
+        "多轮统计"
+      ]
+    },
+    {
+      "id": "devtools.hdc-device-ops",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/tools/hdc-device-ops.md",
+      "keywords": [
+        "hdc",
+        "连接",
+        "安装",
+        "hdc 启动",
+        "启动应用",
+        "应用启动",
+        "shell",
+        "hilog",
+        "faultlog",
+        "cppcrash",
+        "包信息",
+        "进程",
+        "模拟器",
+        "防锁屏",
+        "装不上",
+        "起不来",
+        "启动崩溃",
+        "no signature file",
+        "hilog -x",
+        "install bundle successfully",
+        "verify code signature failed",
+        "hap-sign-tool verify-app",
+        "zip Stored",
+        "Deflate",
+        "ZIP 方法",
+        "native .so",
+        "重新签名",
+        "包完整性签名",
+        "hap-sign-tool",
+        "zip -0",
+        "compressNativeLibs",
+        "extractNativeLibs"
+      ]
+    },
+    {
+      "id": "devtools.hdc-scenarios",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/tools/hdc-scenarios.md",
+      "keywords": [
+        "帧率",
+        "场景",
+        "成套",
+        "一键诊断",
+        "ANR",
+        "后台采集",
+        "hilog -x"
+      ]
+    },
+    {
+      "id": "devtools.hotspot-identification",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/workflows/hotspot-identification.md",
+      "keywords": [
+        "热点",
+        "优化点",
+        "热点 owner",
+        "caller",
+        "inline",
+        "AOT",
+        "JIT",
+        "stub",
+        "BUILDID",
+        "Build ID",
+        "off-CPU",
+        "sched_wakeup",
+        "critical path"
+      ]
+    },
+    {
+      "id": "devtools.htrace-analysis",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/tools/htrace-analysis.md",
+      "keywords": [
+        "htrace",
+        "insight",
+        "cpuprofile",
+        "trace_streamer",
+        "卡顿帧",
+        "program",
+        "trace 标签",
+        "黑洞",
+        "callstack"
+      ]
+    },
+    {
+      "id": "devtools.htrace-event-count-analysis",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/tools/htrace-event-count-analysis.md",
+      "keywords": [
+        "Event Count",
+        "perf_sample",
+        "perf_callchain",
+        "event_count",
+        "sample_count",
+        "leaf",
+        "inclusive",
+        "join 守恒",
+        "sched_wakeup",
+        "frame_slice",
+        "NO_VISIBLE_PERF_LOSS_SIGNAL"
+      ]
+    },
+    {
+      "id": "devtools.load-capture",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/tools/load-capture.md",
+      "keywords": [
+        "hidumper",
+        "hiperf",
+        "mem-smaps",
+        "mem-heap",
+        "kotlin heap",
+        "PSS",
+        "perf.data",
+        "hw-instructions",
+        "内存",
+        "负载",
+        "CPU",
+        "指令"
+      ]
+    },
+    {
+      "id": "devtools.trace-benefit-estimation",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/workflows/trace-benefit-estimation.md",
+      "keywords": [
+        "白盒收益估计",
+        "trace benefit estimation",
+        "收益区间",
+        "CPU-share",
+        "independent-groups",
+        "paired",
+        "blocked",
+        "nested",
+        "Welch",
+        "Student-t",
+        "worker CPU",
+        "victim wait",
+        "关键路径",
+        "UNIDENTIFIABLE"
+      ]
+    },
+    {
+      "id": "devtools.trace-streamer-setup",
+      "module": "kmp-devtools",
+      "domain": "devtools",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-devtools/references/tools/trace-streamer-setup.md",
+      "keywords": [
+        "trace_streamer",
+        "htrace",
+        "SQLite",
+        "Rosetta",
+        "DYLD_INSERT_LIBRARIES",
+        "SQL",
+        "callstack"
+      ]
+    },
+    {
+      "id": "feature-porting.behavior-parity-audit",
+      "module": "cpf-kmp-feature-porting",
+      "domain": "feature-porting",
+      "audience": "both",
+      "path": "skills/cpf-kmp-feature-porting/references/behavior-parity-audit.md",
+      "keywords": [
+        "CPF-KMP 行为对齐",
+        "函数级迁移审计",
+        "无依据偏离",
+        "同类漏迁移扫描",
+        "迁移偏离归因",
+        "迁移决策索引",
+        "历史决策索引",
+        "历史修复回退",
+        "behavior parity",
+        "旧行为义务",
+        "逐字节对照",
+        "静态怀疑",
+        "临时适配残留",
+        "逐文件审查表",
+        "人工确认与备注",
+        "原样迁移",
+        "运行 demo",
+        "静态怀疑不能改代码"
+      ]
+    },
+    {
+      "id": "feature-porting.migration-completeness-review",
+      "module": "cpf-kmp-feature-porting",
+      "domain": "feature-porting",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-feature-porting/references/migration-completeness-review.md",
+      "keywords": [
+        "CPF差量",
+        "社区基线",
+        "社区代码误迁",
+        "CPF-KMP 特性迁移",
+        "漏迁移",
+        "PR 已登记但补丁未迁入",
+        "已登记 PR/文件",
+        "Kotlin 版本升级",
+        "migration completeness",
+        "producer consumer",
+        "迁移双向扫描",
+        "正向迁移扫描",
+        "反向改动扫描",
+        "死代码误判",
+        "HandleScope",
+        "默认关闭能力",
+        "双向扫描"
+      ]
+    },
+    {
+      "id": "feature-porting.upgrade-planning-and-validation",
+      "module": "cpf-kmp-feature-porting",
+      "domain": "feature-porting",
+      "audience": "both",
+      "path": "skills/cpf-kmp-feature-porting/references/upgrade-planning-and-validation.md",
+      "keywords": [
+        "CPF-KMP 升级计划",
+        "迁移主分支",
+        "统一文档目录",
+        "迁移范围",
+        "编译兼容",
+        "运行验收",
+        "平台验收规格",
+        "大版本升级方法论",
+        "迁移验证顺序",
+        "迁移产物身份",
+        "rebase 后验证",
+        "隔离验证",
+        "挑单集成",
+        "冻结全量回归",
+        "组件迁移蓝图",
+        "复合式 Harness",
+        "迁移经验评测",
+        "RSI 改进循环"
+      ]
+    },
+    {
+      "id": "ffi.akinterop-overview",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/knowledge/akinterop-overview.md",
+      "keywords": [
+        "什么是 FFI",
+        "FFI 概念",
+        "AKInterop 总览",
+        "mpcore-ffi 总览",
+        "模块地图"
+      ]
+    },
+    {
+      "id": "ffi.arkts-ffi-converter",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/tools/arkts-ffi-converter.md",
+      "keywords": [
+        "arkts-ffi-converter",
+        "converter",
+        "代理类",
+        "proxy class",
+        "ArkProxy",
+        "convert_module_paths"
+      ]
+    },
+    {
+      "id": "ffi.bug-localization",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/workflows/ffi-bug-localization.md",
+      "keywords": [
+        "StableRef dispose",
+        "TSFN 崩溃",
+        "callback 跨线程",
+        "FFI callback",
+        "napi_ref 泄漏",
+        "FFIRefTracker",
+        "FFIDebugDumper"
+      ]
+    },
+    {
+      "id": "ffi.build-and-package",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/tools/build-and-package.md",
+      "keywords": [
+        "FfiConventionPlugin",
+        "copyFfiDts",
+        "copyFfiEts",
+        "copyFfiSoDebug",
+        "dtsOutputDir",
+        "generationMode",
+        "build-ohos.sh",
+        "test-ohos.sh",
+        "真机测试",
+        "app_auto_test",
+        "publishToMavenLocal"
+      ]
+    },
+    {
+      "id": "ffi.export-generation",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/knowledge/export-generation.md",
+      "keywords": [
+        "KNExportFunction",
+        "KNExportClass",
+        "KNExportInterface",
+        "KNExportField",
+        "KNExportTypeAlias",
+        "KNHide",
+        "KSP",
+        "FFIExportProcessor",
+        "registerKNExports",
+        "KNapiRegisterExports",
+        "ffi_export.d.ts",
+        "ffiRegisterAll",
+        "GenerationMode"
+      ]
+    },
+    {
+      "id": "ffi.napi-bridge",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/knowledge/napi-bridge.md",
+      "keywords": [
+        "AKInterop",
+        "NAPI",
+        "OhosFFIContext",
+        "wrapFFICall",
+        "TSFN",
+        "ThreadSafeFunctionRegister",
+        "napi_value",
+        "ArkValue",
+        "callSyncSafe",
+        "StableRef",
+        "tlsEnv"
+      ]
+    },
+    {
+      "id": "ffi.napi-handle-and-call-safety",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/knowledge/napi-handle-and-call-safety.md",
+      "keywords": [
+        "napi_handle_scope",
+        "napi_escape_handle",
+        "N-API 失败路径",
+        "ArrayBuffer 生命周期",
+        "napi_async_work",
+        "NAPI",
+        "N-API",
+        "NAPI zero-copy",
+        "N-API zero-copy"
+      ]
+    },
+    {
+      "id": "ffi.repository-development",
+      "module": "kmp-ffi-akinterop",
+      "domain": "interop-platformlibs",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-ffi-akinterop/references/tools/repository-development.md",
+      "keywords": [
+        "修改 mpcore-ffi 源码",
+        "mpcore-ffi 开发规范",
+        "AKInterop 开发规范",
+        "AKInterop 代码风格",
+        "代码风格",
+        "代码规范",
+        "AKInterop 测试",
+        "测试放置",
+        "commonTest",
+        "最小回归命令",
+        "生成文件不要手改",
+        "INTEROP_KT_VERSION",
+        "ktVersion",
+        "converter fixtures",
+        "libnapi_bridge.a",
+        "AKInterop runtime",
+        "Gradle 参数",
+        "版本参数",
+        "新增测试"
+      ]
+    },
+    {
+      "id": "fusion-render.build-and-push",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/tools/build-and-push.md",
+      "keywords": [
+        "编译推包",
+        "assembleHar",
+        "assembleHap",
+        "linkRelease",
+        "linkDebug",
+        "linkReleaseSharedOhosArm64",
+        "linkDebugSharedOhosArm64",
+        "融合渲染构建",
+        "构建融合渲染",
+        "编译融合渲染",
+        "构建 debug",
+        "debug 包",
+        "跑 sample",
+        "运行 sample",
+        "跑 ohrender",
+        "ohrender_sample",
+        "ohrender-sample",
+        "publishComposeJbToMavenLocal",
+        "rendererBackend",
+        "OH.0.1.2",
+        "linkJvmBindingsMacosArm64",
+        "Could not find skiko-ohosarm64",
+        "ui-uikitx64"
+      ]
+    },
+    {
+      "id": "fusion-render.build-troubleshooting",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/build-troubleshooting.md",
+      "keywords": [
+        "IrLinkageError",
+        "eazytec",
+        "版本对齐",
+        "prefer-mavenlocal",
+        "init script",
+        "Unresolved reference ExternalRenderNode",
+        "TLS drop",
+        "undefined symbol",
+        "relocating failed",
+        "MUSL relocating failed",
+        "symbol not found",
+        "load module failed",
+        "debug 包加载崩"
+      ]
+    },
+    {
+      "id": "fusion-render.content-blur-native-pierce",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/content-blur-native-pierce.md",
+      "keywords": [
+        "内容模糊",
+        "前景模糊",
+        "模糊穿刺",
+        "blur pierce",
+        "Modifier.blur",
+        "BlurEffect",
+        "RenderEffect",
+        "TileMode.Decal",
+        "BlurredEdgeTreatment",
+        "软件模糊",
+        "软件兜底",
+        "模糊不生效",
+        "模糊没走 GPU",
+        "GPU 加速模糊",
+        "模糊光晕被切",
+        "shadowNode",
+        "模糊脏区",
+        "blur sigma",
+        "原生模糊属性"
+      ]
+    },
+    {
+      "id": "fusion-render.ime-keyboard-issues",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/ime-keyboard-issues.md",
+      "keywords": [
+        "键盘遮挡",
+        "遮挡输入框",
+        "弹层被键盘盖",
+        "弹层不上抬",
+        "sheet 不上抬",
+        "键盘透出下层",
+        "键盘避让透出",
+        "键盘动画透背景",
+        "残留白条",
+        "键盘 inset 不归零",
+        "WindowInsets.ime 恒 0",
+        "imePadding 为 0",
+        "切换键盘失焦",
+        "切换键盘",
+        "安全键盘",
+        "失焦",
+        "键盘避让",
+        "KeyboardAvoidMode",
+        "setKeyboardAvoidMode",
+        "LocalLayoutMargins",
+        "LocalPlatformInsetsHolder",
+        "KeyboardStatusThrottle"
+      ]
+    },
+    {
+      "id": "fusion-render.interop-nested-scroll-architecture",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/interop-nested-scroll-architecture.md",
+      "keywords": [
+        "嵌套滚动",
+        "interop 嵌套滚动",
+        "Compose 嵌 ArkUI",
+        "Compose 内嵌 ArkUI",
+        "Compose 里面嵌 ArkUI",
+        "ArkUI 嵌 Compose",
+        "ArkUI 内嵌 Compose",
+        "内层滑到边",
+        "内层滚到边",
+        "滑到边",
+        "滚到边",
+        "外层继续滚",
+        "外层接着滚",
+        "谁接管",
+        "外层接管",
+        "API 22",
+        "API 23",
+        "低版本",
+        "外A内C",
+        "外C内A",
+        "同轴嵌套滚动",
+        "交叉轴",
+        "主导轴",
+        "手势竞技场",
+        "内层不自滚",
+        "撞边接力",
+        "多内层",
+        "内层驱动",
+        "外层单驱",
+        "滚动量协商",
+        "嵌套滚动开关",
+        "内层卡死",
+        "userScrollEnabled",
+        "enableScrollInteraction",
+        "offsetRemain"
+      ]
+    },
+    {
+      "id": "fusion-render.jank-rootcause",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/jank-rootcause.md",
+      "keywords": [
+        "卡顿",
+        "掉帧",
+        "滑动",
+        "动画抖动",
+        "性能",
+        "recomposition",
+        "热点",
+        "jank",
+        "启动卡顿",
+        "冷启动",
+        "启动慢",
+        "首帧晚到",
+        "交互",
+        "图片",
+        "draw"
+      ]
+    },
+    {
+      "id": "fusion-render.localtest-ohrender-harness",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/tools/localtest-ohrender-harness.md",
+      "keywords": [
+        "CanvasTest",
+        "OHRender 接口用例",
+        "Skia 渲染用例",
+        "assembleApp",
+        "OHRENDER_PATH",
+        "DEF_TEST_CANVAS"
+      ]
+    },
+    {
+      "id": "fusion-render.native-crash-localization",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/native-crash-localization.md",
+      "keywords": [
+        "渲染帧崩溃归因",
+        "旋转崩溃",
+        "配置变更崩溃",
+        "use-after-free",
+        "UAF",
+        "UI function doesn't run on UI thread",
+        "CheckMainThread",
+        "finalizer",
+        "终结器线程",
+        "resetOHPainter",
+        "NoSuchElementException",
+        "List is empty",
+        "DepthSortedSet"
+      ]
+    },
+    {
+      "id": "fusion-render.nested-scroll-and-layout",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/nested-scroll-and-layout.md",
+      "keywords": [
+        "滑动无反应",
+        "纵向滑动",
+        "纵向滑动无反应",
+        "嵌套滚动",
+        "嵌套 Compose",
+        "ArkTS 嵌套",
+        "纵向滚动失效",
+        "滑不动",
+        "网盘相册",
+        "下半部分白屏",
+        "下半空白",
+        "巨长白带",
+        "hitTestBehavior Block",
+        "arkTsRenderNodeInterop",
+        "dispatchTouchEvent",
+        "px vp 单位",
+        "screenHeight 高度估算",
+        "onAreaChange",
+        "layoutWeight"
+      ]
+    },
+    {
+      "id": "fusion-render.ohos-frame-architecture",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/ohos-frame-architecture.md",
+      "keywords": [
+        "帧主循环",
+        "VSync",
+        "onFrame",
+        "Recomposer",
+        "文本布局",
+        "ParagraphBuilder",
+        "ParagraphCache",
+        "融合渲染",
+        "自渲染"
+      ]
+    },
+    {
+      "id": "fusion-render.ohrender-internals",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/ohrender-internals.md",
+      "keywords": [
+        "OHRender",
+        "OHPainter",
+        "SkPaint",
+        "OHRender 原理",
+        "反渲染流程",
+        "Skia 子集",
+        "SkCanvas 包装",
+        "画布状态维护",
+        "图片 DMA",
+        "Brush Pen",
+        "文本绘制映射",
+        "新增 draw 函数",
+        "RenderNode 属性取值范围",
+        "ClampFloat",
+        "Float.MAX_VALUE"
+      ]
+    },
+    {
+      "id": "fusion-render.overview",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/fusion-render-overview.md",
+      "keywords": [
+        "融合渲染",
+        "fusion-render",
+        "模块地图",
+        "概念",
+        "overview"
+      ]
+    },
+    {
+      "id": "fusion-render.render-debug-pipeline",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/render-debug-pipeline.md",
+      "keywords": [
+        "渲染管线",
+        "白屏",
+        "黑屏",
+        "不刷新",
+        "Skiko bridge",
+        "surface",
+        "分层定位"
+      ]
+    },
+    {
+      "id": "fusion-render.render-output-correctness",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/render-output-correctness.md",
+      "keywords": [
+        "统一渲染截断",
+        "clip 截断",
+        "少画一块",
+        "内容被裁",
+        "fix_clip_missing",
+        "光标",
+        "光标定位",
+        "光标不在最后",
+        "光标点不到",
+        "点不到末尾",
+        "点击不到末尾",
+        "getOffsetForPosition",
+        "排版坐标偏移"
+      ]
+    },
+    {
+      "id": "fusion-render.render-symptom-map",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/workflows/render-symptom-map.md",
+      "keywords": [
+        "白屏",
+        "黑屏",
+        "文本缺失",
+        "图片缺失",
+        "闪烁",
+        "SkFontMgr",
+        "linkerOpts",
+        "症状"
+      ]
+    },
+    {
+      "id": "fusion-render.renderer-backend-selection",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/renderer-backend-selection.md",
+      "keywords": [
+        "渲染后端",
+        "切换渲染后端",
+        "统一渲染工程",
+        "自渲染",
+        "backendId",
+        "rendererBackend",
+        "both",
+        "后端不生效",
+        "改了配置还是旧后端",
+        "Configured renderer backend is not registered",
+        "No strategies registered",
+        "Renderer backend mismatch",
+        "fusionRendererLinkerOpts",
+        "dlopen 缺符号"
+      ]
+    },
+    {
+      "id": "fusion-render.rendernode-mechanisms-and-perf",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/rendernode-mechanisms-and-perf.md",
+      "keywords": [
+        "节点复用",
+        "SkPicture 无限重放",
+        "子Canvas",
+        "节点分裂",
+        "乱序渲染",
+        "脏区渲染",
+        "saveLayer",
+        "混排",
+        "RasterCache",
+        "透明度优化",
+        "局部录制",
+        "局部刷新异常",
+        "节点 clone",
+        "超大 clip",
+        "无穷裁剪",
+        "节点尺寸推导",
+        "指示器不显示",
+        "子画布尺寸约束"
+      ]
+    },
+    {
+      "id": "fusion-render.rendernode-vsync-pipeline",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/rendernode-vsync-pipeline.md",
+      "keywords": [
+        "OHRenderNode",
+        "RenderNode",
+        "渲染数据承载",
+        "Vsync 渲染流程",
+        "一帧怎么走",
+        "一帧怎么渲染",
+        "一帧如何渲染",
+        "RenderNode 属性映射",
+        "ArkUI 接入",
+        "NotifyRedraw",
+        "clipToFrame",
+        "offset 变化重绘",
+        "输入遮挡",
+        "渲染坐标变换"
+      ]
+    },
+    {
+      "id": "fusion-render.trace-instrumentation",
+      "module": "kmp-fusion-render",
+      "domain": "render",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-fusion-render/references/knowledge/trace-instrumentation.md",
+      "keywords": [
+        "trace 埋点",
+        "ui.util.trace",
+        "HiTrace",
+        "CompositionTracer",
+        "OhosTrace",
+        "VsyncId",
+        "setTracer",
+        "ensureInstalled",
+        "trace 输出开关",
+        "recomposition"
+      ]
+    },
+    {
+      "id": "gc.cmc-collector-architecture",
+      "module": "kmp-gc",
+      "domain": "native-runtime",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-gc/references/knowledge/cmc-collector-architecture.md",
+      "keywords": [
+        "CMC 架构",
+        "collector 全景",
+        "collector 本体",
+        "模块地图",
+        "common-rt",
+        "GC 相位",
+        "相位",
+        "GC phase",
+        "collector phase",
+        "region 模型",
+        "space",
+        "FROM 区",
+        "对象转发",
+        "forwarding",
+        "搬迁流程",
+        "收集主流程",
+        "主流程",
+        "全景",
+        "STW",
+        "young GC",
+        "分配触发 GC",
+        "flip",
+        "raw-pointer region",
+        "搬迁豁免",
+        "回收候选"
+      ]
+    },
+    {
+      "id": "gc.cmc-kn-integration-invariants",
+      "module": "kmp-gc",
+      "domain": "native-runtime",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-gc/references/knowledge/cmc-kn-integration-invariants.md",
+      "keywords": [
+        "CMC barrier",
+        "CRT GC",
+        "read barrier",
+        "读到旧值",
+        "插入屏障",
+        "insertion barrier",
+        "SATB 误导",
+        "写屏障",
+        "读屏障",
+        "weak reference tag",
+        "并发根扫描",
+        "concurrent root scan",
+        "from-space",
+        "全局根",
+        "全局根槽",
+        "slot healing",
+        "PrepareForward",
+        "AssembleGarbageCandidates",
+        "TryForwardObject",
+        "CopyFromSpace",
+        "RemarkAndPreforwardVisitor",
+        "preforward",
+        "静默堆损坏",
+        "GC 卡死 丢根",
+        "对象移动 悬空引用",
+        "rt-switch",
+        "内存管理切换"
+      ]
+    },
+    {
+      "id": "gc.host-ab-verification",
+      "module": "kmp-gc",
+      "domain": "native-runtime",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-gc/references/workflows/host-ab-verification.md",
+      "keywords": [
+        "A/B 验证",
+        "host 复现",
+        "macOS 复现 GC 崩溃",
+        "对照实验",
+        "修复验证",
+        "复现不了",
+        "复现不出来",
+        "复现概率",
+        "失败率",
+        "配错",
+        "failing set",
+        "同树对照",
+        "配对",
+        "vintage 混配",
+        "marker 验证",
+        "假阳性 假阴性",
+        "GC 压测"
+      ]
+    },
+    {
+      "id": "gc.moving-gc-no-copy-audit",
+      "module": "kmp-gc",
+      "domain": "native-runtime",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-gc/references/workflows/moving-gc-no-copy-audit.md",
+      "keywords": [
+        "no-copy",
+        "裸指针",
+        "stale pointer",
+        "from-space",
+        "from-space 旧值",
+        "旧内存",
+        "对象搬迁",
+        "对象被搬走",
+        "字符串内容坏了",
+        "内容拷坏",
+        "数据腐蚀",
+        "拷坏",
+        "exit 0",
+        "moving GC",
+        "搬迁复现不了",
+        "复现不了搬迁",
+        "aged source",
+        "region 豁免",
+        "裸指针跨分配"
+      ]
+    },
+    {
+      "id": "gc.ohos-suite-evidence",
+      "module": "kmp-gc",
+      "domain": "native-runtime",
+      "facet": "tool",
+      "audience": "ai",
+      "path": "skills/kmp-gc/references/workflows/ohos-gc-suite-evidence.md",
+      "keywords": [
+        "CPF-KMP CMS 测试",
+        "CPF-KMP CMC 测试",
+        "OHOS GC correctness",
+        "测试输入身份",
+        "RECONSTRUCTED_FIXTURE",
+        "框架 PASS",
+        "测试批次合并",
+        "CMC libcrt.so",
+        "LD_LIBRARY_PATH",
+        "Error loading shared library libcrt.so",
+        "run_rc=127"
+      ]
+    },
+    {
+      "id": "governance.architecture-maintenance",
+      "module": "cpf-kmp-knowledge-base-management",
+      "domain": "knowledge-base",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-knowledge-base-management/references/architecture-maintenance.md",
+      "keywords": [
+        "agent-skills 架构更新",
+        "agent-skills 架构维护",
+        "agent-skills 架构演进",
+        "agent-skills 的 skill 架构",
+        "agent-skills 的 RAG 架构",
+        "agent-skills 两级 RAG",
+        "agent-skills reference schema",
+        "agent-skills scripts assets",
+        "Skill bundled resources",
+        "agent-skills catalog plugin CI",
+        "agent-skills repository architecture",
+        "指定 Skill 贡献",
+        "agent-skills 来源版本治理",
+        "agent-skills source manifest",
+        "agent-skills 源码兼容",
+        "来源版本治理",
+        "源码兼容关系",
+        "repository architecture of gitcode.com/CPF-KMP-CMP/agent-skills",
+        "cpf-kmp 架构维护",
+        "CPF-KMP 知识库架构演进"
+      ]
+    },
+    {
+      "id": "governance.document-import",
+      "module": "cpf-kmp-knowledge-base-management",
+      "domain": "knowledge-base",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-knowledge-base-management/references/document-import.md",
+      "keywords": [
+        "KMP知识库提PR",
+        "KMP知识库更新PR",
+        "agent-skills 导入文档",
+        "知识入库",
+        "reference 放置",
+        "领域划分",
+        "document import",
+        "提交本地 Skill",
+        "本地 Skill",
+        "本地 Skill 入库",
+        "指定 Skill 导入",
+        "提交沉淀区",
+        "提交本地沉淀",
+        "产品仓管理 Skill",
+        "产品源码仓管理 Skill",
+        "placeholder Skill 首批材料",
+        "开发者提交产品仓管理"
+      ]
+    },
+    {
+      "id": "governance.issue-handling",
+      "module": "cpf-kmp-knowledge-base-management",
+      "domain": "knowledge-base",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-knowledge-base-management/references/issue-handling.md",
+      "keywords": [
+        "KMP知识库提Issue",
+        "agent-skills 提 Issue",
+        "agent-skills 仓提 Issue",
+        "agent-skills 问题单",
+        "CPF-KMP 知识库坏路由",
+        "gitcode.com/CPF-KMP-CMP/agent-skills 创建 Issue"
+      ]
+    },
+    {
+      "id": "governance.pr-authoring",
+      "module": "cpf-kmp-knowledge-base-management",
+      "domain": "knowledge-base",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-knowledge-base-management/references/pr-authoring.md",
+      "keywords": [
+        "给 agent-skills 提 PR",
+        "给 agent-skills 仓提 PR",
+        "更新 agent-skills PR",
+        "KMP知识库更新PR",
+        "agent-skills 作者清单",
+        "CPF-KMP 知识库提交",
+        "gitcode.com/CPF-KMP-CMP/agent-skills 提 PR"
+      ]
+    },
+    {
+      "id": "governance.pr-review",
+      "module": "cpf-kmp-knowledge-base-management",
+      "domain": "knowledge-base",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-knowledge-base-management/references/pr-review.md",
+      "keywords": [
+        "KMP知识库检视PR",
+        "审核 agent-skills PR",
+        "审核 agent-skills 仓 PR",
+        "检视 agent-skills PR",
+        "agent-skills review",
+        "gitcode.com/CPF-KMP-CMP/agent-skills/pull",
+        "gitcode.com/CPF-KMP-CMP/agent-skills/merge_requests"
+      ]
+    },
+    {
+      "id": "governance.repository-audit",
+      "module": "cpf-kmp-knowledge-base-management",
+      "domain": "knowledge-base",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-knowledge-base-management/references/repository-audit.md",
+      "keywords": [
+        "agent-skills 全量检查",
+        "agent-skills 仓做全量检查",
+        "agent-skills 全量审计",
+        "全量审计 agent-skills",
+        "agent-skills 仓库审计",
+        "仓库审计 agent-skills",
+        "审计整个 agent-skills 仓库",
+        "agent-skills 逐文件检查",
+        "逐文件检查 agent-skills",
+        "agent-skills 逐文件检视",
+        "agent-skills 单 skill 多 skill 闭环",
+        "agent-skills repository audit",
+        "repository audit for gitcode.com/CPF-KMP-CMP/agent-skills",
+        "cpf-kmp 仓库审计",
+        "CPF-KMP 知识库全仓审计"
+      ]
+    },
+    {
+      "id": "governance.session-knowledge-capture",
+      "module": "cpf-kmp-knowledge-base-management",
+      "domain": "knowledge-base",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-knowledge-base-management/references/session-knowledge-capture.md",
+      "keywords": [
+        "KMP知识库沉淀",
+        "CPF-KMP 会话沉淀",
+        "CPF-KMP 经验沉淀",
+        "本轮经验先保存到本地",
+        "session knowledge capture"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.boundary-registration-drift",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/workflows/boundary-registration-drift.md",
+      "keywords": [
+        "Kotlin 帧扫不出来",
+        "整线程根丢失",
+        "walker 漏帧",
+        "android_arm32 构建失败",
+        "android_arm32",
+        "符号未声明",
+        "common:: 符号缺失",
+        "CRT 方法未声明",
+        "回调再入崩溃",
+        "safepoint poll SIGSEGV",
+        "注册漂移",
+        "白名单漂移",
+        "registration drift",
+        "丢根"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.crt-finalizer-shutdown",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/crt-finalizer-shutdown.md",
+      "keywords": [
+        "KNFinalizationInterface",
+        "FinalizerThreadIsRunning",
+        "FinalizersThreadIsRunning",
+        "knownRuntimes",
+        "aliveRuntimesCount",
+        "Kotlin_shutdownRuntime",
+        "checked shutdown",
+        "forceCheckedShutdown",
+        "alive runtimes",
+        "finalizer 注册",
+        "CRT finalizer",
+        "FinalizerHooks",
+        "finalizer 关闭",
+        "Cannot run checkers",
+        "CRT finalizer thread is expected to start during init"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.gc-addrspace-statepoint-model",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/gc-addrspace-statepoint-model.md",
+      "keywords": [
+        "addrspace",
+        "addrspace(1)",
+        "AS0 泄漏",
+        "statepoint",
+        "gc.relocate",
+        "RS4GC",
+        "根槽",
+        "root slot",
+        "shadow stack",
+        "引用丢跟踪",
+        "对象移动 悬空",
+        "bc 里没有 statepoint",
+        "精确栈 codegen"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.gc-mode-stackmap-toggle",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/tools/gc-mode-stackmap-toggle.md",
+      "keywords": [
+        "gc 模式切换",
+        "切 gc 模式",
+        "-Xbinary=gc=cms",
+        "-Xbinary=gc=cmc",
+        "-Xbinary=gc=pmcs",
+        "-Xallocator=crt",
+        "cms cmc pmcs",
+        "K/N GC mode",
+        "kotlin.native.crt",
+        "Linker.kt",
+        "EnabledTargets",
+        "libcrt.so",
+        "precise stackmap",
+        "精确栈开关",
+        "enableStackmap",
+        "ohos_x64 off 包",
+        "x86 模拟器",
+        "栈口味",
+        "口味混配",
+        "跨 vintage 配对",
+        "rt-switch",
+        "USE_CRT"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.interop-stub-gv-materialization",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/interop-stub-gv-materialization.md",
+      "keywords": [
+        "KotlinStubGV",
+        "KotlinStubGV not found",
+        "KotlinStubGenerator",
+        "interop stub",
+        "K2N stub",
+        "N2K stub",
+        "boundary function",
+        "specialized",
+        "FunctionSpecialization",
+        "MergeFunctions",
+        "AlwaysInliner",
+        "emitKotlinCallStubInstImpl",
+        "isKotlinInteropBoundary",
+        "kotlin-native 属性",
+        "mlink-builtin-bitcode",
+        "后端 fatal error"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.kn-runtime-dist-rebuild-and-crt-tests",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/tools/kn-runtime-dist-rebuild-and-crt-tests.md",
+      "keywords": [
+        "K/N runtime 重建",
+        "dist 重建",
+        "crtGcTest",
+        "CRT GC 测试",
+        "dist libcrt.so",
+        "Failed connecting to the daemon",
+        "空 jar",
+        "build cache 中毒",
+        "compdb",
+        "clangd",
+        "bc graft",
+        "快速 A/B",
+        "libcxx-ohos"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.konanc-llvm-backend-cmdline-repro",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/tools/konanc-llvm-backend-cmdline-repro.md",
+      "keywords": [
+        "konanc 后端命令行",
+        "clang++ -cc1 -emit-obj",
+        "-Xverbose-phases=ObjectFiles",
+        "ObjectFilesPhase",
+        "BitcodeCompiler",
+        "-Xsave-llvm-ir-after",
+        "-Xsave-llvm-ir-directory",
+        "-Xtemporary-files-dir",
+        "-Xoverride-clang-options",
+        "out.bc",
+        "Codegen.ll",
+        "LTOBitcodeOptimization.ll",
+        "-mllvm 参数翻译",
+        "llc -mtriple",
+        "opt -passes",
+        "-disable-llvm-optzns",
+        "clangFlags.ohos_arm64",
+        "targetTriple 字面量",
+        "aarch64-linux-ohos",
+        "absoluteLlvmHome",
+        "-ftime-report=per-pass",
+        "-ftime-report=per-pass-run",
+        "new pass manager timing",
+        "instrumentation overhead",
+        ".bc to .o benchmark"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.kotlin-compiler-local-build",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/tools/kotlin-compiler-local-build.md",
+      "keywords": [
+        "本地编译 kotlin 编译器",
+        "kotlin-native-prebuilt",
+        "Could not find kotlin-native-prebuilt",
+        "publishBundlePrebuilt",
+        "DEPLOY_VERSION",
+        "下游消费本地 kotlin",
+        "rsync build repo",
+        "rsync ~/.m2",
+        "konan dist",
+        "plugin not found",
+        ".pom 在 m2",
+        "exit code 134",
+        "library load disallowed",
+        "exit code 137",
+        "Killed: 9",
+        "_LocationEssentials",
+        "Xcode 26"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.lfi-anchor-boundary-protocol",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/lfi-anchor-boundary-protocol.md",
+      "keywords": [
+        "LastFrameInfo",
+        "锚点",
+        "anchor",
+        "边界 stub",
+        "boundary stub",
+        "栈扫描 walker",
+        "FpUnwind",
+        "精确栈扫描 帧分类",
+        "GC 根丢失 整线程",
+        "stub 异常路径",
+        "unwind personality",
+        "safepoint park",
+        "帧类型混乱"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.local-llvm-toolchain-binding",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/tools/local-llvm-toolchain-binding.md",
+      "keywords": [
+        "本地编译 OHOS LLVM",
+        "llvm-build/build.py",
+        "discover_paths REPOROOT",
+        "out/llvm-install",
+        "out/llvm_make",
+        "ninja install 漏执行",
+        "-Pkotlin.native.llvm",
+        "kotlin.native.llvm 绝对路径",
+        "llvmHome.macos_arm64",
+        "targetToolchain.macos_arm64-ohos_arm64",
+        "dist konan.properties 绑定校验",
+        "ohos_arm64CrossDistRuntime",
+        "ohos_arm64PlatformLibs",
+        "distCompiler 变成 no-op",
+        "isDefaultNativeHome",
+        "buildLibCrt",
+        "common-rt build.sh 生成文件",
+        "工具链新旧混用",
+        "KN-performance-testcases",
+        "本地 konanc 跑矩阵",
+        "llvmVersion 记录不准",
+        "-Xverbose-phases=Linker"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.object-holder-and-pin-scope",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/object-holder-and-pin-scope.md",
+      "keywords": [
+        "ObjHolder",
+        "EnterPinScope",
+        "pin scope",
+        "CRT_Pin",
+        "CRT_UnPin",
+        "Kotlin_String_replace",
+        "Kotlin_String_plusImpl",
+        "Kotlin_String_unsafeStringFromCharArray",
+        "Kotlin_String_overwriteArray",
+        "字符串跨分配",
+        "根引用",
+        "对象固定",
+        "旧地址"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.ohos-native-linking-and-abi",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/ohos-native-linking-and-abi.md",
+      "keywords": [
+        "Kotlin Native 链接",
+        "ET_DYN",
+        "libcrt.so",
+        "OhosLinker",
+        "Kotlin Native ABI",
+        "符号可见性"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.pinning-and-gc-region",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/pinning-and-gc-region.md",
+      "keywords": [
+        "pin",
+        "region pin",
+        "unpin",
+        "usePinned",
+        "addressOf",
+        "Pinned",
+        "RawPointer",
+        "地址稳定",
+        "pin 泄漏",
+        "钉住对象",
+        "zero-copy",
+        "裸指针交给 native",
+        "Latin1 String",
+        "String.usePinned"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.release-artifact-equivalence-audit",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "tool",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/workflows/release-artifact-equivalence-audit.md",
+      "keywords": [
+        "产物等价性判定",
+        "重复构建噪声基线",
+        "runtime.fingerprint",
+        "compiler.fingerprint",
+        "PrepareDistributionFingerprint",
+        "distInvalidateStaleCaches",
+        "CrossDistBitcodeCopy",
+        "klib/cache 陈旧缓存",
+        "validateStaleCache",
+        "RuntimeAssert 源码行号",
+        "CURRENT_SOURCE_LOCATION",
+        "Kotlin_runtimeAssertsMode",
+        "!srcloc 偏移漂移",
+        "predefines 缓冲区",
+        "llvm.ident",
+        "canonicalizer 正对照",
+        "差异归因链",
+        "bitcode 逐字节比对",
+        "libcrt.so 进 runtime 指纹"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.runtime-hotpaths-and-platform-trace",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/runtime-hotpaths-and-platform-trace.md",
+      "keywords": [
+        "Kotlin runtime 热路径",
+        "Kotlin_ByteArray",
+        "restrace",
+        "KmpTraceSupported",
+        "弱符号"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.safepoint-late-expansion-vs-runtime-switch",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/safepoint-late-expansion-vs-runtime-switch.md",
+      "keywords": [
+        "SAFEPOINT_EXPANSION_NONE",
+        "safepoint expansion",
+        "inline poll",
+        "PrologueStub",
+        "WhileLoopBodyStub",
+        "while-loop-body",
+        "Kotlin_mm_safePointWhileLoopBody",
+        "Kotlin_mm_safePointWhileLoopBodyStub",
+        "collectWhileLoopSafepoints",
+        "expandWhileLoopSafepoints",
+        "SafePointSlowPathStub",
+        "slowPathStub",
+        "RUNTIME_SWITCH",
+        "RemoveRedundantSafepoints",
+        "isSafepointInliningAllowed",
+        "shouldInlineSafepoints",
+        "inlineForPerformance",
+        "firstBlockHasSafepoint",
+        "两个 K2R 边界",
+        "trampoline",
+        "循环体 safepoint"
+      ]
+    },
+    {
+      "id": "native-compiler-runtime.x28-tls-phase-register-contract",
+      "module": "kmp-native-compiler-runtime",
+      "domain": "native-compiler-backend",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-native-compiler-runtime/references/knowledge/x28-tls-phase-register-contract.md",
+      "keywords": [
+        "x28",
+        "TLS 寄存器",
+        "相位位",
+        "phase bit",
+        "读屏障失效",
+        "read barrier elision",
+        "foreign 回调崩溃",
+        "safepoint poll crash",
+        "寄存器保留",
+        "reserved register",
+        "gc fastpath",
+        "直呼 契约",
+        "direct native call"
+      ]
+    },
+    {
+      "id": "ohos-platform.kmp-platform-overview",
+      "module": "kmp-ohos-platform",
+      "domain": "ohos-platform",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-ohos-platform/references/knowledge/ohos-kmp-platform-overview.md",
+      "keywords": [
+        "KMP on OHOS",
+        "KMP integrates with OHOS",
+        "KMP 对 OHOS",
+        "KMP 在鸿蒙",
+        "KMP 怎么在鸿蒙",
+        "KMP 接入 OHOS",
+        "Kotlin 调用 OHOS C API",
+        "ohosCAPI",
+        "KMP 鸿蒙能力",
+        "鸿蒙跨平台方案",
+        "鸿蒙平台架构",
+        "平台地图",
+        "架构图",
+        "原生编译",
+        "系统能力",
+        "平台分层",
+        "宿主边界",
+        "ArkTS 宿主",
+        "ArkUI",
+        "Kotlin/Native OHOS",
+        "MainArkUIViewController",
+        "平台边界",
+        "共享代码和 OHOS 专用代码",
+        "ArkTS 承载 KMP",
+        "ArkUI 承载 Compose"
+      ]
+    },
+    {
+      "id": "ohos-platform.project-artifact-model",
+      "module": "kmp-ohos-platform",
+      "domain": "ohos-platform",
+      "facet": "knowledge",
+      "audience": "both",
+      "path": "skills/kmp-ohos-platform/references/knowledge/ohos-project-and-artifact-model.md",
+      "keywords": [
+        "OHOS 工程",
+        "ohosArm64",
+        "ohosX64",
+        "ohosMain",
+        "commonMain",
+        "harmonyApp",
+        "libkn.so",
+        "libkn_api.h",
+        "libentry.so",
+        "compose.har",
+        "HAP",
+        "HAR",
+        "source set",
+        "OHOS source set",
+        "产物模型",
+        "产物",
+        "安装包",
+        "应用包",
+        "native 库",
+        "HAP 和 HAR",
+        "KMP 应用装配",
+        "ArkTS 承载 KMP",
+        "共享代码和 OHOS 专用代码",
+        "Compose 资源流向",
+        "kotlin.native.home",
+        "Maven KLIB",
+        "重编依赖",
+        "重编 KLIB",
+        "重编 HAR",
+        "不改应用 C++",
+        "应用侧 native 胶水",
+        "napi_init.cpp 空实现"
+      ]
+    },
+    {
+      "id": "product-repo.agent-write-boundary",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/agent-write-boundary-on-product-repos.md",
+      "keywords": [
+        "写入边界",
+        "可改目录",
+        "白名单",
+        "黑名单",
+        "保护路径",
+        "只读仓",
+        "补丁校验",
+        "补丁被拒",
+        "不许改测试",
+        "自动化改动",
+        "coding agent",
+        "策略文件",
+        "多仓路由",
+        "子模块归属"
+      ]
+    },
+    {
+      "id": "product-repo.automated-repair-pr-lifecycle",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/automated-repair-pr-lifecycle.md",
+      "keywords": [
+        "修复 PR",
+        "自动生成 PR",
+        "PR 生命周期",
+        "PR 收敛",
+        "自动关闭",
+        "目标分支",
+        "净修复",
+        "构建噪声",
+        "diff 为空",
+        "门禁判红",
+        "红绿判定",
+        "自动修复",
+        "判红",
+        "判绿",
+        "推送被拒",
+        "fork 属主"
+      ]
+    },
+    {
+      "id": "product-repo.code-review",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/code-review.md",
+      "keywords": [
+        "CPF-KMP 产品代码检视",
+        "code review",
+        "旧意见",
+        "本地改动",
+        "代码差异",
+        "调用链",
+        "增量复审",
+        "Fork PR",
+        "评论去重",
+        "评论回读"
+      ]
+    },
+    {
+      "id": "product-repo.code-review-architecture-compatibility",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/code-review-architecture-compatibility.md",
+      "keywords": [
+        "产品架构检视",
+        "平台隔离",
+        "兼容性检视",
+        "跨仓同步",
+        "重构等价性",
+        "组件许可"
+      ]
+    },
+    {
+      "id": "product-repo.code-review-async-lifecycle",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/code-review-async-lifecycle.md",
+      "keywords": [
+        "异步生命周期检视",
+        "销毁后回调",
+        "取消后完成",
+        "持锁等待",
+        "thread_local",
+        "静态初始化"
+      ]
+    },
+    {
+      "id": "product-repo.code-review-cpp-safety",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/code-review-cpp-safety.md",
+      "keywords": [
+        "C++ 代码检视",
+        "整数溢出",
+        "RAII",
+        "异常路径",
+        "比较器"
+      ]
+    },
+    {
+      "id": "product-repo.code-review-data-and-control-flow",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/code-review-data-and-control-flow.md",
+      "keywords": [
+        "数据契约检视",
+        "控制流检视",
+        "类型断言",
+        "索引错误",
+        "输入事件",
+        "无障碍"
+      ]
+    },
+    {
+      "id": "product-repo.code-review-documentation",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/code-review-documentation.md",
+      "keywords": [
+        "文档检视",
+        "文档审计",
+        "示例说明",
+        "双语一致性"
+      ]
+    },
+    {
+      "id": "product-repo.code-review-performance-security",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/code-review-performance-security.md",
+      "keywords": [
+        "性能代码检视",
+        "安全代码检视",
+        "热路径",
+        "缓存失效",
+        "外部输入"
+      ]
+    },
+    {
+      "id": "product-repo.kotlin-repository-review",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/kotlin-repository-review.md",
+      "keywords": [
+        "Kotlin 产品 PR",
+        "OH 适配检视",
+        "上游边界",
+        "中文测试数据",
+        "DCO"
+      ]
+    },
+    {
+      "id": "product-repo.source-lineage-and-worktrees",
+      "module": "cpf-kmp-product-repository-management",
+      "domain": "repo-management",
+      "audience": "ai",
+      "path": "skills/cpf-kmp-product-repository-management/references/source-lineage-and-worktrees.md",
+      "keywords": [
+        "worktree",
+        "工作区",
+        "checkout",
+        "锚点仓",
+        "canonical",
+        "隔离环境",
+        "污染源码目录",
+        "封版快照",
+        "分支命名",
+        "多分支并行",
+        "台账",
+        "清理工作区"
+      ]
+    }
+  ]
+}
