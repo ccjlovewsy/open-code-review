@@ -81,8 +81,9 @@ type ToolCalls struct {
 
 // Comment mirrors model.LlmComment. StartLine and EndLine are 1-indexed; when
 // both are 0 the finding is file-level and the adapter must not invent a line
-// number. Severity is an open set (critical, high, medium, low have been
-// observed, but consumers must tolerate unknown values).
+// number. Severity is an open set (critical, high, medium, suggestion have been
+// observed, but consumers must tolerate unknown values). Disposition is
+// confirmed or needs_confirmation; an empty value means confirmed.
 type Comment struct {
 	Path           string `json:"path"`
 	Content        string `json:"content"` // always emitted; mirrors model.LlmComment's tag
@@ -92,6 +93,7 @@ type Comment struct {
 	EndLine        int    `json:"end_line"`
 	Category       string `json:"category,omitempty"`
 	Severity       string `json:"severity,omitempty"`
+	Disposition    string `json:"disposition,omitempty"`
 }
 
 // Manifest mirrors the review run manifest (ocr.run-manifest/v1). Only the

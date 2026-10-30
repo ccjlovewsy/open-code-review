@@ -3,7 +3,7 @@
 > 状态：活跃
 > 创建：2026-10-30
 > 基线：`OCR-vs-CPF实测对比.md` §8（11 PR / 60 条 CPF 评论，三阶段实测）
-> 当前分支 HEAD：`941cee2`（`feat/cpf-kb-review-enhancements`）
+> 当前分支 HEAD：`cea0740`（文档初版提交）；能力差距基线 `941cee2`（`feat/cpf-kb-review-enhancements`）
 > 维护约定：每完成一项，更新本文档的状态、commit、验证命令与残留风险；未验证的内容不得标记为完成。
 
 ## 0. 维护约定（过程透明）
@@ -229,6 +229,8 @@
 }
 ```
 
+`check` / `remediation` 只放可检索的摘要；完整规则正文与触发细节仍以目标仓 `rule.json` 或知识文档为准，避免双份维护。
+
 **实施步骤**：
 
 1. 写生成脚本（建议 `scripts/build-rule-catalog.*`），解析 `references/custom/*.md` 与 `references/*-standard.md` 的表格行，不按章号机械生成。
@@ -362,8 +364,8 @@
 | pr408#7 | `useCompilerDriverAsLinker` 与 `ld.lld` 矛盾 | OHOS linker | 同上 |
 | pr408#10 | 链接命令缺失 `dynamicLibraries` | OHOS linker | 同上 |
 | pr408#11 | `OHOS_X64` 不应列 HWADDRESS | target capability | `规则映射表.md` R-xplat-4；`R3-003` |
-| pr447#3 | `prctl(PR_SET_VMA_ANON_NAME)` 去掉 `useMmap` 短路 | 系统调用前置条件 | `OCR-vs-CPF实测对比.md` §4.3；agent-skills GC/runtime 资料 |
-| pr438#2 | 非 OHOS `DumpMemoryAsync` 改为 gzip、移除 `isStrip` 拒绝 | 跨平台 dump | `OCR-vs-CPF实测对比.md` §4.5；agent-skills `ohos-native-linking-and-abi.md` 等 |
+| pr447#3 | `prctl(PR_SET_VMA_ANON_NAME)` 去掉 `useMmap` 短路 | 系统调用前置条件 | `OCR-vs-CPF实测对比.md` §4.3；agent-skills `kmp-gc` / `kmp-native-compiler-runtime` |
+| pr438#2 | 非 OHOS `DumpMemoryAsync` 改为 gzip、移除 `isStrip` 拒绝 | 跨平台 dump | `OCR-vs-CPF实测对比.md` §4.5；agent-skills `kmp-native-compiler-runtime`（runtime/dump 相关 reference） |
 
 **建议做法**：
 
@@ -540,9 +542,9 @@
 
 ### 3.3 推荐落地步骤（方案 C）
 
-1. **建目录**：`catalog.json`（规则/索引）+ `knowledge/`（按 domain 存放 vendoring 的 reference 摘要或全文）。
+1. **建目录**：`catalog.json`（ID/索引/元数据）+ `knowledge/`（按 domain 存放 vendoring 的 reference 摘要或全文）；可执行规则文本仍写入目标仓 `.opencodereview/rule.json` 或内置规则文件，catalog 不复制正文，避免两套真相。
 2. **抽取**：脚本解析 `kotlin-pr-review` 的 207 条规则 + `agent-skills` 168 条 reference，生成 catalog；保留 `source`、`commit`、`license`。
-3. **映射**：用 domain 字段把规则、reference、路径触发条件关联起来；与 3.3 的路由表共用。
+3. **映射**：用 domain 字段把规则、reference、路径触发条件关联起来；与任务 3.3 的路由表共用。
 4. **注入**：prompt 只加载“目录摘要 + 命中领域的核心规则”；详细文档按需加载，受 token 上限约束。
 5. **校验**：CI 校验 catalog schema、ID 唯一性、来源存在、生成文件与脚本一致；禁止手改生成文件。
 6. **刷新**：记录 `knowledge_version`（agent-skills 2026-09）与 commit；每次刷新单独提交并附 diff 说明。
@@ -605,7 +607,7 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 - [x] 事项 4：pr408 重跑（营救生效 + 规则巡检有效）—— 2026-10-29，commit `13a358c`
 - [x] 事项 5：Stage A + Stage B（11 PR 详细匹配分析）—— 2026-10-29，commit `3d329b0`、`616b747`
 - [x] 能力差距评估（§8 已添加到文档）—— 2026-10-30，commit `2bfae0e`
-- [x] 创建本文档（OCR 增强待办）—— 2026-10-30，未提交，待 review
+- [x] 创建本文档（OCR 增强待办）—— 2026-10-30，初版由 commit `cea0740` 收录；后续修订见工作区
 
 **提交哈希说明**：以上为记录时的分支提交。当前分支重建后存在 patch-id 等价的提交，核对结果如下（2026-10-30）：
 
@@ -635,7 +637,8 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 
 | 日期 | 变更 | commit/说明 |
 |---|---|---|
-| 2026-10-30 | 创建文档，整理 P0/P1/P2 任务、复用方案、资源与验收标准 | 未提交 |
+| 2026-10-30 | 创建文档，整理 P0/P1/P2 任务、复用方案、资源与验收标准 | `cea0740` |
+| 2026-10-30 | 修正规则来源与交叉引用，补充“本次创建核对记录” | 工作区，未提交 |
 
 **本次创建核对记录（2026-10-30）**：
 

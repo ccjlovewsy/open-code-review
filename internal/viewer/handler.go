@@ -132,6 +132,7 @@ func toLlmComments(comments []*ReviewComment) []model.LlmComment {
 			EndLine:        c.EndLine,
 			Category:       c.Category,
 			Severity:       c.Severity,
+			Disposition:    c.Disposition,
 		})
 	}
 	return out

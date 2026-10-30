@@ -16,8 +16,12 @@ type LlmComment struct {
 	// bug, security, performance, maintainability, test, style, documentation, process, other.
 	Category string `json:"category,omitempty"`
 	// Severity indicates the importance of the finding. One of:
-	// critical, high, medium, low, suggestion, needs_confirmation.
+	// critical, high, medium, suggestion.
 	Severity string `json:"severity,omitempty"`
+	// Disposition records whether the evidence is confirmed. One of:
+	// confirmed, needs_confirmation; empty means confirmed. It never changes
+	// the severity ranking.
+	Disposition string `json:"disposition,omitempty"`
 	// Topic is the secondary classification within the category (free text,
 	// e.g. "logic error", "stability", "readability"). Empty when the category
 	// alone is specific enough.

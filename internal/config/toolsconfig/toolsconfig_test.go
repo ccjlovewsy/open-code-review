@@ -28,6 +28,55 @@ func TestLoad_Default(t *testing.T) {
 	}
 }
 
+// TestDefaultCodeCommentSchema pins the four-level severity enum and the
+// separate disposition field so a prompt/schema drift cannot reintroduce low or
+// needs_confirmation as severities.
+func TestDefaultCodeCommentSchema(t *testing.T) {
+	tools, err := Load("")
+	if err != nil {
+		t.Fatalf("Load default tools: %v", err)
+	}
+	var def struct {
+		Parameters struct {
+			Properties struct {
+				Comments struct {
+					Items struct {
+						Properties map[string]struct {
+							Enum []string `json:"enum"`
+						} `json:"properties"`
+					} `json:"items"`
+				} `json:"comments"`
+			} `json:"properties"`
+		} `json:"parameters"`
+	}
+	for _, entry := range tools {
+		if entry.Name != "code_comment" {
+			continue
+		}
+		if err := json.Unmarshal(entry.Definition, &def); err != nil {
+			t.Fatalf("unmarshal code_comment definition: %v", err)
+		}
+		fields := def.Parameters.Properties.Comments.Items.Properties
+		severity := fields["severity"].Enum
+		if got, want := len(severity), 4; got != want {
+			t.Fatalf("severity enum has %d values (%v), want %d", got, severity, want)
+		}
+		for _, forbidden := range []string{"low", "needs_confirmation"} {
+			for _, value := range severity {
+				if value == forbidden {
+					t.Errorf("severity enum still contains legacy value %q", forbidden)
+				}
+			}
+		}
+		disposition := fields["disposition"].Enum
+		if got, want := len(disposition), 2; got != want {
+			t.Fatalf("disposition enum has %d values (%v), want %d", got, disposition, want)
+		}
+		return
+	}
+	t.Fatal("code_comment tool not found in default tools config")
+}
+
 func TestLoad_CustomFile(t *testing.T) {
 	tmp := t.TempDir()
 	path := filepath.Join(tmp, "tools.json")

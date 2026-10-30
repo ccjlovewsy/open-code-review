@@ -179,7 +179,7 @@ func TestParseTemplate_SessionWithComments(t *testing.T) {
 		{FilePath: "a.go", Content: "c1", Category: "bug", Severity: "critical", StartLine: 1, EndLine: 2},
 		{FilePath: "a.go", Content: "c2", Category: "security", Severity: "high"},
 		{FilePath: "b.go", Content: "c3", Category: "performance", Severity: "medium"},
-		{FilePath: "b.go", Content: "c4", Category: "docs", Severity: "low"},
+		{FilePath: "b.go", Content: "c4", Category: "docs", Severity: "suggestion", Disposition: "needs_confirmation"},
 	}
 	vs := &ViewSession{
 		Summary:  SessionSummary{SessionID: "s", CWD: "/p"},
@@ -205,10 +205,12 @@ func TestParseTemplate_SessionWithComments(t *testing.T) {
 		`data-filter-kind="severity" data-filter-value="all"`,
 		`data-filter-kind="category" data-filter-value="all"`,
 		`data-filter-kind="severity" data-filter-value="critical"`,
+		`data-filter-kind="severity" data-filter-value="suggestion"`,
 		`data-filter-kind="category" data-filter-value="bug"`,
 		`data-filter-kind="category" data-filter-value="other"`,
 		`data-comment-card data-category="bug" data-severity="critical"`,
-		`data-comment-card data-category="other" data-severity="low"`,
+		`data-comment-card data-category="other" data-severity="suggestion"`,
+		`<span class="comment-badge severity-needs-confirmation">needs_confirmation</span>`,
 		`<nav id="comments-pagination" class="pagination" aria-label="Review comment pages" hidden>`,
 		`<details class="comment-file-group" open hidden>`,
 		`data-comment-filter-empty`,

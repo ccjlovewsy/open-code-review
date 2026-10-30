@@ -445,7 +445,7 @@ ocr session comments --severity critical,high --category bug,security <session-i
 |---|---|---|
 | `--repo <path>` | 현재 디렉터리 | 살펴볼 세션이 속한 저장소. |
 | `--json` | `false` | 코멘트를 JSON 배열로 출력합니다. |
-| `--severity <list>` | 전체 | 포함할 심각도(쉼표 구분): `critical`, `high`, `medium`, `low`. |
+| `--severity <list>` | 전체 | 포함할 심각도(쉼표 구분): `critical`, `high`, `medium`, `suggestion`. |
 | `--category <list>` | 전체 | 포함할 분류(쉼표 구분). 예: `bug`, `security`. |
 
 ### `ocr session compare` {#ocr-session-compare}

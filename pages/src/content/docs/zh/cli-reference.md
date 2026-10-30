@@ -427,7 +427,7 @@ ocr session comments --severity critical,high --category bug,security <session-i
 |---|---|---|
 | `--repo <path>` | 当前目录 | 要查看会话的仓库。 |
 | `--json` | `false` | 以 JSON 数组输出评论。 |
-| `--severity <list>` | 全部 | 逗号分隔的要包含的严重程度（`critical`、`high`、`medium`、`low`）。 |
+| `--severity <list>` | 全部 | 逗号分隔的要包含的严重程度（`critical`、`high`、`medium`、`suggestion`）。 |
 | `--category <list>` | 全部 | 逗号分隔的要包含的类别（如 `bug`、`security`）。 |
 
 ### `ocr session compare`

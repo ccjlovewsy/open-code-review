@@ -167,18 +167,21 @@ func sarifRules() []sarifRule {
 }
 
 // sarifSeverityLevel maps an OCR severity string to a SARIF result level.
-// critical/high → error, medium → warning, low/suggestion/needs_confirmation → note.
-// Empty/unknown falls back to "note", matching normalizeCodeCommentSeverity
-// in internal/tool/code_comment.go which defaults unknown severities to "low"
-// (→ "note" at the SARIF level). This prevents an empty severity from being
-// bumped to "warning", which would overstate the finding's importance.
+// critical/high → error, medium → warning, suggestion → note. Empty/unknown
+// falls back to "note", matching normalizeCodeCommentSeverity in
+// internal/tool/code_comment.go which defaults unknown severities to
+// suggestion (→ "note" at the SARIF level). This prevents an empty severity
+// from being bumped to "warning", which would overstate the finding's
+// importance. low and needs_confirmation are legacy severity values kept for
+// sessions written before the four-level scale; the current model records the
+// latter as a disposition and does not change the SARIF level for it.
 func sarifSeverityLevel(severity string) string {
 	switch severity {
 	case "critical", "high":
 		return "error"
 	case "medium":
 		return "warning"
-	case "low", "suggestion", "needs_confirmation":
+	case "suggestion", "low", "needs_confirmation":
 		return "note"
 	default:
 		return "note"

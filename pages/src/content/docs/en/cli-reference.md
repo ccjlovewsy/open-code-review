@@ -453,7 +453,7 @@ ocr session comments --severity critical,high --category bug,security <session-i
 |---|---|---|
 | `--repo <path>` | current dir | Repository whose session should be inspected. |
 | `--json` | `false` | Emit the comments as a JSON array. |
-| `--severity <list>` | all | Comma-separated severities to include (`critical`, `high`, `medium`, `low`). |
+| `--severity <list>` | all | Comma-separated severities to include (`critical`, `high`, `medium`, `suggestion`). |
 | `--category <list>` | all | Comma-separated categories to include (e.g. `bug`, `security`). |
 
 ### `ocr session compare`

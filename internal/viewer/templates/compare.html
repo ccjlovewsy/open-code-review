@@ -37,7 +37,8 @@
     <div class="comment-card" data-pagination-item hidden>
         <div class="comment-meta">
             {{if .Category}}<span class="comment-badge {{categoryClass .Category}}">{{.Category}}</span>{{end}}
-            {{if .Severity}}<span class="comment-badge {{severityClass .Severity}}">{{.Severity}}</span>{{end}}
+            {{if .Severity}}<span class="comment-badge {{severityClass .Severity}}">{{commentSeverity .Severity}}</span>{{end}}
+            {{if .Disposition}}<span class="comment-badge severity-needs-confirmation">{{.Disposition}}</span>{{end}}
             <span class="comment-lines">{{.Path}}{{if .StartLine}}:L{{.StartLine}}{{if and .EndLine (ne .EndLine .StartLine)}}-L{{.EndLine}}{{end}}{{end}}</span>
         </div>
         <div class="comment-content">{{.Content}}</div>

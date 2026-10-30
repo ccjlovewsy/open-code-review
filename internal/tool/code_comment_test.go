@@ -190,6 +190,9 @@ func TestParseComments_CategorySeverity(t *testing.T) {
 		if comments[0].Severity != "" {
 			t.Errorf("severity = %q, want empty", comments[0].Severity)
 		}
+		if comments[0].Disposition != "" {
+			t.Errorf("disposition = %q, want empty", comments[0].Disposition)
+		}
 	})
 
 	t.Run("normalizes casing", func(t *testing.T) {
@@ -243,11 +246,53 @@ func TestParseComments_CategorySeveritySchemaDrift(t *testing.T) {
 	if got := comments[0].Category; got != "other" {
 		t.Errorf("category = %q, want %q", got, "other")
 	}
-	if got := comments[0].Severity; got != "low" {
-		t.Errorf("severity = %q, want %q", got, "low")
+	if got := comments[0].Severity; got != "suggestion" {
+		t.Errorf("severity = %q, want %q", got, "suggestion")
 	}
 	if got := comments[0].Content; got != "Use the canonical metadata fallback." {
 		t.Errorf("content = %q", got)
+	}
+}
+
+func TestParseComments_LegacySeverityMigration(t *testing.T) {
+	tests := []struct {
+		name            string
+		severity        string
+		disposition     string
+		wantSeverity    string
+		wantDisposition string
+	}{
+		{"low becomes suggestion", "low", "", "suggestion", ""},
+		{"needs_confirmation becomes medium plus disposition", "needs_confirmation", "", "medium", "needs_confirmation"},
+		{"explicit disposition is parsed", "high", "needs_confirmation", "high", "needs_confirmation"},
+		{"explicit confirmed overrides legacy inference", "needs_confirmation", "confirmed", "medium", "confirmed"},
+		{"unknown disposition defaults to confirmed", "medium", "unclear", "medium", "confirmed"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj := map[string]any{
+				"content":       "finding",
+				"existing_code": "x := 1",
+				"severity":      tt.severity,
+				"path":          "main.go",
+			}
+			if tt.disposition != "" {
+				obj["disposition"] = tt.disposition
+			}
+			comments, errMsg := ParseComments(map[string]any{"comments": []any{obj}})
+			if errMsg != "" {
+				t.Fatalf("unexpected error message: %s", errMsg)
+			}
+			if len(comments) != 1 {
+				t.Fatalf("expected 1 comment, got %d", len(comments))
+			}
+			if got := comments[0].Severity; got != tt.wantSeverity {
+				t.Errorf("severity = %q, want %q", got, tt.wantSeverity)
+			}
+			if got := comments[0].Disposition; got != tt.wantDisposition {
+				t.Errorf("disposition = %q, want %q", got, tt.wantDisposition)
+			}
+		})
 	}
 }
 
@@ -267,14 +312,18 @@ func TestLlmComment_JSONCategorySeverity(t *testing.T) {
 		if strings.Contains(out, "severity") {
 			t.Errorf("expected no severity key, got %s", out)
 		}
+		if strings.Contains(out, "disposition") {
+			t.Errorf("expected no disposition key, got %s", out)
+		}
 	})
 
 	t.Run("serialized when set", func(t *testing.T) {
 		b, err := json.Marshal(model.LlmComment{
-			Path:     "main.go",
-			Content:  "sql injection",
-			Category: "security",
-			Severity: "critical",
+			Path:        "main.go",
+			Content:     "sql injection",
+			Category:    "security",
+			Severity:    "critical",
+			Disposition: "needs_confirmation",
 		})
 		if err != nil {
 			t.Fatalf("marshal: %v", err)
@@ -285,6 +334,9 @@ func TestLlmComment_JSONCategorySeverity(t *testing.T) {
 		}
 		if !strings.Contains(out, `"severity":"critical"`) {
 			t.Errorf("expected severity in output, got %s", out)
+		}
+		if !strings.Contains(out, `"disposition":"needs_confirmation"`) {
+			t.Errorf("expected disposition in output, got %s", out)
 		}
 	})
 }

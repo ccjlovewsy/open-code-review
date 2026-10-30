@@ -140,8 +140,10 @@ func severityLabel(severity string) string {
 		return "High"
 	case "medium":
 		return "Medium"
+	case "suggestion":
+		return "Suggestion"
 	case "low":
-		return "Low"
+		return "Low" // legacy sessions
 	case "":
 		return "Unspecified"
 	default:
@@ -158,7 +160,7 @@ func writeSeverityCounts(b *strings.Builder, comments []contract.Comment) {
 		counts[comment.Severity]++
 	}
 	labels := make([]string, 0, len(counts))
-	for _, severity := range []string{"critical", "high", "medium", "low"} {
+	for _, severity := range []string{"critical", "high", "medium", "suggestion", "low"} {
 		if count := counts[severity]; count > 0 {
 			labels = append(labels, fmt.Sprintf("%s %d", severityLabel(severity), count))
 			delete(counts, severity)

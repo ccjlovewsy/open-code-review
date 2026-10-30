@@ -428,7 +428,7 @@ ocr session comments --severity critical,high --category bug,security <session-i
 |---|---|---|
 | `--repo <path>` | カレントディレクトリ | セッションを確認するリポジトリ。 |
 | `--json` | `false` | コメントを JSON 配列として出力します。 |
-| `--severity <list>` | すべて | 含める重要度をカンマ区切りで指定します（`critical`、`high`、`medium`、`low`）。 |
+| `--severity <list>` | すべて | 含める重要度をカンマ区切りで指定します（`critical`、`high`、`medium`、`suggestion`）。 |
 | `--category <list>` | すべて | 含めるカテゴリをカンマ区切りで指定します（例: `bug`、`security`）。 |
 
 ### `ocr session compare`

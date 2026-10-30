@@ -197,10 +197,10 @@ type CommentFileGroup struct {
 
 // SeverityCount holds counts for each severity level.
 type SeverityCount struct {
-	Critical int
-	High     int
-	Medium   int
-	Low      int
+	Critical   int
+	High       int
+	Medium     int
+	Suggestion int
 }
 
 // CategoryCount holds counts for each review comment category.
@@ -236,8 +236,41 @@ func normalizedCommentCategory(category string) string {
 	return "other"
 }
 
+// normalizedCommentSeverity folds legacy severity values into the four-level
+// scale for display and filtering: low becomes suggestion, and
+// needs_confirmation becomes medium (its evidence state lives in Disposition).
 func normalizedCommentSeverity(severity string) string {
-	return strings.ToLower(strings.TrimSpace(severity))
+	switch normalized := strings.ToLower(strings.TrimSpace(severity)); normalized {
+	case "low":
+		return "suggestion"
+	case "needs_confirmation":
+		return "medium"
+	default:
+		return normalized
+	}
+}
+
+// migrationSeverityAndDisposition maps a persisted severity onto the current
+// model. Old sessions may still store low or needs_confirmation as a severity;
+// they stay readable, with needs_confirmation additionally recorded as the
+// disposition it now represents.
+func migrationSeverityAndDisposition(severity string) (string, string) {
+	normalized := strings.ToLower(strings.TrimSpace(severity))
+	switch normalized {
+	case "needs_confirmation":
+		return "medium", "needs_confirmation"
+	default:
+		return normalizedCommentSeverity(normalized), ""
+	}
+}
+
+// normalizedCommentDisposition keeps only needs_confirmation; an empty or
+// unknown disposition means confirmed, matching the model default.
+func normalizedCommentDisposition(disposition string) string {
+	if strings.ToLower(strings.TrimSpace(disposition)) == "needs_confirmation" {
+		return "needs_confirmation"
+	}
+	return ""
 }
 
 func categoryCounts(comments []*ReviewComment) CategoryCount {
@@ -270,15 +303,15 @@ func categoryCounts(comments []*ReviewComment) CategoryCount {
 func severityCounts(comments []*ReviewComment) SeverityCount {
 	var counts SeverityCount
 	for _, comment := range comments {
-		switch strings.ToLower(strings.TrimSpace(comment.Severity)) {
+		switch normalizedCommentSeverity(comment.Severity) {
 		case "critical":
 			counts.Critical++
 		case "high":
 			counts.High++
 		case "medium":
 			counts.Medium++
-		case "low":
-			counts.Low++
+		case "suggestion":
+			counts.Suggestion++
 		}
 	}
 	return counts
@@ -428,12 +461,8 @@ func parseTemplate(name string) (*template.Template, error) {
 				return "severity-high"
 			case "medium":
 				return "severity-medium"
-			case "low":
-				return "severity-low"
 			case "suggestion":
 				return "severity-suggestion"
-			case "needs_confirmation":
-				return "severity-needs-confirmation"
 			default:
 				return "severity-default"
 			}

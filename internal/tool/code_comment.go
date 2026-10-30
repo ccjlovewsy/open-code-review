@@ -24,12 +24,13 @@ const (
 	codeCommentCategoryProcess         = "process"
 	codeCommentCategoryOther           = "other"
 
-	codeCommentSeverityCritical          = "critical"
-	codeCommentSeverityHigh              = "high"
-	codeCommentSeverityMedium            = "medium"
-	codeCommentSeverityLow               = "low"
-	codeCommentSeveritySuggestion        = "suggestion"
-	codeCommentSeverityNeedsConfirmation = "needs_confirmation"
+	codeCommentSeverityCritical   = "critical"
+	codeCommentSeverityHigh       = "high"
+	codeCommentSeverityMedium     = "medium"
+	codeCommentSeveritySuggestion = "suggestion"
+
+	codeCommentDispositionConfirmed         = "confirmed"
+	codeCommentDispositionNeedsConfirmation = "needs_confirmation"
 )
 
 var validCodeCommentCategories = map[string]struct{}{
@@ -45,12 +46,15 @@ var validCodeCommentCategories = map[string]struct{}{
 }
 
 var validCodeCommentSeverities = map[string]struct{}{
-	codeCommentSeverityCritical:          {},
-	codeCommentSeverityHigh:              {},
-	codeCommentSeverityMedium:            {},
-	codeCommentSeverityLow:               {},
-	codeCommentSeveritySuggestion:        {},
-	codeCommentSeverityNeedsConfirmation: {},
+	codeCommentSeverityCritical:   {},
+	codeCommentSeverityHigh:       {},
+	codeCommentSeverityMedium:     {},
+	codeCommentSeveritySuggestion: {},
+}
+
+var validCodeCommentDispositions = map[string]struct{}{
+	codeCommentDispositionConfirmed:         {},
+	codeCommentDispositionNeedsConfirmation: {},
 }
 
 // CommentNoneUsableMsg reports a parsed batch with no usable comments.
@@ -155,7 +159,10 @@ func parseCommentsInner(args map[string]any, defaultPath string) ([]model.LlmCom
 			cm.Category = normalizeCodeCommentCategory(category)
 		}
 		if severity, ok := obj["severity"].(string); ok {
-			cm.Severity = normalizeCodeCommentSeverity(severity)
+			cm.Severity, cm.Disposition = normalizeCodeCommentSeverity(severity)
+		}
+		if disposition, ok := obj["disposition"].(string); ok {
+			cm.Disposition = normalizeCodeCommentDisposition(disposition)
 		}
 		if topic, ok := obj["topic"].(string); ok {
 			cm.Topic = topic
@@ -202,10 +209,32 @@ func normalizeCodeCommentCategory(category string) string {
 	return codeCommentCategoryOther
 }
 
-func normalizeCodeCommentSeverity(severity string) string {
-	normalized := strings.ToLower(severity)
+// normalizeCodeCommentSeverity maps model input onto the four-level scale.
+// Legacy values from older prompts are migrated rather than rejected: low
+// becomes suggestion, and needs_confirmation becomes medium carrying the
+// needs_confirmation disposition. Unknown or empty values fall back to
+// suggestion, the least severe level.
+func normalizeCodeCommentSeverity(severity string) (string, string) {
+	normalized := strings.ToLower(strings.TrimSpace(severity))
 	if _, ok := validCodeCommentSeverities[normalized]; ok {
+		return normalized, ""
+	}
+	switch normalized {
+	case "low":
+		return codeCommentSeveritySuggestion, ""
+	case codeCommentDispositionNeedsConfirmation:
+		return codeCommentSeverityMedium, codeCommentDispositionNeedsConfirmation
+	default:
+		return codeCommentSeveritySuggestion, ""
+	}
+}
+
+// normalizeCodeCommentDisposition defaults missing or unknown values to
+// confirmed, which is also the meaning of an empty disposition.
+func normalizeCodeCommentDisposition(disposition string) string {
+	normalized := strings.ToLower(strings.TrimSpace(disposition))
+	if _, ok := validCodeCommentDispositions[normalized]; ok {
 		return normalized
 	}
-	return codeCommentSeverityLow
+	return codeCommentDispositionConfirmed
 }

@@ -205,9 +205,9 @@ func init() {
 
 	sessionCommentsCmd.Flags().StringVar(&sessionCommentsRepoDir, "repo", "", "root directory of the git repository (default: current dir)")
 	sessionCommentsCmd.Flags().BoolVar(&sessionCommentsJSON, "json", false, "emit the comments as a JSON array")
-	sessionCommentsCmd.Flags().StringVar(&sessionCommentsSeverity, "severity", "", "comma-separated severities to include (critical, high, medium, low, suggestion, needs_confirmation)")
+	sessionCommentsCmd.Flags().StringVar(&sessionCommentsSeverity, "severity", "", "comma-separated severities to include (critical, high, medium, suggestion)")
 	sessionCommentsCmd.Flags().StringVar(&sessionCommentsCategory, "category", "", "comma-separated categories to include (e.g. bug, security)")
-	sessionCommentsCmd.RegisterFlagCompletionFunc("severity", completeEnum("critical", "high", "medium", "low", "suggestion", "needs_confirmation"))
+	sessionCommentsCmd.RegisterFlagCompletionFunc("severity", completeEnum("critical", "high", "medium", "suggestion"))
 	sessionCommentsCmd.RegisterFlagCompletionFunc("category", completeEnum("bug", "security", "performance", "maintainability", "test", "style", "documentation", "process", "other"))
 
 	sessionCompareCmd.Flags().StringVar(&sessionCompareRepoDir, "repo", "", "root directory of the git repository (default: current dir)")

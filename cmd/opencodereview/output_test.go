@@ -19,7 +19,9 @@ func TestBuildBadge(t *testing.T) {
 	}{
 		{"both fields", model.LlmComment{Category: "security", Severity: "high"}, "[security · high]"},
 		{"category only", model.LlmComment{Category: "bug"}, "[bug]"},
-		{"severity only", model.LlmComment{Severity: "low"}, "[low]"},
+		{"severity only", model.LlmComment{Severity: "suggestion"}, "[suggestion]"},
+		{"unconfirmed finding", model.LlmComment{Category: "bug", Severity: "high", Disposition: "needs_confirmation"}, "[bug · high · needs_confirmation]"},
+		{"confirmed disposition stays implicit", model.LlmComment{Category: "bug", Severity: "high", Disposition: "confirmed"}, "[bug · high]"},
 		{"neither", model.LlmComment{}, ""},
 		{"strips control chars", model.LlmComment{Category: "bug\x1b[0m", Severity: "high"}, "[bug[0m · high]"},
 	}
@@ -33,9 +35,10 @@ func TestBuildBadge(t *testing.T) {
 }
 
 func TestSeverityColor(t *testing.T) {
-	// Each known severity must map to a distinct color; unknown falls back to dim.
+	// Each severity in the current scale must map to a distinct color; unknown
+	// falls back to dim. low is a legacy severity kept for old sessions.
 	seen := map[string]string{}
-	for _, sev := range []string{"critical", "high", "medium", "low"} {
+	for _, sev := range []string{"critical", "high", "medium", "suggestion", "low"} {
 		c := severityColor(sev)
 		if c == "" {
 			t.Errorf("severityColor(%q) is empty", sev)
@@ -50,6 +53,15 @@ func TestSeverityColor(t *testing.T) {
 	}
 	if got := severityColor(""); got != "\033[2m" {
 		t.Errorf("severityColor(empty) = %q, want dim", got)
+	}
+}
+
+func TestBadgeColor(t *testing.T) {
+	if got := badgeColor(model.LlmComment{Severity: "high", Disposition: "needs_confirmation"}); got != "\033[95m" {
+		t.Errorf("badgeColor(unconfirmed) = %q, want magenta", got)
+	}
+	if got := badgeColor(model.LlmComment{Severity: "high", Disposition: "confirmed"}); got != "\033[91m" {
+		t.Errorf("badgeColor(confirmed) = %q, want severity color", got)
 	}
 }
 

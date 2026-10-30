@@ -753,6 +753,52 @@ func TestLoadSession_ReviewComments(t *testing.T) {
 	}
 }
 
+// TestLoadSession_LegacySeverityMigration keeps sessions written before the
+// four-level scale readable: low folds into suggestion, and needs_confirmation
+// becomes medium plus the disposition the current model records separately.
+func TestLoadSession_LegacySeverityMigration(t *testing.T) {
+	root := t.TempDir()
+	repoDir := filepath.Join(root, "repo")
+	if err := os.MkdirAll(repoDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	writeJSONL(t, filepath.Join(repoDir, "legacy.jsonl"),
+		`{"type":"session_start","timestamp":"2025-01-01T00:00:00Z","cwd":"/x","model":"m"}`,
+		`{"type":"review_item_done","filePath":"main.go","comments":[`+
+			`{"content":"old low","severity":"low"},`+
+			`{"content":"old unconfirmed","severity":"needs_confirmation"},`+
+			`{"content":"new finding","severity":"high","disposition":"needs_confirmation"}]}`,
+		`{"type":"session_end","duration_seconds":5}`,
+	)
+
+	vs, err := LoadSession(root, "repo", "legacy")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(vs.Comments) != 3 {
+		t.Fatalf("Comments = %d, want 3", len(vs.Comments))
+	}
+	if got := vs.Comments[0].Severity; got != "suggestion" {
+		t.Errorf("legacy low severity = %q, want suggestion", got)
+	}
+	if got := vs.Comments[0].Disposition; got != "" {
+		t.Errorf("legacy low disposition = %q, want empty", got)
+	}
+	if got := vs.Comments[1].Severity; got != "medium" {
+		t.Errorf("legacy needs_confirmation severity = %q, want medium", got)
+	}
+	if got := vs.Comments[1].Disposition; got != "needs_confirmation" {
+		t.Errorf("legacy needs_confirmation disposition = %q", got)
+	}
+	if got := vs.Comments[2].Severity; got != "high" {
+		t.Errorf("new severity = %q, want high", got)
+	}
+	if got := vs.Comments[2].Disposition; got != "needs_confirmation" {
+		t.Errorf("new disposition = %q", got)
+	}
+}
+
 func TestLoadSession_MarkIDStableAndDistinct(t *testing.T) {
 	root := t.TempDir()
 	writeMarkIdentityFixture(t, root, "repo", "s1")

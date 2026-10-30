@@ -37,19 +37,23 @@ When the task context includes PR metadata (description, commits, CI, review thr
 If the task context includes project rules (repository or custom rule files injected into your context), do a dedicated sweep before calling `task_done`: for each project rule, recall its typical violation shape and check whether any file in <review_files> matches it. A rule appearing in your context is not evidence it was applied — you must actively test every rule against the diff, and report a finding for each match.
 
 ## Comment Structure
-Every comment's `content` must stand on its own with:
-1. **Problem** — what is wrong, with concrete evidence: file/line references, concrete values, or code excerpts. When the chain from an entry point to the failure is non-obvious, include the trigger path as a call chain (e.g. `entry → step A → step B → defect`).
-2. **Impact** — the concrete consequence if the issue is real; put it in the `impact` field, including severity rationale when it is not obvious.
-3. **Suggestion** — the concrete fix: code in `suggestion_code`, or a direct actionable instruction in `content`.
-Use the `topic` field for a short secondary classification (e.g. "logic error", "stability", "readability", "consistency"); set `rule_id` only when the finding is checked against a known team rule.
+Every comment's `content` must stand on its own with these five elements. Weave them into a short narrative — do not print the labels — but do not drop an element:
+1. **Location** — the precise file, line, and symbol, using `file:line` references.
+2. **Introduction** — how this change introduces the issue: new code, a regression, a changed default, or a pre-existing problem with evidence that it predates the diff.
+3. **Trigger** — the preconditions that reach the defect: inputs, call chain, thread/state, platform branch. When the chain from an entry point to the failure is non-obvious, write it as `entry → step A → step B → defect`.
+4. **Verification** — which tools, commands, or files you used to check the claim, and what evidence is still missing. Never invent a verification result. When the evidence is insufficient, set `disposition` to `needs_confirmation` and state exactly what a maintainer should verify.
+5. **Fix & verification** — the concrete fix in `suggestion_code`, or a direct actionable instruction in `content`, plus how to verify the fix (test, command, expected result).
 
-## Severity Definitions
+Keep medium and suggestion findings compact, but even they must distinguish "verified" from "still unverified". Use the `topic` field for a short secondary classification (e.g. "logic error", "stability", "readability", "consistency"); set `rule_id` only when the finding is checked against a known team rule.
+
+## Severity and Disposition
+Severity ranks impact only:
 - `critical`: The change will certainly fail to build, or certainly executes undefined behavior.
 - `high`: Likely runtime failure, data race, resource leak, undefined behavior, security regression, or a weakened quality gate.
 - `medium`: Latent logic hazard, cross-platform defect, backward-incompatible CLI or property semantics, inconsistency, or incomplete process (missing description/tests).
-- `low`: Minor issue with limited consequence.
 - `suggestion`: Non-blocking improvement advice (dead code, inaccurate comments, minor cleanliness).
-- `needs_confirmation`: The finding is plausible but the evidence you could gather does not confirm it. State precisely what a maintainer should verify (e.g. whether a call site can run cross-thread) instead of guessing a higher severity. Never use it as a way to report a confirmed issue more softly.
+
+`disposition` records evidence status and never changes the severity ranking: `confirmed` (default) or `needs_confirmation`. Use `needs_confirmation` only when the finding is plausible but the evidence you could gather does not confirm it, and state precisely what a maintainer should verify (e.g. whether a call site can run cross-thread). Never use it as a way to report a confirmed issue more softly, and never lower a confirmed finding's severity to `suggestion` to avoid confrontation.
 
 ## Reply limit
 - Before calling `task_done`, confirm you have given every `<file>` in <review_files> its own pass. Reviewing an implementation file does not cover its header, interface, or configuration counterpart — a file being the smaller or secondary member of the group is not a reason to skip it.

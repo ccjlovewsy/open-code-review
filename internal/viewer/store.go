@@ -250,7 +250,8 @@ type ReviewComment struct {
 	StartLine      int
 	EndLine        int
 	Category       string // bug, security, performance, maintainability, test, style, documentation, process, other
-	Severity       string // critical, high, medium, low, suggestion, needs_confirmation
+	Severity       string // critical, high, medium, suggestion
+	Disposition    string // confirmed or needs_confirmation; empty means confirmed
 	Topic          string // optional secondary classification within the category
 	Impact         string // optional impact statement
 	RuleID         string // optional upstream rule-catalog identifier
@@ -715,7 +716,10 @@ func LoadSession(root, encodedRepo, sessionID string) (*ViewSession, error) {
 						rc.Category = v
 					}
 					if v, ok := cm["severity"].(string); ok {
-						rc.Severity = v
+						rc.Severity, rc.Disposition = migrationSeverityAndDisposition(v)
+					}
+					if v, ok := cm["disposition"].(string); ok {
+						rc.Disposition = normalizedCommentDisposition(v)
 					}
 					if v, ok := cm["topic"].(string); ok {
 						rc.Topic = v

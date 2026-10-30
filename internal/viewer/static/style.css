@@ -82,8 +82,6 @@ Copyright 2026 alibaba/open-code-review Contributors
     --severity-high-fg: #c2410c;
     --severity-medium-bg: #fefce8;
     --severity-medium-fg: #a16207;
-    --severity-low-bg: var(--badge-neutral-bg);
-    --severity-low-fg: var(--badge-neutral-fg);
     --severity-suggestion-bg: var(--badge-neutral-bg);
     --severity-suggestion-fg: var(--badge-neutral-fg);
     --severity-needs-confirmation-bg: #fdf4ff;
@@ -1186,7 +1184,6 @@ p {
 .severity-critical { background: var(--severity-critical-bg); color: var(--severity-critical-fg); }
 .severity-high { background: var(--severity-high-bg); color: var(--severity-high-fg); }
 .severity-medium { background: var(--severity-medium-bg); color: var(--severity-medium-fg); }
-.severity-low { background: var(--severity-low-bg); color: var(--severity-low-fg); }
 .severity-suggestion { background: var(--severity-suggestion-bg); color: var(--severity-suggestion-fg); }
 .severity-needs-confirmation { background: var(--severity-needs-confirmation-bg); color: var(--severity-needs-confirmation-fg); }
 

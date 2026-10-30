@@ -42,7 +42,7 @@
               "properties": {
                 "content": {
                   "type": "string",
-                  "description": "Comment content. State the problem with concrete evidence (file/line references, values, or code excerpts); when the failure chain from entry point to defect is non-obvious, include the trigger path as a call chain. Keep the fix recommendation here or in 'suggestion_code'."
+                  "description": "Comment content. Cover the five evidence elements without printing their labels: precise location (file:line and symbol), how this change introduces the issue (or evidence that it predates the diff), trigger preconditions and call chain, what you verified versus what evidence is still missing, and the fix plus how to verify it. Keep medium and suggestion findings compact."
                 },
                 "existing_code": {
                   "type": "string",
@@ -73,11 +73,18 @@
                     "critical",
                     "high",
                     "medium",
-                    "low",
-                    "suggestion",
+                    "suggestion"
+                  ],
+                  "description": "The severity of the issue. Use 'suggestion' for non-blocking improvement advice. Severity ranks impact only; record incomplete evidence with the separate 'disposition' field instead of lowering or raising severity."
+                },
+                "disposition": {
+                  "type": "string",
+                  "enum": [
+                    "confirmed",
                     "needs_confirmation"
                   ],
-                  "description": "The severity of the issue. Use 'suggestion' for non-blocking improvement advice; use 'needs_confirmation' when the finding is plausible but the evidence available to you cannot confirm it — state what a maintainer should verify instead of guessing a higher severity."
+                  "default": "confirmed",
+                  "description": "Evidence status of the finding. Defaults to 'confirmed'. Use 'needs_confirmation' only when the finding is plausible but the evidence available to you cannot confirm it; state precisely what a maintainer should verify. Disposition never changes the severity ranking."
                 },
                 "topic": {
                   "type": "string",
@@ -85,7 +92,7 @@
                 },
                 "impact": {
                   "type": "string",
-                  "description": "Optional impact statement: the concrete consequence if the issue is real, including the trigger path when the chain from entry point to failure is non-obvious."
+                  "description": "Optional impact statement: the concrete consequence if the issue is real, including severity rationale and the trigger path when the chain from entry point to failure is non-obvious."
                 },
                 "rule_id": {
                   "type": "string",

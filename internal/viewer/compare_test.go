@@ -86,6 +86,7 @@ func TestToLlmComments(t *testing.T) {
 		EndLine:        5,
 		Category:       "bug",
 		Severity:       "high",
+		Disposition:    "needs_confirmation",
 	}
 	tests := []struct {
 		name string
@@ -110,6 +111,7 @@ func TestToLlmComments(t *testing.T) {
 				EndLine:        5,
 				Category:       "bug",
 				Severity:       "high",
+				Disposition:    "needs_confirmation",
 			}},
 		},
 	}

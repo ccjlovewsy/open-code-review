@@ -129,7 +129,7 @@ func renderComment(comment model.LlmComment, out io.Writer) {
 		lines := wrapByRunes(content, 100)
 		for i, ln := range lines {
 			if i == 0 && badge != "" && strings.HasPrefix(ln, badge) {
-				ln = colorize(severityColor(comment.Severity), badge) + ln[len(badge):]
+				ln = colorize(badgeColor(comment), badge) + ln[len(badge):]
 			}
 			fmt.Fprintf(out, "%s\n", ln)
 		}
@@ -152,26 +152,41 @@ func renderComment(comment model.LlmComment, out io.Writer) {
 	fmt.Fprintln(out)
 }
 
-// buildBadge renders a compact "[category · severity]" tag for a finding. It returns
-// an empty string when neither structured field is present, so text output for findings
-// without metadata is unchanged.
+// buildBadge renders a compact "[category · severity · disposition]" tag for a
+// finding. A confirmed disposition is the default and stays implicit. It returns
+// an empty string when no field is present, so text output for findings without
+// metadata is unchanged.
 func buildBadge(comment model.LlmComment) string {
-	category := sanitizeTerminal(comment.Category)
-	severity := sanitizeTerminal(comment.Severity)
-	switch {
-	case category != "" && severity != "":
-		return fmt.Sprintf("[%s · %s]", category, severity)
-	case category != "":
-		return fmt.Sprintf("[%s]", category)
-	case severity != "":
-		return fmt.Sprintf("[%s]", severity)
-	default:
+	parts := make([]string, 0, 3)
+	if category := sanitizeTerminal(comment.Category); category != "" {
+		parts = append(parts, category)
+	}
+	if severity := sanitizeTerminal(comment.Severity); severity != "" {
+		parts = append(parts, severity)
+	}
+	if disposition := sanitizeTerminal(comment.Disposition); disposition != "" && disposition != "confirmed" {
+		parts = append(parts, disposition)
+	}
+	if len(parts) == 0 {
 		return ""
 	}
+	return "[" + strings.Join(parts, " · ") + "]"
+}
+
+// badgeColor picks the badge color from the evidence disposition first, then
+// from severity. An unconfirmed finding is magenta regardless of severity so a
+// reader cannot mistake it for a confirmed one.
+func badgeColor(comment model.LlmComment) string {
+	if comment.Disposition == "needs_confirmation" {
+		return "\033[95m" // bright magenta — plausible but unconfirmed
+	}
+	return severityColor(comment.Severity)
 }
 
 // severityColor maps a finding severity to an ANSI color used for its badge.
-// Unknown or empty severities fall back to dim.
+// Unknown or empty severities fall back to dim. The low and needs_confirmation
+// cases only serve sessions written before the four-level scale; new findings
+// use the separate disposition field instead.
 func severityColor(severity string) string {
 	switch severity {
 	case "critical":
@@ -185,7 +200,7 @@ func severityColor(severity string) string {
 	case "suggestion":
 		return "\033[92m" // bright green — non-blocking advice
 	case "needs_confirmation":
-		return "\033[95m" // bright magenta — plausible but unconfirmed
+		return "\033[95m" // bright magenta — legacy severity value
 	default:
 		return "\033[2m" // dim
 	}

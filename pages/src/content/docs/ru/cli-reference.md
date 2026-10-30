@@ -441,7 +441,7 @@ ocr session comments --severity critical,high --category bug,security <session-i
 |---|---|---|
 | `--repo <path>` | текущий каталог | Репозиторий, сессию которого нужно проверить. |
 | `--json` | `false` | Вывести комментарии как массив JSON. |
-| `--severity <list>` | все | Включить перечисленные через запятую уровни серьёзности (`critical`, `high`, `medium`, `low`). |
+| `--severity <list>` | все | Включить перечисленные через запятую уровни серьёзности (`critical`, `high`, `medium`, `suggestion`). |
 | `--category <list>` | все | Включить перечисленные через запятую категории (например, `bug`, `security`). |
 
 ### `ocr session compare`
