@@ -1,0 +1,96 @@
+internal/config/domainroute/routes.json
+  s_b8e96de04cf649::t_0c658923169c89 8-11,54-57,93-95,130-132,167-170,204-206,238-240,248-249,275-278,284-286,324-326,359-361
+  s_b8e96de04cf649::t_1fe09355b7941c 1-7,12-53,58-92,96-129,133-166,171-203,207-237,241-247,250-274,279-283,287-323,327-358,362-387
+cmd/opencodereview/review_cmd.go
+  s_b8e96de04cf649::t_8e9e80bea49c7e 54,143-145,231,407-416
+cmd/opencodereview/scan_cmd.go
+  s_b8e96de04cf649::t_8e9e80bea49c7e 45,131-133,219
+internal/scan/agent.go
+  s_b8e96de04cf649::t_6504d6385850a2 790-809,829
+  s_b8e96de04cf649::t_cf02de4287fe3c 18,49
+cmd/opencodereview/route_cmd_test.go
+  s_b8e96de04cf649::t_46128b87d91f19 1-37,39-103
+  s_b8e96de04cf649::t_527da936d89cb5 38
+internal/scan/agent_test.go
+  s_b8e96de04cf649::t_291c1af66374c7 15,566-601
+  s_b8e96de04cf649::t_7e6be9d669d8f7 602
+internal/agent/agent.go
+  s_b8e96de04cf649::t_e0e45d4859ab21 16,26,79-82,1077,1703-1718,1759-1778
+  s_b8e96de04cf649::t_e403b7bb5e1638 1779
+internal/config/template/prompts/main_task_system.md
+  s_b8e96de04cf649::t_4485eb57134466 68-70
+cmd/opencodereview/shared_flags.go
+  s_b8e96de04cf649::t_8e9e80bea49c7e 221,244
+internal/agent/manifest_hash_test.go
+  s_b8e96de04cf649::t_29260387e77ccd 12,81-90
+  s_b8e96de04cf649::t_93d4cff13b506f 91-92
+cmd/opencodereview/shared.go
+  s_b8e96de04cf649::t_ac93e8dddb92a1 20,46,149-153,160
+internal/agent/grouping_test.go
+  s_b8e96de04cf649::t_29260387e77ccd 16,769-829
+  s_b8e96de04cf649::t_d9e4be9daa4d9b 830
+internal/config/template/scan_template.json
+  s_b8e96de04cf649::t_4485eb57134466 6
+internal/config/domainroute/domainroute.go
+  s_b8e96de04cf649::t_604291a22b61b8 228,247-249,252-257,274,404,406,408-409,412-415
+  s_b8e96de04cf649::t_f0266710eb8346 136,150
+  s_b8e96de04cf649::t_5221ac393620f2 1-135,137-149,151-227,229-246,250-251,258-273,275-403,405,407,410-411,416-565
+cmd/opencodereview/route_cmd.go
+  s_b8e96de04cf649::t_7e43ebf0ed32a0 31
+  s_b8e96de04cf649::t_0f8c83925547e1 1-30,32-112
+internal/config/domainroute/domainroute_test.go
+  s_b8e96de04cf649::t_f29c44c87e97c9 1-161,163-165,167,169-174,176-178,181,201-226,228-411,436,453-468,470-473,475-599
+  s_b8e96de04cf649::t_0c658923169c89 437
+  s_b8e96de04cf649::t_9e6d34766617af 162,166,168,175,179-180,182-200,227,412-435,438-452,469,474
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "cca6ae96f877d7445840ffffcb68ee595dd1d21e",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_b8e96de04cf649": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e74c41988ffeLUv0qOsjmd50Kw",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 2053,
+      "total_deletions": 90,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_0c658923169c89": "volcengine/deepseek-v4.1-flash",
+        "t_0f8c83925547e1": "volcengine/deepseek-v4.1-flash",
+        "t_1fe09355b7941c": "volcengine/deepseek-v4.1-flash",
+        "t_291c1af66374c7": "volcengine/deepseek-v4.1-flash",
+        "t_29260387e77ccd": "volcengine/deepseek-v4.1-flash",
+        "t_4485eb57134466": "volcengine/deepseek-v4.1-flash",
+        "t_46128b87d91f19": "volcengine/deepseek-v4.1-flash",
+        "t_5221ac393620f2": "volcengine/deepseek-v4.1-flash",
+        "t_527da936d89cb5": "volcengine/deepseek-v4.1-flash",
+        "t_604291a22b61b8": "volcengine/deepseek-v4.1-flash",
+        "t_6504d6385850a2": "volcengine/deepseek-v4.1-flash",
+        "t_7e43ebf0ed32a0": "volcengine/deepseek-v4.1-flash",
+        "t_8e9e80bea49c7e": "volcengine/deepseek-v4.1-flash",
+        "t_9e6d34766617af": "volcengine/deepseek-v4.1-flash",
+        "t_ac93e8dddb92a1": "volcengine/deepseek-v4.1-flash",
+        "t_cf02de4287fe3c": "volcengine/deepseek-v4.1-flash",
+        "t_e0e45d4859ab21": "volcengine/deepseek-v4.1-flash",
+        "t_f0266710eb8346": "volcengine/deepseek-v4.1-flash",
+        "t_f29c44c87e97c9": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 2053,
+          "deletions": 90
+        }
+      }
+    }
+  }
+}
