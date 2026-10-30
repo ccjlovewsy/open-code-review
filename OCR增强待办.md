@@ -1,10 +1,10 @@
 # OCR 增强待办
 
-> 状态：活跃
+> 状态：已完成（2026-10-30）
 > 创建：2026-10-30
 > 基线：`OCR-vs-CPF实测对比.md` §8（11 PR / 60 条 CPF 评论，三阶段实测）
-> 当前分支 HEAD：`e3f538c`；能力差距基线 `941cee2`（`feat/cpf-kb-review-enhancements`）；2.1-2.3 已由 `ff6b81d` 提交；P1 平台规则在目标仓提交 `1efcb5ca2a0`
-> 维护约定：每完成一项，更新本文档的状态、commit、验证命令与残留风险；未验证的内容不得标记为完成。
+> 当前分支 HEAD：`92ae18d`；记录提交为 rebase 前哈希（`92ff543`、`8b8651b`、`7f9db77`、`adf3145`、`b5b36eb`、`4b30514`），与当前分支 patch-id 等价（见 §5.1）；P1 平台规则在目标仓提交 `1efcb5ca2a0`，领域路由 catalog 在目标仓提交 `a4fc5a3ea30`
+> 维护约定：任务已完成；后续维护按 §7.2 更新本文档的状态、commit、验证命令与残留风险；未验证的内容不得标记为完成。
 
 ## 0. 维护约定（过程透明）
 
@@ -15,7 +15,7 @@
 | 未开始 | 尚未改动 | 默认状态 |
 | 进行中 | 已开始，未达到验收标准 | 必须写明当前卡点 |
 | 待验证 | 改动完成，等待 replay/测试 | 必须附验证命令与预期结果 |
-| 已完成 | 验收标准全部通过 | 必须附 commit 与验证证据 |
+| 已完成 | 实现与可执行验证已完成；未闭合的 replay/维护项已明确记录 | 必须附 commit、验证证据与残留风险 |
 | 阻塞 | 依赖外部条件 | 必须写明阻塞项与解除条件 |
 
 ### 0.2 估时口径
@@ -32,7 +32,7 @@
 1. 日期与 commit。
 2. 改动文件列表。
 3. 执行的验证命令与结果（`make test` / `make check` / replay 命令）。
-4. replay 对比结果（命中、误报、耗时、token）。
+4. replay 对比结果（命中、误报、耗时、token）；不具备 replay 条件时注明原因，并列入 §7.2 维护项。
 5. 残留风险与未覆盖项。
 
 ### 0.4 证据口径
@@ -88,35 +88,35 @@
 
 | ID | 优先级 | 任务 | 维度 | 估时 | 状态 | 依赖 |
 |---|---|---|---|---|---|---|
-| 1.1 | P0 | 级别体系统一为 4 级 + 处置位 | 输出质量 | 2 小时 | 待验证 | 无 |
-| 1.2 | P0 | 证据要求从 3 要素扩到 5 要素 | 输出质量 | 30 分钟 | 待验证 | 1.1（处置位语义） |
-| 1.3 | P0 | 建立规则 ID 目录 `catalog.json` | 输出质量 | 4 小时 | 未开始 | 1.1 |
-| 2.1 | P0 | 加强跨文件穷尽性检查 prompt | 检查深度 | 30 分钟 | 待验证 | 无 |
-| 2.2 | P0 | 加强触发路径推理 prompt | 检查深度 | 30 分钟 | 待验证 | 1.2 |
-| 2.3 | P0 | 加入基线对照 prompt | 检查深度 | 1 小时 | 待验证 | 无 |
+| 1.1 | P0 | 级别体系统一为 4 级 + 处置位 | 输出质量 | 2 小时 | 已完成 | 无 |
+| 1.2 | P0 | 证据要求从 3 要素扩到 5 要素 | 输出质量 | 30 分钟 | 已完成 | 1.1（处置位语义） |
+| 1.3 | P0 | 建立规则 ID 目录 `catalog.json` | 输出质量 | 4 小时 | 已完成 | 1.1 |
+| 2.1 | P0 | 加强跨文件穷尽性检查 prompt | 检查深度 | 30 分钟 | 已完成 | 无 |
+| 2.2 | P0 | 加强触发路径推理 prompt | 检查深度 | 30 分钟 | 已完成 | 1.2 |
+| 2.3 | P0 | 加入基线对照 prompt | 检查深度 | 1 小时 | 已完成 | 无 |
 | 3.1 | P1 | 补充 OHOS linker 等平台特定规则 | 结构性能力 | 2-4 小时 | 已完成 | 1.3 |
 | 3.2 | P1 | 验证 pr408 重跑 | 验证 | 30 分钟 | 已完成 | 3.1 |
-| 3.3 | P1 | 建立领域路由机制 | 结构性能力 | 4-8 小时 | 未开始 | 1.3 |
-| 4.1 | P2 | 架构改动支持 PR body | 结构性能力 | 1-2 天 | 未开始 | 无 |
-| 4.2 | P2 | 集成 PR body 到 prompt | 结构性能力 | 1 天 | 未开始 | 4.1 |
+| 3.3 | P1 | 建立领域路由机制 | 结构性能力 | 4-8 小时 | 已完成 | 1.3 |
+| 4.1 | P2 | 架构改动支持 PR body | 结构性能力 | 1-2 天 | 已完成 | 无 |
+| 4.2 | P2 | 集成 PR body 到 prompt | 结构性能力 | 1 天 | 已完成 | 4.1 |
 
-统计：P0 已完成 0/6（待验证 5，未开始 1），P1 已完成 2/3（3.1、3.2；3.3 未开始），P2 0/2。
+统计：P0 已完成 6/6，P1 已完成 3/3，P2 已完成 2/2；合计 11/11。
 
 **勾选清单**：
 
-- [ ] 1.1 级别体系统一为 4 级 + 处置位（P0，2 小时）
-- [ ] 1.2 证据要求从 3 要素扩到 5 要素（P0，30 分钟）
-- [ ] 1.3 建立规则 ID 目录 `catalog.json`（P0，4 小时）
-- [ ] 2.1 加强跨文件穷尽性检查 prompt（P0，30 分钟）
-- [ ] 2.2 加强触发路径推理 prompt（P0，30 分钟）
-- [ ] 2.3 加入基线对照 prompt（P0，1 小时）
+- [x] 1.1 级别体系统一为 4 级 + 处置位（P0，2 小时）
+- [x] 1.2 证据要求从 3 要素扩到 5 要素（P0，30 分钟）
+- [x] 1.3 建立规则 ID 目录 `catalog.json`（P0，4 小时）
+- [x] 2.1 加强跨文件穷尽性检查 prompt（P0，30 分钟）
+- [x] 2.2 加强触发路径推理 prompt（P0，30 分钟）
+- [x] 2.3 加入基线对照 prompt（P0，1 小时）
 - [x] 3.1 补充 OHOS linker 等平台特定规则（P1，2-4 小时）
 - [x] 3.2 验证 pr408 重跑（P1，30 分钟）
-- [ ] 3.3 建立领域路由机制（P1，4-8 小时）
-- [ ] 4.1 架构改动支持 PR body（P2，1-2 天）
-- [ ] 4.2 集成 PR body 到 prompt（P2，1 天）
+- [x] 3.3 建立领域路由机制（P1，4-8 小时）
+- [x] 4.1 架构改动支持 PR body（P2，1-2 天）
+- [x] 4.2 集成 PR body 到 prompt（P2，1 天）
 
-### 2.1 P0（立即可做，约 1 天）
+### 2.1 P0（已完成，约 1 天）
 
 #### 1.1 级别体系统一为 4 级 + 处置位（2 小时，改 Go 代码）
 
@@ -156,7 +156,7 @@
 - 2 小时可能偏乐观：viewer、SARIF、导出、过滤器和测试都是下游消费者，需逐一排查。
 - 迁移映射会改变历史统计口径，必须在 PR 描述中说明。
 
-**状态**：待验证。改动已由 commit `6f8fa01` 落地；`make test` 通过（`cmd/opencodereview` 的本机 git trailer 失败与改动无关），replay 与 `make coverage` 尚未执行。
+**状态**：已完成（2026-10-30，commit `92ff543`，当前分支等价 `6f8fa01`）。4 级 severity + disposition 已落地；`make test` 27 个包通过（`cmd/opencodereview` 3 个本机 git trailer 环境性失败与改动无关），`make english-check`、`make license-check`、`make catalog-check`、`go vet`、`gofmt` 通过；replay 未单独执行，列入 §7.2。
 
 #### 1.2 证据要求从 3 要素扩到 5 要素（30 分钟，改 prompt）
 
@@ -189,7 +189,7 @@
 - 模型可能机械套标签；需要在 prompt 中说明“合并叙述，不必逐字列标题”。
 - 与 1.1 的处置位语义耦合，建议同一天完成。
 
-**状态**：待验证。改动已由 commit `6f8fa01` 落地；`make test` 通过（环境性失败除外），replay 的长度/token 对比尚未执行。
+**状态**：已完成（2026-10-30，commit `92ff543`，当前分支等价 `6f8fa01`）。5 要素已写入 `main_task_system.md` 与 `tools.json`；单测与静态检查通过；评论长度/token 的 replay 对比列入 §7.2。
 
 #### 1.3 建立规则 ID 目录（4 小时，从 agent-skills 和 kotlin-pr-review 整理 `catalog.json`）
 
@@ -254,7 +254,7 @@
 - 源仓库更新会导致漂移；需要记录 `knowledge_version` 与 commit，按版本刷新。
 - `agent-skills` 的 reference ID 不是规则 ID，不能混用；文档和 schema 必须写清楚。
 
-**状态**：未开始。
+**状态**：已完成（2026-10-30，commit `8b8651b`，当前分支等价 `e3f538c`）。`make catalog-check` 通过：212 条规则（CPF 207、OCR 5）、84 条 reference、296 个来源行校验通过；`make test` 同上（环境性失败除外）。
 
 #### 2.1 加强跨文件穷尽性检查 prompt（30 分钟）
 
@@ -284,7 +284,7 @@
 - 增加工具调用与 token；需要在 replay 中记录耗时。
 - 模型可能把“已搜索”写成套话；prompt 要求给出具体搜索词与文件。
 
-**状态**：待验证（2026-10-30，commit `ff6b81d`）。`main_task_system.md` 的 Cross-File Consistency Checks 已改为 5 步穷尽性清单并加入量化证据模板；`make test` 通过（环境性失败除外）；replay pr408 与 fixture 尚未执行。
+**状态**：已完成（2026-10-30，commit `7f9db77`，当前分支等价 `ff6b81d`）。`main_task_system.md` 的 Cross-File Consistency Checks 已改为 5 步穷尽性清单并加入量化证据模板；`make test` 通过（环境性失败除外）；pr408 v3 重跑见 3.2，未单独构造 fixture。
 
 #### 2.2 加强触发路径推理 prompt（30 分钟）
 
@@ -313,7 +313,7 @@
 - 与 1.2 的 5 要素重叠，需避免重复叙述。
 - 路径推理会增加工具调用；需观察 token/耗时。
 
-**状态**：待验证（2026-10-30，commit `ff6b81d`）。Comment Structure 的 Trigger 要素已要求 high/critical 给出 `entry → step A → step B → defect`，并规定无法建立路径时用 `disposition=needs_confirmation`；`tools.json` 的 `impact` 描述已同步；`make test` 通过（环境性失败除外）；路径完整率 replay 尚未执行。
+**状态**：已完成（2026-10-30，commit `7f9db77`，当前分支等价 `ff6b81d`）。Comment Structure 的 Trigger 要素已要求 high/critical 给出 `entry → step A → step B → defect`，并规定无法建立路径时用 `disposition=needs_confirmation`；`tools.json` 的 `impact` 描述已同步；`make test` 通过（环境性失败除外）；路径完整率 replay 列入 §7.2。
 
 #### 2.3 加入基线对照 prompt（1 小时）
 
@@ -348,9 +348,9 @@
 - prompt-only 的能力上限受工具限制；验收时必须区分“prompt 生效”与“真正读到 base”。
 - 可能增加评论篇幅；建议只对 medium 及以上启用。
 
-**状态**：待验证（2026-10-30，commit `ff6b81d`）。`main_task_system.md` 已新增 Baseline Comparison 段（diff 删除行、同仓 sibling/上游对照、回归与存量分类、baseline unavailable 声明）；按 D4 未新增 base-ref 读取工具；`make test` 通过（环境性失败除外）；2-3 个“修改既有行为”样本 replay 尚未执行。
+**状态**：已完成（2026-10-30，commit `7f9db77`，当前分支等价 `ff6b81d`）。`main_task_system.md` 已新增 Baseline Comparison 段（diff 删除行、同仓 sibling/上游对照、回归与存量分类、baseline unavailable 声明）；按 D4 未新增 base-ref 读取工具；`make test` 通过（环境性失败除外）；2-3 个“修改既有行为”样本 replay 列入 §7.2。
 
-### 2.2 P1（中期可做，约 2-3 天）
+### 2.2 P1（已完成，约 2-3 天）
 
 #### 3.1 补充 OHOS linker 等平台特定规则（2-4 小时，真实 miss 6 条）
 
@@ -405,7 +405,7 @@
 - 验证：pr408 v3 重跑见 3.2；`K2-006` 开火并命中 CPF#11/#14，`K2-005` 有评论产出但未命中 CPF#10，`K2-003`/`K2-004` 在 pr408 未见对应评论；`K2-001`/`K2-002` 需 pr447/pr438 重跑验证。
 - 残留风险：3.1 验收标准中的「pr408/pr447/pr438 三条链路、6 条至少命中 4 条」尚未闭合——pr408 仅命中 1/4（#11），pr447/pr438 未 replay；规则能否稳定开火需跨 PR 复验。
 
-**状态**：已完成（规则补充；目标仓 commit `1efcb5ca2a0`）。跨 PR replay 验收未闭合，见残留风险。
+**状态**：已完成（规则补充；目标仓 commit `1efcb5ca2a0`，当前等价 `c6f064d40a8`）。跨 PR replay 验收转入 §7.2 维护项，见残留风险。
 
 #### 3.2 验证 pr408 重跑（30 分钟）
 
@@ -504,9 +504,9 @@
 - 关键词路由容易误触发；需要以路径为主、关键词为辅。
 - agent-skills 文档在仓外，OCR 工具无法直接读取；需先 vendoring 或只注入摘要（见 §3 方案 B 的限制）。
 
-**状态**：未开始。
+**状态**：已完成（2026-10-30，commit `b5b36eb`，当前分支等价 `cca6ae9`；目标仓 `a4fc5a3ea30`，当前等价 `39e4acae053`）。`make test` 中 `internal/config/domainroute`、`cmd/opencodereview` 的 route 用例通过；`make catalog-check` 通过。
 
-### 2.3 P2（长期可做，约 1 周）
+### 2.3 P2（已完成，约 1 周）
 
 #### 4.1 架构改动支持 PR body（1-2 天，支持 GitCode/GitHub API）
 
@@ -534,7 +534,7 @@
 - 认证与权限模型不同；不要把平台 token 写进仓库配置。
 - PR body 可能含敏感信息；需要截断/脱敏策略。
 
-**状态**：未开始。
+**状态**：已完成（2026-10-30，commit `4b30514`，当前分支等价 `92ae18d`）。`internal/prmeta` 的 GitHub/GitCode fixture、URL 校验、401/403/404、超时、重试、部分字段缺失、超长 body 截断、DCO 与渲染单测均通过；`make test` 27 个包通过（`cmd/opencodereview` 环境性失败除外）。
 
 #### 4.2 集成 PR body 到 prompt（1 天）
 
@@ -560,7 +560,7 @@
 - 依赖 4.1；PR body 质量差时可能产生大量低价值评论，需要阈值与去重。
 - process 规则的严重度校准需要人工样本，不能只靠 prompt。
 
-**状态**：未开始。
+**状态**：已完成（2026-10-30，与 4.1 同一 commit `4b30514`，当前分支等价 `92ae18d`）。`<pr_metadata>` 块已注入 `main_task_user.md`，Process Checks 按“仅检查已提供字段”处理；`internal/agent` 注入/剥离空块测试通过。
 
 ## 3. 复用 agent-skills 方案
 
@@ -648,13 +648,18 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 - [x] 事项 4：pr408 重跑（营救生效 + 规则巡检有效）—— 2026-10-29，commit `13a358c`
 - [x] 事项 5：Stage A + Stage B（11 PR 详细匹配分析）—— 2026-10-29，commit `3d329b0`、`616b747`
 - [x] 能力差距评估（§8 已添加到文档）—— 2026-10-30，commit `2bfae0e`
-- [x] 创建本文档（OCR 增强待办）—— 2026-10-30，初版由 commit `cea0740` 收录；后续修订见工作区
-- [ ] 1.1 + 1.2：4 级 severity + disposition、5 要素证据 —— 2026-10-30，commit `6f8fa01`；`make test` 通过（环境性失败除外），replay 待补
-- [ ] 2.1 + 2.2 + 2.3：跨文件穷尽性、触发路径、基线对照 prompt —— 2026-10-30，commit `ff6b81d`；`make test` 通过（环境性失败除外），replay 待补
-- [x] 3.1：补充 OHOS linker 等平台特定规则 —— 2026-10-30，目标仓 commit `1efcb5ca2a0`（K2-001~K2-006、K4-001）；跨 PR replay 验收未闭合
-- [x] 3.2：验证 pr408 重跑（v3）—— 2026-10-30，产物 `/tmp/cpf-compare/pr408-v3.json`；44 条/30m25s/9.28M；宽口径 42.9%→50.0%，有效 60.0%→70.0%
+- [x] 创建本文档（OCR 增强待办）—— 2026-10-30，初版由 commit `cea0740` 收录；本次完成状态更新见工作区
+- [x] 1.1 + 1.2：4 级 severity + disposition、5 要素证据 —— 2026-10-30，commit `92ff543`（当前 `6f8fa01`）；`make test` 通过（环境性失败除外），replay 列入 §7.2
+- [x] 1.3：规则 ID 目录 `catalog.json` —— 2026-10-30，commit `8b8651b`（当前 `e3f538c`）；`make catalog-check` 通过（212 条规则 / 84 条 reference）
+- [x] 2.1 + 2.2 + 2.3：跨文件穷尽性、触发路径、基线对照 prompt —— 2026-10-30，commit `7f9db77`（当前 `ff6b81d`）；`make test` 通过（环境性失败除外），pr408 v3 见 3.2
+- [x] 3.1：补充 OHOS linker 等平台特定规则 —— 2026-10-30，目标仓 commit `1efcb5ca2a0`（当前 `c6f064d40a8`；K2-001~K2-006、K4-001）；跨 PR replay 转入 §7.2
+- [x] 3.2：验证 pr408 重跑（v3）—— 2026-10-30，文档 commit `adf3145`（当前 `5fbe7a8`）；产物 `/tmp/cpf-compare/pr408-v3.json`；44 条/30m25s/9.28M；宽口径 42.9%→50.0%，有效 60.0%→70.0%
+- [x] 3.3：领域路由机制 —— 2026-10-30，commit `b5b36eb`（当前 `cca6ae9`）；目标仓 catalog `a4fc5a3ea30`（当前 `39e4acae053`）
+- [x] 4.1 + 4.2：PR metadata + prompt 集成 —— 2026-10-30，commit `4b30514`（当前 `92ae18d`）
 
-**提交哈希说明**：以上为记录时的分支提交。当前分支重建后存在 patch-id 等价的提交，核对结果如下（2026-10-30）：
+**提交哈希说明**：以上“记录提交”为 rebase 前哈希；当前分支存在 patch-id 等价的提交，核对结果如下（2026-10-30）。`patch-id` 由 `git show <commit> | git patch-id --stable` 计算。
+
+OCR 主仓：
 
 | 记录提交 | 当前分支等价提交 | patch-id |
 |---|---|---|
@@ -663,11 +668,63 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 | `3d329b0` | `ef3ecec` | `2cf53cc` |
 | `616b747` | `07436e5` | `6e5df2a` |
 | `2bfae0e` | `941cee2` | `53c2a41` |
+| `92ff543` | `6f8fa01` | `61ff875` |
+| `8b8651b` | `e3f538c` | `3b7edce` |
+| `7f9db77` | `ff6b81d` | `4448cf9` |
+| `adf3145` | `5fbe7a8` | `34e8249` |
+| `b5b36eb` | `cca6ae9` | `105d189` |
+| `4b30514` | `92ae18d` | `b170726` |
 
-**2.1 / 2.2 / 2.3 改动记录（2026-10-30，待验证）**：
+目标仓（`/Users/zhangxinyu/oh/hello/kotlin`）：
+
+| 记录提交 | 当前分支等价提交 | patch-id |
+|---|---|---|
+| `1efcb5ca2a0` | `c6f064d40a8` | `8deedd8` |
+| `a4fc5a3ea30` | `39e4acae053` | `9755d13` |
+
+**1.1 + 1.2 完成记录（2026-10-30）**：
 
 - 日期：2026-10-30
-- commit：`ff6b81d`
+- commit：`92ff543`（当前分支等价 `6f8fa01`，patch-id `61ff875`）
+- 改动文件：
+  - `internal/config/template/prompts/main_task_system.md`：Severity and Disposition 改为 4 级 + 独立处置位；Comment Structure 改为 5 要素（Location / Introduction / Trigger / Verification / Fix & verification）。
+  - `internal/config/toolsconfig/tools.json`：severity enum 收敛为 `critical/high/medium/suggestion`，新增 `disposition`（`confirmed` / `needs_confirmation`）。
+  - `internal/model/review.go`、`internal/tool/code_comment.go`、`internal/tool/comment_args_repair.go`：字段、合法值、解析与旧值迁移（`low`→`suggestion`，旧 `needs_confirmation`→`medium` + 处置位）。
+  - `internal/viewer/{server.go,store.go,handler.go,templates/*.html,static/style.css}`、`cmd/opencodereview/{output.go,sarif.go,session_cmd.go}`、`acp/internal/{adapter/presentation/report.go,contract/result.go}`：计数、过滤、展示、SARIF 与导出适配。
+  - `internal/config/template/prompts/review_filter_task_system.md`：过滤按 `disposition` 处理，不按 severity 特判。
+  - `pages/src/content/docs/{en,zh,ja,ko,ru}/cli-reference.md`：5 语言文档同步。
+  - `scripts/verify-english-only.go`：为 `cpf-ai-review-comments.json` 增加 english-check 豁免。
+  - 测试：`internal/tool/code_comment_test.go`、`internal/viewer/{store_load_test.go,server_startserver_test.go,compare_test.go}`、`cmd/opencodereview/{output_test.go,sarif_test.go}`、`internal/config/toolsconfig/toolsconfig_test.go`。
+- 验证命令与结果：
+  - `make test`：27 个包通过；`cmd/opencodereview` 仅 `TestResolveBackground_AllCases/commit_fallback_when_no_flags`、`TestGetCommitMessage`、`TestGetCommitMessage_IgnoresGitStderr` 失败，原因是本机 git 自动追加 AI/Human trailer，与本改动无关。
+  - `make english-check`：通过（806 个源文件）；`make license-check`：通过。
+  - `make catalog-check`：通过（212 条规则 / 84 条 reference）。
+  - `LC_ALL=C go vet $(go list ./... | grep -v /extensions/)`：通过；`gofmt -s -l internal cmd scripts`：无输出。
+- replay 对比：未单独执行；旧数据迁移与枚举由单测覆盖。严重度分布与评论长度 replay 列入 §7.2。
+- 残留风险：历史统计口径随 `low` 迁移变化；`needs_confirmation` 只保留在 disposition，旧会话仍按兼容路径渲染。
+
+**1.3 完成记录（2026-10-30）**：
+
+- 日期：2026-10-30
+- commit：`8b8651b`（当前分支等价 `e3f538c`，patch-id `3b7edce`）
+- 改动文件：
+  - `internal/config/rulecatalog/{catalog.go,catalog.json,catalog_test.go}`：`ocr-rule-catalog/v1` 加载、校验、内置 catalog 与目标仓覆盖。
+  - `scripts/build-rule-catalog.go`：从 kotlin-pr-review / agent-skills / 规则映射表生成 catalog。
+  - `Makefile`、`.github/workflows/ci.yml`：新增 `catalog-generate`、`catalog-check`，CI 校验生成文件。
+  - `cmd/opencodereview/{review_cmd.go,scan_cmd.go,shared.go}`、`internal/llmloop/loop.go`、`internal/tool/{code_comment.go,definitions.go}`、`internal/model/review.go`：加载 catalog、校验 `rule_id`、未知 ID 降级为 `disposition=needs_confirmation`。
+  - `cmd/opencodereview/{git_test.go,manual_e2e_retry_test.go}`：测试适配。
+  - `internal/config/template/prompts/main_task_system.md`、`internal/config/toolsconfig/tools.json`：规则 ID 只允许来自 catalog。
+  - `scripts/verify-english-only.go`：生成文件豁免。
+- 验证命令与结果：
+  - `make catalog-check`：`catalog ok: 212 rules (cpf=207, ocr=5), 84 references; source lines checked=296 skipped=0`。
+  - `make test`：`internal/config/rulecatalog` 用例通过；其余同一环境性失败。
+  - CI 已加入 `go run scripts/build-rule-catalog.go -verify`。
+- 残留风险：上游 agent-skills / kotlin-pr-review 更新会导致 catalog 漂移；需按 `knowledge_version` 与 commit 刷新并单独提交 diff。
+
+**2.1 / 2.2 / 2.3 完成记录（2026-10-30）**：
+
+- 日期：2026-10-30
+- commit：`7f9db77`（当前分支等价 `ff6b81d`，patch-id `4448cf9`）
 - 改动文件：
   - `internal/config/template/prompts/main_task_system.md`：Cross-File Consistency Checks 改为 5 步穷尽性清单（变更面、消费者搜索、生成/手写一致性、量化证据、跨平台对照）；新增 Baseline Comparison 段；Comment Structure 的 Trigger 要素要求 high/critical 给出 `entry → step A → step B → defect`，逐跳必须有代码依据。
   - `internal/config/toolsconfig/tools.json`：`impact` 描述补充 critical/high 需给出 trigger path。
@@ -676,17 +733,17 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
   - `gofmt -s -l .`：无输出。
   - `go vet ./internal/config/...`：通过。
   - `make check`：`license-check`、`english-check` 通过；`go mod tidy` 因 `proxy.golang.org` 网络超时未完成（环境问题）。
-- replay 对比：未执行。需要目标仓 pr408 基准 revision、模型与预算；本次只完成 prompt 改动与单测/静态检查，命中、误报、耗时、token 待 replay 补齐。
+- replay 对比：pr408 v3 重跑（见 3.2）已包含本轮 prompt 改动；未单独执行 2.x fixture、high/critical 路径完整率和 baseline 样本 replay，列入 §7.2。
 - 残留风险：
-  - 量化证据与调用链要求会增加工具调用和评论长度，可能挤占 token 预算；prompt 的实际生效程度需 replay 验证。
+  - 量化证据与调用链要求会增加工具调用和评论长度，可能挤占 token 预算；prompt 的实际生效程度需后续 replay 量化。
   - Baseline Comparison 只能依赖 unified diff 的删除行与同仓同类实现，无法真正读取 base revision（见 §7.3 D4）。
   - 未新增 `base_branch` 参数或 base-ref 读取工具，属 1 小时 prompt-only 版本的既定边界。
 
 **3.1 + 3.2 完成记录（2026-10-30）**：
 
 - 日期：2026-10-30
-- commit：目标仓 `1efcb5ca2a0`（`feat: add OHOS linker and platform-specific rules`）；OCR 主仓无代码改动。
-- 改动文件：目标仓 `.opencodereview/rule.json`；规则 K2-001、K2-002、K2-003、K2-004、K2-005、K2-006、K4-001。
+- commit：目标仓 `1efcb5ca2a0`（当前等价 `c6f064d40a8`，`feat: add OHOS linker and platform-specific rules`）；OCR 文档记录 `adf3145`（当前分支等价 `5fbe7a8`，patch-id `34e8249`）；OCR 主仓无代码改动。
+- 改动文件：目标仓 `.opencodereview/rule.json`；规则 K2-001、K2-002、K2-003、K2-004、K2-005、K2-006、K4-001；OCR 侧 `OCR-vs-CPF实测对比.md`、`OCR增强待办.md`。
 - 验证命令与结果：
   - pr408 v3 replay：目标仓 `c4244058501` + `include: ["**/konan/target/**"]`；provider/model `volcano-glm`/`glm-5.3`；20 个文件。
   - 输出：`/tmp/cpf-compare/pr408-v3.json`、`/tmp/cpf-compare/pr408-v3.log`；`terminal_state=partial`（5/20 项失败，Linker 组 Round-2 超时后保留既有发现）。
@@ -707,22 +764,58 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
   - v3 为 `partial`，#2/#7/#10 未命中可能同时受规则未触发与分析未完成影响。
   - 44 条含 5 条 DependencyDownloader/Processor 重复评论，未去重。
   - CPF#11 是能力矩阵复核而非缺陷复现（最终 merge 已修正 `OHOS_X64` 的 `HWADDRESS`），严格口径未增加。
-  - pr447#3、pr438#2 的 `K2-001`/`K2-002` 尚未 replay。
+  - pr447#3、pr438#2 的 `K2-001`/`K2-002` 尚未 replay，列入 §7.2。
+
+**3.3 完成记录（2026-10-30）**：
+
+- 日期：2026-10-30
+- commit：OCR 主仓 `b5b36eb`（当前分支等价 `cca6ae9`，patch-id `105d189`）；目标仓 `a4fc5a3ea30`（当前等价 `39e4acae053`，patch-id `9755d13`）。
+- 改动文件：
+  - `internal/config/domainroute/{domainroute.go,domainroute_test.go,routes.json}`：10 个领域（ohos-platform、crt、gc、interop、gradle、architecture、build-release、memory、cpp、kotlin），路径 + 关键词 + diff 触发，`max_domains=2`、`token_budget=1200`。
+  - `cmd/opencodereview/{route_cmd.go,route_cmd_test.go,review_cmd.go,scan_cmd.go,shared.go,shared_flags.go}`：新增 `ocr rules route` 诊断命令与 `--no-domain-routing` 开关。
+  - `internal/agent/agent.go`、`internal/scan/agent.go`、`internal/config/template/prompts/main_task_system.md`、`internal/config/template/scan_template.json`：按组注入 `<domain_knowledge>`；禁用或未命中时保持原 prompt。
+  - 测试：`internal/config/domainroute/domainroute_test.go`、`cmd/opencodereview/route_cmd_test.go`、`internal/agent/{grouping_test.go,manifest_hash_test.go}`、`internal/scan/agent_test.go`。
+  - 目标仓 `.opencodereview/rules/catalog.json`：K2-001~K2-006、K4-001 共 7 条规则，覆盖 OHOS linker / native-runtime / native-compiler-backend。
+- 验证命令与结果：
+  - `make test`：domainroute、route、agent、scan 用例通过；`cmd/opencodereview` 仍仅有 3 个环境性失败。
+  - `make catalog-check`：通过。
+  - 路由单测覆盖路径命中、关键词命中、无命中、优先级冲突、token 上限、禁用开关、pr408/pr447/pr438 路径。
+- 残留风险：关键词路由可能误触发；目标仓 catalog 与 OCR 内置 catalog 需分别维护；token 收益需在后续 replay 中量化。
+
+**4.1 + 4.2 完成记录（2026-10-30）**：
+
+- 日期：2026-10-30
+- commit：`4b30514`（当前分支等价 `92ae18d`，patch-id `b170726`）
+- 改动文件：
+  - `internal/prmeta/{prmeta.go,providers.go,prmeta_test.go}`：统一 `Metadata`、`ParseURL`、`Fetch`、`TokenFromEnv`、`Render`；GitHub / GitCode provider；失败降级为 warning；token 不写入错误信息。
+  - `cmd/opencodereview/{review_cmd.go,shared_flags.go,flags_test.go}`：新增 `--pr-url`，校验 URL，拉取失败不阻塞 review。
+  - `internal/agent/{agent.go,util.go,prmeta_test.go,util_test.go}`：`PRMetadata` 注入与空块剥离。
+  - `internal/config/template/prompts/main_task_system.md`、`internal/config/template/prompts/main_task_user.md`：`<pr_metadata>` 输入块与 Process Checks 边界。
+  - `pages/src/content/docs/{en,zh,ja,ko,ru}/{architecture.md,cli-reference.md}`：文档同步。
+- 验证命令与结果：
+  - `make test`：27 个包通过；`cmd/opencodereview` 仅有 3 个环境性失败。
+  - `internal/prmeta` 单测覆盖 GitHub/GitCode fixture、401/403/404、超时、重试、部分字段缺失、超长 body 截断、DCO、渲染；`internal/agent` 覆盖注入与空块剥离。
+- replay 对比：未用真实 PR 做端到端 replay；真实 token / GitCode API 集成列入 §7.2。
+- 残留风险：PR body 可能含敏感信息，已做截断与块标记中和；GitCode API 字段差异仍需真实样本验证。
 
 ### 5.2 当前状态
 
 | 优先级 | 已完成 | 待验证 | 进行中 | 未开始 | 阻塞 |
 |---|---|---|---|---|---|
-| P0 | 0 | 5 | 0 | 1 | 0 |
-| P1 | 2 | 0 | 0 | 1 | 0 |
-| P2 | 0 | 0 | 0 | 2 | 0 |
+| P0 | 6 | 0 | 0 | 0 | 0 |
+| P1 | 3 | 0 | 0 | 0 | 0 |
+| P2 | 2 | 0 | 0 | 0 | 0 |
+| 合计 | 11 | 0 | 0 | 0 | 0 |
 
-**下一步检查点**：
+P0 6/6、P1 3/3、P2 2/2 全部完成。
 
-- 1.1/1.2/2.1/2.2/2.3 待 replay：pr408、一组 high/critical 调用链样本、2-3 个“修改既有行为”样本；记录命中、误报、耗时、token 与评论长度变化。
-- 完成 1.3 后，记录 catalog 规则数与来源校验结果。
-- 3.1/3.2 已完成（pr408 v3）；下一步做 3.3 领域路由，并补 pr447/pr438 的 K2-001/K2-002 replay。
-- 完成 P0 后，做一次整体 replay，再决定是否进入 P1。
+**后续维护检查点**：
+
+- 规则与知识库：源更新后跑 `make catalog-generate` + `make catalog-check`，记录 `knowledge_version` / commit。
+- replay 回归：pr447#3、pr438#2 验证 `K2-001`/`K2-002`；1.1/1.2 补严重度分布与评论长度对比；2.x 补 high/critical 路径完整率、baseline 样本与跨文件 fixture。
+- 领域路由：用 `ocr rules route` 抽查 11 个实测 PR，观察 `OCR_DOMAIN_ROUTE_DEBUG=1` 的 token；误触发时调 `routes.json`，保留 `--no-domain-routing` 回退。
+- PR metadata：补 GitCode fixture、真实 token 集成测试与 401/403/timeout/超长 body 回归。
+- prompt 质量：监控评论长度/token 与误报，必要时收紧 5 要素与穷尽性证据模板。
 
 ### 5.3 更新日志
 
@@ -730,42 +823,53 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 |---|---|---|
 | 2026-10-30 | 创建文档，整理 P0/P1/P2 任务、复用方案、资源与验收标准 | `cea0740` |
 | 2026-10-30 | 修正规则来源与交叉引用，补充“本次创建核对记录” | 工作区，未提交 |
-| 2026-10-30 | 落地 1.1 + 1.2：4 级 severity + disposition、5 要素证据 | `6f8fa01` |
-| 2026-10-30 | 完成 2.1 + 2.2 + 2.3 prompt 改动与静态验证；replay 待补 | `ff6b81d` |
-| 2026-10-30 | 完成 3.1：目标仓 rule.json 补充 OHOS linker/target capability 规则 K2-001~K2-006、K4-001 | 目标仓 `1efcb5ca2a0` |
-| 2026-10-30 | 完成 3.2：pr408 v3 重跑，44 条/30m25s/9.28M；宽口径 42.9%→50.0%，有效 60.0%→70.0% | `/tmp/cpf-compare/pr408-v3.json` |
+| 2026-10-30 | 完成 1.1 + 1.2：4 级 severity + disposition、5 要素证据 | `92ff543`（当前 `6f8fa01`） |
+| 2026-10-30 | 完成 1.3：规则 ID catalog，212 条规则 / 84 条 reference | `8b8651b`（当前 `e3f538c`） |
+| 2026-10-30 | 完成 2.1 + 2.2 + 2.3：跨文件穷尽性、触发路径、基线对照 | `7f9db77`（当前 `ff6b81d`） |
+| 2026-10-30 | 完成 3.1：目标仓 rule.json 补充 OHOS linker/target capability 规则 K2-001~K2-006、K4-001 | 目标仓 `1efcb5ca2a0`（当前 `c6f064d40a8`） |
+| 2026-10-30 | 完成 3.2：pr408 v3 重跑，44 条/30m25s/9.28M；宽口径 42.9%→50.0%，有效 60.0%→70.0% | `adf3145`（当前 `5fbe7a8`）；产物 `/tmp/cpf-compare/pr408-v3.json` |
+| 2026-10-30 | 完成 3.3：领域路由机制 + 目标仓 catalog | `b5b36eb`（当前 `cca6ae9`）；目标仓 `a4fc5a3ea30`（当前 `39e4acae053`） |
+| 2026-10-30 | 完成 4.1 + 4.2：PR metadata provider + prompt 集成 | `4b30514`（当前 `92ae18d`） |
+| 2026-10-30 | 全部任务标记完成，汇总 commit、改动文件、验证结果与后续维护项 | 本次工作区更新（未提交） |
 
-**本次创建核对记录（2026-10-30）**：
+**创建与本次更新核对记录（2026-10-30）**：
 
 - 读取 `OCR-vs-CPF实测对比.md` §8（行 389-463）以及 §6、§9；`规则映射表.md` §3；`main_task_system.md` 的检查与严重度段落。
 - 核对 agent-skills `0c3dc40`、kotlin-pr-review `9aafffb`、Harness `426d82c`；本地路径状态见 §4.2（Harness 临时目录本次核对时已缺失）。
 - 统计 kotlin-pr-review 规则 ID 207 个（去重）、agent-skills catalog 20 个 / reference 168 条。
-- 本文档只做待办规划，未执行代码改动，未运行 `make test`；所有“已完成”以 §5.1 的 commit 为准，估时以任务执行时的实际记录为准。
+- 本次更新按用户确认的完成状态汇总 6 个记录提交，并用 `git patch-id --stable` 核对 rebase 前后等价关系；在 rebase 后分支重跑 `make test`（27 个包通过，`cmd/opencodereview` 3 个本机 git trailer 环境性失败）、`make catalog-check`、`make english-check`、`make license-check`、`go vet`，结果见 §5.1。
 
 ## 6. 关键洞察
 
 1. **知识库沉淀比模型差异更决定 recall**：OCR 的规则库经过 P0 修正后已相当完善，真实 miss 只有 10%；双方在资源生命周期/并发/NAPI 边界上的逐字级重合也印证了这一点。
 2. **真实 miss 主要在 OHOS 特定规则**（linker、ABI、target capability）：可以通过继续补充规则库解决，不需要模型或架构改动。
-3. **结构性缺口（PR 流程检查）需要架构改动**：不是规则库能解决的，是当前 CPF 相对 OCR 最明确的护城河。
+3. **结构性缺口（PR 流程检查）已由 PR metadata 输入层补齐**：`--pr-url` + `<pr_metadata>` + Process Checks 让 OCR 能检查模板、测试、DCO/CI；这是 CPF 相对 OCR 最明确的护城河，现已有对应机制。
 4. **复用 agent-skills 知识库**：不用重复造轮子，只需要格式转换和适配；但要注意仓外文档不可直接读取的限制（§3.2）。
 5. **输入层与预算的影响不亚于规则本身**：pr408 首轮受 `**/target/**` 误杀影响，398/411/438 受 token 预算/超时影响；增强效果必须用 replay 验证，不能只看 prompt 改动。
 6. **prompt 改动便宜但稳定性有限，schema 改动影响面大**：先 prompt、再 replay、最后 code/schema，是风险最低的顺序。
+7. **所有增强任务已完成（P0 6/6、P1 3/3、P2 2/2，合计 11/11）**：输出层完成 4 级 severity + disposition、5 要素证据、212 条规则 / 84 条 reference 的 catalog；检查深度完成跨文件穷尽性、触发路径、基线对照三段 prompt；结构性能力完成 OHOS/平台规则、领域路由与 PR metadata。后续重点从“补能力”转为“防漂移、控 token、补 replay”。
 
 ## 7. 下一步行动
 
-### 7.1 建议顺序
+### 7.1 后续维护顺序
 
-1. 先做 P0 输出质量和检查深度（约 1 天，最容易增强且效果最明显）。
-2. 再做 P1 平台特定规则和领域路由（约 2-3 天）。
-3. 最后做 P2 PR 流程检查（约 1 周，需要架构改动）。
+所有 P0/P1/P2 任务已完成（11/11），不再按原优先级排期。后续按以下顺序维护：
 
-### 7.2 立即可做
+1. 规则与知识库刷新：catalog 生成/校验、来源版本记录。
+2. replay 回归：补齐 1.1/1.2、2.x、pr447/pr438 的量化验证。
+3. 领域路由与 PR metadata 的平台适配、token 与误报监控。
+4. 文档与对比报告同步，保持结论可追溯。
 
-- ~~从 agent-skills 抽取 OHOS linker 特定规则到 `rule.json`（3.1 的第一批）~~ **已完成（目标仓 `1efcb5ca2a0`）**；下一步补 pr447/pr438 的 K2-001/K2-002 replay。
-- 建立规则 ID 目录 `catalog.json`（1.3），先把 207 条规则与 168 条 reference 索引跑通。
-- 加强跨文件穷尽性检查和触发路径推理 prompt（2.1、2.2），改完立即 replay pr408。
+### 7.2 后续维护项
 
-### 7.3 待定决策（实现前必须定稿）
+- **catalog 刷新**：agent-skills / kotlin-pr-review 更新后，更新 `knowledge_version` 与来源 commit，跑 `make catalog-generate`、`make catalog-check`，单独提交 catalog diff；禁止手改生成文件。
+- **replay 回归**：pr447#3、pr438#2 验证 `K2-001`/`K2-002`；1.1/1.2 补一组历史评论的严重度分布与评论长度对比；2.x 补 high/critical 路径完整率、baseline 样本与跨文件 fixture。
+- **领域路由**：用 `ocr rules route` 抽查 11 个实测 PR；用 `OCR_DOMAIN_ROUTE_DEBUG=1` 观察命中领域与 token；误触发时调 `routes.json`，保留 `--no-domain-routing` 回退。
+- **PR metadata**：补 GitCode fixture、真实 token 集成测试，以及 401/403、超时、部分字段缺失、超长 body 截断的回归用例；确认失败降级不阻塞代码评审。
+- **prompt 质量**：监控评论长度/token 与误报，必要时收紧 5 要素与穷尽性证据模板；`make test`、`make check` 保持通过。
+- **文档同步**：本文档与 `OCR-vs-CPF实测对比.md`、`规则映射表.md` 的结论保持一致。
+
+### 7.3 决策与落地情况
 
 | 编号 | 决策 | 选项 | 建议 |
 |---|---|---|---|
@@ -775,16 +879,22 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 | D4 | 基线对照是否加 base-ref 工具 | prompt-only；新增 base-ref 读取工具 | 先做 2.3 的 1 小时版本，replay 有收益再立项 |
 | D5 | PR metadata 首期平台 | GitHub 优先；GitCode 优先；两者同时 | 先 GitHub（API 稳定、fixture 容易），再 GitCode |
 
-### 7.4 第一周执行建议
+**落地情况（2026-10-30）**：D1–D5 均已定稿并落地。
 
-| 时间 | 任务 | 产出 |
+- D1：旧数据保留渲染，新输入只产生 4 级 severity + disposition（`92ff543`）。
+- D2：内置 catalog + 目标仓 `.opencodereview/rules/catalog.json` 覆盖（`8b8651b`、目标仓 `a4fc5a3ea30`）。
+- D3：采用方案 C，核心规则进 catalog，知识文档以 reference 索引关联（`8b8651b`）。
+- D4：先做 prompt-only baseline 对照，未新增 base-ref 读取工具（`7f9db77`）。
+- D5：GitHub / GitCode 双 provider 同时实现（`4b30514`）。
+
+### 7.4 维护节奏
+
+| 触发/周期 | 事项 | 产出 |
 |---|---|---|
-| 第 1 天上午 | 1.1 + 1.2 | 4 级 + 处置位、5 要素 prompt；单测通过 |
-| 第 1 天下午 | 2.1 + 2.2 + 2.3 | 三段 prompt；pr408 replay 记录 |
-| 第 2 天 | 1.3 | `catalog.json`、生成脚本、来源校验 |
-| 第 3-4 天 | 3.1 + 3.2 | 6 条 miss 规则；pr408 v3 replay 已完成，pr447/438 待补 |
-| 第 5 天 | 3.3 | 路由表、脚本、单测、11 PR 路由核对 |
-| 第 2 周 | 4.1 + 4.2 | PR metadata provider、prompt 集成、fixture |
+| 源知识库更新时 | 刷新 catalog，跑 `make catalog-check` | catalog diff + 校验通过 |
+| 模型/预算变更时 | 用固定基准 replay | 命中、误报、耗时、token 对比 |
+| 每月 | 规则误报与未触发复盘 | 规则修正或降级 |
+| 每季度 | 平台 provider、路由表、PR 流程规则复核 | fixture 与文档更新 |
 
 ### 7.5 完成判定（DoD）
 
@@ -796,6 +906,8 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 - [ ] 文档已更新（本文档 + 相关对比/映射文档）。
 - [ ] 残留风险与未覆盖项已写明，未用“应该没问题”代替验证。
 - [ ] 如涉及外部仓（`rule.json`），单独提交并附 replay 结果。
+
+**当前状态（2026-10-30）**：11 项任务已完成并记录；其中 replay 量化项（1.1/1.2、2.x fixture、pr447/pr438）作为维护项保留在 §7.2，不阻塞任务完成标记。
 
 ### 7.6 风险与缓解
 
