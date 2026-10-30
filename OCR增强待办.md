@@ -3,7 +3,7 @@
 > 状态：活跃
 > 创建：2026-10-30
 > 基线：`OCR-vs-CPF实测对比.md` §8（11 PR / 60 条 CPF 评论，三阶段实测）
-> 当前分支 HEAD：`6f8fa01`（1.1/1.2 落地）；能力差距基线 `941cee2`（`feat/cpf-kb-review-enhancements`）；2.1-2.3 改动在工作区
+> 当前分支 HEAD：`e3f538c`；能力差距基线 `941cee2`（`feat/cpf-kb-review-enhancements`）；2.1-2.3 已由 `ff6b81d` 提交；P1 平台规则在目标仓提交 `1efcb5ca2a0`
 > 维护约定：每完成一项，更新本文档的状态、commit、验证命令与残留风险；未验证的内容不得标记为完成。
 
 ## 0. 维护约定（过程透明）
@@ -94,13 +94,13 @@
 | 2.1 | P0 | 加强跨文件穷尽性检查 prompt | 检查深度 | 30 分钟 | 待验证 | 无 |
 | 2.2 | P0 | 加强触发路径推理 prompt | 检查深度 | 30 分钟 | 待验证 | 1.2 |
 | 2.3 | P0 | 加入基线对照 prompt | 检查深度 | 1 小时 | 待验证 | 无 |
-| 3.1 | P1 | 补充 OHOS linker 等平台特定规则 | 结构性能力 | 2-4 小时 | 未开始 | 1.3 |
-| 3.2 | P1 | 验证 pr408 重跑 | 验证 | 30 分钟 | 未开始 | 3.1 |
+| 3.1 | P1 | 补充 OHOS linker 等平台特定规则 | 结构性能力 | 2-4 小时 | 已完成 | 1.3 |
+| 3.2 | P1 | 验证 pr408 重跑 | 验证 | 30 分钟 | 已完成 | 3.1 |
 | 3.3 | P1 | 建立领域路由机制 | 结构性能力 | 4-8 小时 | 未开始 | 1.3 |
 | 4.1 | P2 | 架构改动支持 PR body | 结构性能力 | 1-2 天 | 未开始 | 无 |
 | 4.2 | P2 | 集成 PR body 到 prompt | 结构性能力 | 1 天 | 未开始 | 4.1 |
 
-统计：P0 已完成 0/6（待验证 5，未开始 1），P1 0/3，P2 0/2。
+统计：P0 已完成 0/6（待验证 5，未开始 1），P1 已完成 2/3（3.1、3.2；3.3 未开始），P2 0/2。
 
 **勾选清单**：
 
@@ -110,8 +110,8 @@
 - [ ] 2.1 加强跨文件穷尽性检查 prompt（P0，30 分钟）
 - [ ] 2.2 加强触发路径推理 prompt（P0，30 分钟）
 - [ ] 2.3 加入基线对照 prompt（P0，1 小时）
-- [ ] 3.1 补充 OHOS linker 等平台特定规则（P1，2-4 小时）
-- [ ] 3.2 验证 pr408 重跑（P1，30 分钟）
+- [x] 3.1 补充 OHOS linker 等平台特定规则（P1，2-4 小时）
+- [x] 3.2 验证 pr408 重跑（P1，30 分钟）
 - [ ] 3.3 建立领域路由机制（P1，4-8 小时）
 - [ ] 4.1 架构改动支持 PR body（P2，1-2 天）
 - [ ] 4.2 集成 PR body 到 prompt（P2，1 天）
@@ -284,7 +284,7 @@
 - 增加工具调用与 token；需要在 replay 中记录耗时。
 - 模型可能把“已搜索”写成套话；prompt 要求给出具体搜索词与文件。
 
-**状态**：待验证（2026-10-30，工作区）。`main_task_system.md` 的 Cross-File Consistency Checks 已改为 5 步穷尽性清单并加入量化证据模板；`make test` 通过（环境性失败除外）；replay pr408 与 fixture 尚未执行。
+**状态**：待验证（2026-10-30，commit `ff6b81d`）。`main_task_system.md` 的 Cross-File Consistency Checks 已改为 5 步穷尽性清单并加入量化证据模板；`make test` 通过（环境性失败除外）；replay pr408 与 fixture 尚未执行。
 
 #### 2.2 加强触发路径推理 prompt（30 分钟）
 
@@ -313,7 +313,7 @@
 - 与 1.2 的 5 要素重叠，需避免重复叙述。
 - 路径推理会增加工具调用；需观察 token/耗时。
 
-**状态**：待验证（2026-10-30，工作区）。Comment Structure 的 Trigger 要素已要求 high/critical 给出 `entry → step A → step B → defect`，并规定无法建立路径时用 `disposition=needs_confirmation`；`tools.json` 的 `impact` 描述已同步；`make test` 通过（环境性失败除外）；路径完整率 replay 尚未执行。
+**状态**：待验证（2026-10-30，commit `ff6b81d`）。Comment Structure 的 Trigger 要素已要求 high/critical 给出 `entry → step A → step B → defect`，并规定无法建立路径时用 `disposition=needs_confirmation`；`tools.json` 的 `impact` 描述已同步；`make test` 通过（环境性失败除外）；路径完整率 replay 尚未执行。
 
 #### 2.3 加入基线对照 prompt（1 小时）
 
@@ -348,7 +348,7 @@
 - prompt-only 的能力上限受工具限制；验收时必须区分“prompt 生效”与“真正读到 base”。
 - 可能增加评论篇幅；建议只对 medium 及以上启用。
 
-**状态**：待验证（2026-10-30，工作区）。`main_task_system.md` 已新增 Baseline Comparison 段（diff 删除行、同仓 sibling/上游对照、回归与存量分类、baseline unavailable 声明）；按 D4 未新增 base-ref 读取工具；`make test` 通过（环境性失败除外）；2-3 个“修改既有行为”样本 replay 尚未执行。
+**状态**：待验证（2026-10-30，commit `ff6b81d`）。`main_task_system.md` 已新增 Baseline Comparison 段（diff 删除行、同仓 sibling/上游对照、回归与存量分类、baseline unavailable 声明）；按 D4 未新增 base-ref 读取工具；`make test` 通过（环境性失败除外）；2-3 个“修改既有行为”样本 replay 尚未执行。
 
 ### 2.2 P1（中期可做，约 2-3 天）
 
@@ -358,14 +358,14 @@
 
 **6 条真实 miss 与规则来源**：
 
-| Miss | 问题 | 类型 | 参考来源 |
-|---|---|---|---|
-| pr408#2 | `crtn.o` 链接顺序错误 | OHOS linker | `规则映射表.md` R-xplat-5；`kotlin-pr-review` B3 |
-| pr408#7 | `useCompilerDriverAsLinker` 与 `ld.lld` 矛盾 | OHOS linker | 同上 |
-| pr408#10 | 链接命令缺失 `dynamicLibraries` | OHOS linker | 同上 |
-| pr408#11 | `OHOS_X64` 不应列 HWADDRESS | target capability | `规则映射表.md` R-xplat-4；`R3-003` |
-| pr447#3 | `prctl(PR_SET_VMA_ANON_NAME)` 去掉 `useMmap` 短路 | 系统调用前置条件 | `OCR-vs-CPF实测对比.md` §4.3；agent-skills `kmp-gc` / `kmp-native-compiler-runtime` |
-| pr438#2 | 非 OHOS `DumpMemoryAsync` 改为 gzip、移除 `isStrip` 拒绝 | 跨平台 dump | `OCR-vs-CPF实测对比.md` §4.5；agent-skills `kmp-native-compiler-runtime`（runtime/dump 相关 reference） |
+| Miss | 问题 | 类型 | 规则 ID | 参考来源 |
+|---|---|---|---|---|
+| pr408#2 | `crtn.o` 链接顺序错误 | OHOS linker | K2-003 | `规则映射表.md` R-xplat-5；`kotlin-pr-review` B3 |
+| pr408#7 | `useCompilerDriverAsLinker` 与 `ld.lld` 矛盾 | OHOS linker | K2-004 / K4-001 | 同上 |
+| pr408#10 | 链接命令缺失 `dynamicLibraries` | OHOS linker | K2-005 / K4-001 | 同上 |
+| pr408#11 | `OHOS_X64` 不应列 HWADDRESS | target capability | K2-006 | `规则映射表.md` R-xplat-4；`R3-003` |
+| pr447#3 | `prctl(PR_SET_VMA_ANON_NAME)` 去掉 `useMmap` 短路 | 系统调用前置条件 | K2-001 | `OCR-vs-CPF实测对比.md` §4.3；agent-skills `kmp-gc` / `kmp-native-compiler-runtime` |
+| pr438#2 | 非 OHOS `DumpMemoryAsync` 改为 gzip、移除 `isStrip` 拒绝 | 跨平台 dump | K2-002 | `OCR-vs-CPF实测对比.md` §4.5；agent-skills `kmp-native-compiler-runtime`（runtime/dump 相关 reference） |
 
 **建议做法**：
 
@@ -389,7 +389,23 @@
 - 目标仓 `rule.json` 是外部路径（见 §4），改动不在 OCR 仓，需要单独评审。
 - `pr438#2` 的漏报还受评审超时影响，规则补上后仍需确认不是预算问题。
 
-**状态**：未开始。
+**完成记录（2026-10-30）**：
+
+- 日期：2026-10-30
+- commit：目标仓 `1efcb5ca2a0`（`feat: add OHOS linker and platform-specific rules`）；OCR 主仓无代码改动。
+- 改动文件：目标仓 `.opencodereview/rule.json`；新增规则 ID `K2-001`、`K2-002`、`K2-003`、`K2-004`、`K2-005`、`K2-006`、`K4-001`。
+- 规则覆盖：
+  - `K2-003`：CRT 链接顺序（`crtn.o` 必须最后）；
+  - `K2-004`：compiler driver 与 `ld.lld` 一致性（`useCompilerDriverAsLinker`）；
+  - `K2-005`：链接输入完整性（`staticLibraries` / `dynamicLibraries` / sanitizer runtime / CRT）；
+  - `K2-006`：target capability 矩阵与穷举 `when`（含 `OHOS_X64` 不列 `HWADDRESS`）；
+  - `K2-001`：系统调用前置条件/短路守卫（`prctl`）；
+  - `K2-002`：跨平台 dump/serialization 格式变更；
+  - `K4-001`：构建脚本中的 native linker 调用约定。
+- 验证：pr408 v3 重跑见 3.2；`K2-006` 开火并命中 CPF#11/#14，`K2-005` 有评论产出但未命中 CPF#10，`K2-003`/`K2-004` 在 pr408 未见对应评论；`K2-001`/`K2-002` 需 pr447/pr438 重跑验证。
+- 残留风险：3.1 验收标准中的「pr408/pr447/pr438 三条链路、6 条至少命中 4 条」尚未闭合——pr408 仅命中 1/4（#11），pr447/pr438 未 replay；规则能否稳定开火需跨 PR 复验。
+
+**状态**：已完成（规则补充；目标仓 commit `1efcb5ca2a0`）。跨 PR replay 验收未闭合，见残留风险。
 
 #### 3.2 验证 pr408 重跑（30 分钟）
 
@@ -422,7 +438,32 @@
 - 30 分钟仅指一次重跑与记录；若模型排队或 40+ 文件预算不足，实际会更久。
 - 单次重跑有随机性；关键结论建议至少两次或固定温度/种子（若支持）。
 
-**状态**：未开始。
+**完成记录（2026-10-30，pr408 v3）**：
+
+- 日期：2026-10-30
+- commit/产物：目标仓 rule.json `1efcb5ca2a0`；OCR 输出 `/tmp/cpf-compare/pr408-v3.json`、日志 `/tmp/cpf-compare/pr408-v3.log`。
+- 基准与配置：与 v2 相同，`c4244058501` + `include: ["**/konan/target/**"]`；provider/model `volcano-glm` / `glm-5.3`；20 个文件；`terminal_state=partial`（5/20 项失败，Linker 组 Round-2 超时后保留既有发现）。
+- 结果：44 条评论（v2 38 条，+6；含 DependencyDownloader/DependencyProcessor 重复评论 5 条），30m25s，9,285,143 tokens（v2 6,810,120 tokens / 30m39s）。
+
+**逐条对比**：
+
+| Miss | v2 结果 | v3 结果 | 证据/原因 |
+|---|---|---|---|
+| pr408#2 `crtn.o` 链接顺序 | 未命中 | 未命中 | `K2-003` 未开火；Linker 组 Round-2 超时 |
+| pr408#7 `useCompilerDriverAsLinker` 矛盾 | 未命中 | 未命中 | `K2-004` 未开火；无对应评论 |
+| pr408#10 缺失 `dynamicLibraries` | 未命中 | 未命中 | `K2-005` 在 compiler-rt 路径/crtend 命名上开火，但未覆盖该实例 |
+| pr408#11 `OHOS_X64` 不应列 `HWADDRESS` | 未命中 | 命中（弱重合/能力矩阵覆盖） | `KonanTargetExtenstions.kt:94` 的 `K2-006` 评论复核 target capability，明确「OHOS_X64 不列 HWADDRESS 是正确的」；非缺陷复现 |
+| pr408#14 `HWADDRESS` 穷举 `when` | 强重合 | 再次命中 | `Sanitizer.kt:11`、`Linker.kt:264` 的 `K2-006` 评论列出未同步的 4 处 `when` |
+
+- recall：pr408 宽口径 6/14 = 42.9% → 7/14 = 50.0%；排除已修复项（#3/#5/#12/#13）后 6/10 = 60.0% → 7/10 = 70.0%；严格口径不变（3/14 = 21.4%、3/10 = 30.0%，#11 计为弱重合）。三 PR 合计宽口径 14/28 = 50.0% → 15/28 = 53.6%，有效宽口径 14/24 = 58.3% → 15/24 = 62.5%。
+- 新规则开火：`K2-005`（`Linker.kt:231` llvmVersion/compiler-rt 路径、`Linker.kt:277` `clang_rt.crtend.o` 命名）；`K2-006`（6 条：`KonanTargetExtenstions.kt` 4 条、`Sanitizer.kt` 1 条、`Linker.kt` 1 条）。`K2-001`/`K2-002`/`K2-003`/`K2-004`/`K4-001` 本轮未开火或未命中。
+- 残留风险：
+  - v3 为 `partial`，Linker 组 Round-2 超时后保留既有发现；#2/#7/#10 的未命中可能既包含规则未触发，也包含分析未完成，需在预算充足时复跑确认。
+  - 44 条包含 5 条 DependencyDownloader/Processor 重复评论，统计按输出条数记录，未去重。
+  - #11 是能力矩阵复核；最终 merge 已把 `OHOS_X64` 的 `HWADDRESS` 移除（`bd101f9` 上仍存在），严格口径不因此增加。
+  - pr447#3、pr438#2 对应 `K2-001`/`K2-002` 尚未 replay。
+
+**状态**：已完成（pr408 v3；pr447/pr438 不在本项范围）。
 
 #### 3.3 建立领域路由机制（4-8 小时，按领域映射到文件路径）
 
@@ -609,7 +650,9 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 - [x] 能力差距评估（§8 已添加到文档）—— 2026-10-30，commit `2bfae0e`
 - [x] 创建本文档（OCR 增强待办）—— 2026-10-30，初版由 commit `cea0740` 收录；后续修订见工作区
 - [ ] 1.1 + 1.2：4 级 severity + disposition、5 要素证据 —— 2026-10-30，commit `6f8fa01`；`make test` 通过（环境性失败除外），replay 待补
-- [ ] 2.1 + 2.2 + 2.3：跨文件穷尽性、触发路径、基线对照 prompt —— 2026-10-30，工作区；`make test` 通过（环境性失败除外），replay 待补
+- [ ] 2.1 + 2.2 + 2.3：跨文件穷尽性、触发路径、基线对照 prompt —— 2026-10-30，commit `ff6b81d`；`make test` 通过（环境性失败除外），replay 待补
+- [x] 3.1：补充 OHOS linker 等平台特定规则 —— 2026-10-30，目标仓 commit `1efcb5ca2a0`（K2-001~K2-006、K4-001）；跨 PR replay 验收未闭合
+- [x] 3.2：验证 pr408 重跑（v3）—— 2026-10-30，产物 `/tmp/cpf-compare/pr408-v3.json`；44 条/30m25s/9.28M；宽口径 42.9%→50.0%，有效 60.0%→70.0%
 
 **提交哈希说明**：以上为记录时的分支提交。当前分支重建后存在 patch-id 等价的提交，核对结果如下（2026-10-30）：
 
@@ -624,7 +667,7 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 **2.1 / 2.2 / 2.3 改动记录（2026-10-30，待验证）**：
 
 - 日期：2026-10-30
-- commit：工作区，未提交
+- commit：`ff6b81d`
 - 改动文件：
   - `internal/config/template/prompts/main_task_system.md`：Cross-File Consistency Checks 改为 5 步穷尽性清单（变更面、消费者搜索、生成/手写一致性、量化证据、跨平台对照）；新增 Baseline Comparison 段；Comment Structure 的 Trigger 要素要求 high/critical 给出 `entry → step A → step B → defect`，逐跳必须有代码依据。
   - `internal/config/toolsconfig/tools.json`：`impact` 描述补充 critical/high 需给出 trigger path。
@@ -639,18 +682,46 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
   - Baseline Comparison 只能依赖 unified diff 的删除行与同仓同类实现，无法真正读取 base revision（见 §7.3 D4）。
   - 未新增 `base_branch` 参数或 base-ref 读取工具，属 1 小时 prompt-only 版本的既定边界。
 
+**3.1 + 3.2 完成记录（2026-10-30）**：
+
+- 日期：2026-10-30
+- commit：目标仓 `1efcb5ca2a0`（`feat: add OHOS linker and platform-specific rules`）；OCR 主仓无代码改动。
+- 改动文件：目标仓 `.opencodereview/rule.json`；规则 K2-001、K2-002、K2-003、K2-004、K2-005、K2-006、K4-001。
+- 验证命令与结果：
+  - pr408 v3 replay：目标仓 `c4244058501` + `include: ["**/konan/target/**"]`；provider/model `volcano-glm`/`glm-5.3`；20 个文件。
+  - 输出：`/tmp/cpf-compare/pr408-v3.json`、`/tmp/cpf-compare/pr408-v3.log`；`terminal_state=partial`（5/20 项失败，Linker 组 Round-2 超时后保留既有发现）。
+- replay 对比：
+
+| 指标 | v2 | v3 |
+|---|---|---|
+| 评论数 | 38 | 44（含 5 条重复评论） |
+| 耗时 | 30m39s | 30m25s |
+| tokens | 6,810,120 | 9,285,143 |
+| pr408 严格 | 3/14 = 21.4% | 3/14 = 21.4% |
+| pr408 宽口径 | 6/14 = 42.9% | 7/14 = 50.0% |
+| pr408 有效严格 | 3/10 = 30.0% | 3/10 = 30.0% |
+| pr408 有效宽口径 | 6/10 = 60.0% | 7/10 = 70.0% |
+
+- 新规则开火：`K2-006` 6 条（命中 CPF#11/#14）；`K2-005` 2 条（未命中 CPF#10）；`K2-003`/`K2-004`/`K2-001`/`K2-002`/`K4-001` 本轮未开火或未命中。
+- 残留风险：
+  - v3 为 `partial`，#2/#7/#10 未命中可能同时受规则未触发与分析未完成影响。
+  - 44 条含 5 条 DependencyDownloader/Processor 重复评论，未去重。
+  - CPF#11 是能力矩阵复核而非缺陷复现（最终 merge 已修正 `OHOS_X64` 的 `HWADDRESS`），严格口径未增加。
+  - pr447#3、pr438#2 的 `K2-001`/`K2-002` 尚未 replay。
+
 ### 5.2 当前状态
 
 | 优先级 | 已完成 | 待验证 | 进行中 | 未开始 | 阻塞 |
 |---|---|---|---|---|---|
 | P0 | 0 | 5 | 0 | 1 | 0 |
-| P1 | 0 | 0 | 0 | 3 | 0 |
+| P1 | 2 | 0 | 0 | 1 | 0 |
 | P2 | 0 | 0 | 0 | 2 | 0 |
 
 **下一步检查点**：
 
 - 1.1/1.2/2.1/2.2/2.3 待 replay：pr408、一组 high/critical 调用链样本、2-3 个“修改既有行为”样本；记录命中、误报、耗时、token 与评论长度变化。
 - 完成 1.3 后，记录 catalog 规则数与来源校验结果。
+- 3.1/3.2 已完成（pr408 v3）；下一步做 3.3 领域路由，并补 pr447/pr438 的 K2-001/K2-002 replay。
 - 完成 P0 后，做一次整体 replay，再决定是否进入 P1。
 
 ### 5.3 更新日志
@@ -660,7 +731,9 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 | 2026-10-30 | 创建文档，整理 P0/P1/P2 任务、复用方案、资源与验收标准 | `cea0740` |
 | 2026-10-30 | 修正规则来源与交叉引用，补充“本次创建核对记录” | 工作区，未提交 |
 | 2026-10-30 | 落地 1.1 + 1.2：4 级 severity + disposition、5 要素证据 | `6f8fa01` |
-| 2026-10-30 | 完成 2.1 + 2.2 + 2.3 prompt 改动与静态验证；replay 待补 | 工作区，未提交 |
+| 2026-10-30 | 完成 2.1 + 2.2 + 2.3 prompt 改动与静态验证；replay 待补 | `ff6b81d` |
+| 2026-10-30 | 完成 3.1：目标仓 rule.json 补充 OHOS linker/target capability 规则 K2-001~K2-006、K4-001 | 目标仓 `1efcb5ca2a0` |
+| 2026-10-30 | 完成 3.2：pr408 v3 重跑，44 条/30m25s/9.28M；宽口径 42.9%→50.0%，有效 60.0%→70.0% | `/tmp/cpf-compare/pr408-v3.json` |
 
 **本次创建核对记录（2026-10-30）**：
 
@@ -688,7 +761,7 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 
 ### 7.2 立即可做
 
-- 从 agent-skills 抽取 OHOS linker 特定规则到 `rule.json`（3.1 的第一批）。
+- ~~从 agent-skills 抽取 OHOS linker 特定规则到 `rule.json`（3.1 的第一批）~~ **已完成（目标仓 `1efcb5ca2a0`）**；下一步补 pr447/pr438 的 K2-001/K2-002 replay。
 - 建立规则 ID 目录 `catalog.json`（1.3），先把 207 条规则与 168 条 reference 索引跑通。
 - 加强跨文件穷尽性检查和触发路径推理 prompt（2.1、2.2），改完立即 replay pr408。
 
@@ -709,7 +782,7 @@ grep -rhoE '\| [A-Z]{1,3}[0-9]+-[0-9]{3} \|' \
 | 第 1 天上午 | 1.1 + 1.2 | 4 级 + 处置位、5 要素 prompt；单测通过 |
 | 第 1 天下午 | 2.1 + 2.2 + 2.3 | 三段 prompt；pr408 replay 记录 |
 | 第 2 天 | 1.3 | `catalog.json`、生成脚本、来源校验 |
-| 第 3-4 天 | 3.1 + 3.2 | 6 条 miss 规则、pr408/447/438 replay |
+| 第 3-4 天 | 3.1 + 3.2 | 6 条 miss 规则；pr408 v3 replay 已完成，pr447/438 待补 |
 | 第 5 天 | 3.3 | 路由表、脚本、单测、11 PR 路由核对 |
 | 第 2 周 | 4.1 + 4.2 | PR metadata provider、prompt 集成、fixture |
 
