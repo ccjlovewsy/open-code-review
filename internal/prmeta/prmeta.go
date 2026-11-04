@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -294,8 +295,59 @@ func newAPIClient(provider, baseURL, token string, httpClient *http.Client, retr
 		provider: provider,
 		baseURL:  strings.TrimRight(baseURL, "/"),
 		token:    token,
-		http:     httpClient,
+		http:     clientWithRedirectPolicy(httpClient),
 		retry:    retry,
+	}
+}
+
+// clientWithRedirectPolicy clones the client and strips credentials when a
+// redirect leaves the original origin. The clone keeps the caller's client
+// untouched, and a caller-supplied CheckRedirect keeps deciding whether the
+// redirect may proceed.
+func clientWithRedirectPolicy(client *http.Client) *http.Client {
+	if client == nil {
+		client = &http.Client{Timeout: DefaultTimeout}
+	}
+	clone := *client
+	previous := client.CheckRedirect
+	clone.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if previous != nil {
+			if err := previous(req, via); err != nil {
+				return err
+			}
+		} else if len(via) >= 10 {
+			return fmt.Errorf("stopped after 10 redirects")
+		}
+		if len(via) > 0 && !sameOrigin(via[0].URL, req.URL) {
+			req.Header.Del("Authorization")
+			req.Header.Del("PRIVATE-TOKEN")
+		}
+		return nil
+	}
+	return &clone
+}
+
+func sameOrigin(a, b *url.URL) bool {
+	if a == nil || b == nil {
+		return false
+	}
+	if !strings.EqualFold(a.Scheme, b.Scheme) || !strings.EqualFold(a.Hostname(), b.Hostname()) {
+		return false
+	}
+	return effectivePort(a) == effectivePort(b)
+}
+
+func effectivePort(u *url.URL) string {
+	if port := u.Port(); port != "" {
+		return port
+	}
+	switch strings.ToLower(u.Scheme) {
+	case "http":
+		return "80"
+	case "https":
+		return "443"
+	default:
+		return ""
 	}
 }
 
@@ -408,17 +460,39 @@ func shortSHA(sha string) string {
 	return sha
 }
 
+var singleLineSeparators = strings.NewReplacer(
+	"\r\n", " ",
+	"\r", " ",
+	"\n", " ",
+	"\v", " ",
+	"\f", " ",
+	"\u0085", " ",
+	"\u2028", " ",
+	"\u2029", " ",
+)
+
+// sanitizeSingleLine folds provider-controlled text into one line and
+// neutralizes block markers, so a crafted value cannot forge a metadata field
+// or close the enclosing block. Body keeps its line breaks and is handled
+// separately in Render.
+func sanitizeSingleLine(s string) string {
+	return neutralizeBlockMarkers(singleLineSeparators.Replace(s))
+}
+
 func notProvided(s string) string {
-	if strings.TrimSpace(s) == "" {
+	s = strings.TrimSpace(sanitizeSingleLine(s))
+	if s == "" {
 		return "not provided"
 	}
 	return s
 }
 
+var blockMarkerPattern = regexp.MustCompile(`(?i)<[\s\p{Z}\p{C}]*/?[\s\p{Z}\p{C}]*pr_metadata\b`)
+
 func neutralizeBlockMarkers(s string) string {
-	s = strings.ReplaceAll(s, "</pr_metadata>", "<\\/pr_metadata>")
-	s = strings.ReplaceAll(s, "<pr_metadata", "<\\pr_metadata")
-	return s
+	return blockMarkerPattern.ReplaceAllStringFunc(s, func(marker string) string {
+		return "<\\" + marker[1:]
+	})
 }
 
 // Render formats the snapshot as a <pr_metadata> block. Missing fields are
@@ -463,7 +537,7 @@ func Render(meta *Metadata) string {
 			}
 			subject := truncateRunes(commit.Subject, maxCommitSubject)
 			fmt.Fprintf(&b, "- %s %s (author: %s; Signed-off-by: %s)\n",
-				shortSHA(commit.SHA), notProvided(subject), notProvided(commit.Author), signoff)
+				shortSHA(sanitizeSingleLine(commit.SHA)), notProvided(subject), notProvided(commit.Author), signoff)
 		}
 	}
 
@@ -502,7 +576,7 @@ func Render(meta *Metadata) string {
 	if len(meta.Warnings) > 0 {
 		b.WriteString("Metadata warnings:\n")
 		for _, warning := range meta.Warnings {
-			fmt.Fprintf(&b, "- %s\n", neutralizeBlockMarkers(warning))
+			fmt.Fprintf(&b, "- %s\n", sanitizeSingleLine(warning))
 		}
 	}
 	b.WriteString("</pr_metadata>")
@@ -513,7 +587,11 @@ func renderLabels(labels []string) string {
 	if len(labels) == 0 {
 		return "not provided"
 	}
-	return strings.Join(labels, ", ")
+	safe := make([]string, 0, len(labels))
+	for _, label := range labels {
+		safe = append(safe, sanitizeSingleLine(label))
+	}
+	return strings.Join(safe, ", ")
 }
 
 func renderIssues(meta *Metadata) string {
@@ -525,7 +603,8 @@ func renderIssues(meta *Metadata) string {
 	}
 	parts := make([]string, 0, len(meta.LinkedIssues))
 	for _, issue := range meta.LinkedIssues {
-		parts = append(parts, fmt.Sprintf("#%d %s [%s]", issue.Number, issue.Title, notProvided(issue.State)))
+		parts = append(parts, fmt.Sprintf("#%d %s [%s]", issue.Number,
+			sanitizeSingleLine(issue.Title), notProvided(issue.State)))
 	}
 	return strings.Join(parts, "; ")
 }
@@ -543,14 +622,15 @@ func renderChangedFiles(meta *Metadata) string {
 			parts = append(parts, fmt.Sprintf("... %d more", len(meta.ChangedFiles)-i))
 			break
 		}
-		parts = append(parts, fmt.Sprintf("%s (%s, +%d/-%d)", file.Path, notProvided(file.Status), file.Additions, file.Deletions))
+		parts = append(parts, fmt.Sprintf("%s (%s, +%d/-%d)",
+			sanitizeSingleLine(file.Path), notProvided(file.Status), file.Additions, file.Deletions))
 	}
 	return fmt.Sprintf("%d total: %s", len(meta.ChangedFiles), strings.Join(parts, "; "))
 }
 
 func renderCheckState(check Check) string {
-	status := strings.TrimSpace(check.Status)
-	conclusion := strings.TrimSpace(check.Conclusion)
+	status := strings.TrimSpace(sanitizeSingleLine(check.Status))
+	conclusion := strings.TrimSpace(sanitizeSingleLine(check.Conclusion))
 	switch {
 	case conclusion != "" && status != "":
 		return status + "/" + conclusion
@@ -567,10 +647,11 @@ func renderDCO(meta *Metadata) string {
 	if meta.DCO == "" {
 		return "not provided"
 	}
+	state := sanitizeSingleLine(meta.DCO)
 	if meta.DCOBasis != "" {
-		return meta.DCO + " (" + meta.DCOBasis + ")"
+		return state + " (" + sanitizeSingleLine(meta.DCOBasis) + ")"
 	}
-	return meta.DCO
+	return state
 }
 
 func renderReviews(meta *Metadata) string {
@@ -619,16 +700,145 @@ func computeDCO(commits []Commit, commitsKnown bool, labels []string) (string, s
 	return "unknown", fmt.Sprintf("%d of %d commit(s) carry Signed-off-by", signed, len(commits))
 }
 
-func checkConclusionFromLabel(label string) string {
-	lower := strings.ToLower(label)
-	switch {
-	case strings.Contains(label, gcLabelFailure), strings.Contains(lower, "fail"), strings.Contains(lower, "error"):
-		return "failed"
-	case strings.Contains(label, gcLabelInProgress), strings.Contains(label, gcLabelRunning), strings.Contains(lower, "pending"), strings.Contains(lower, "running"):
-		return "pending"
-	default:
-		return "passed"
+func checkStateFromLabel(label string) (string, string) {
+	tokens := labelTokens(label)
+	negatedNext := false
+	failed, running, passed := false, false, false
+	for _, token := range tokens {
+		if isNegationToken(token) {
+			negatedNext = true
+			continue
+		}
+		switch {
+		case isFailureToken(token):
+			if !negatedNext {
+				failed = true
+			}
+		case isRunningToken(token):
+			if !negatedNext {
+				running = true
+			}
+		case isPassedToken(token):
+			if !negatedNext {
+				passed = true
+			}
+		}
+		negatedNext = false
 	}
+
+	if hasUnnegatedMarker(label, gcLabelFailure) {
+		failed = true
+	}
+	if hasUnnegatedMarker(label, gcLabelInProgress) || hasUnnegatedMarker(label, gcLabelRunning) {
+		running = true
+	}
+	if hasUnnegatedMarker(label, gcLabelSuccess) {
+		passed = true
+	}
+
+	switch {
+	case failed:
+		return "completed", "failed"
+	case running:
+		return "in_progress", "pending"
+	case passed:
+		return "completed", "passed"
+	default:
+		return "", ""
+	}
+}
+
+func isNegationToken(token string) bool {
+	switch token {
+	case "no", "not", "without":
+		return true
+	default:
+		return false
+	}
+}
+
+func isFailureToken(token string) bool {
+	switch token {
+	case "fail", "fails", "failed", "failing", "failure", "failures", "error", "errors", "errored":
+		return true
+	default:
+		return false
+	}
+}
+
+func isRunningToken(token string) bool {
+	switch token {
+	case "pending", "running", "progress":
+		return true
+	default:
+		return false
+	}
+}
+
+func isPassedToken(token string) bool {
+	switch token {
+	case "pass", "passes", "passed", "passing", "success", "successes", "successful", "succeeded", "succeeds", "ok":
+		return true
+	default:
+		return false
+	}
+}
+
+// Common Chinese negation prefixes, kept as escapes so the source stays ASCII.
+var chineseNegationPrefixes = []string{
+	"\u672A",
+	"\u65E0",
+	"\u4E0D",
+	"\u975E",
+	"\u6CA1",
+	"\u6CA1\u6709",
+	"\u672A\u80FD",
+	"\u65E0\u6CD5",
+	"\u4E0D\u80FD",
+}
+
+func hasUnnegatedMarker(label, marker string) bool {
+	for offset := 0; offset <= len(label); {
+		idx := strings.Index(label[offset:], marker)
+		if idx < 0 {
+			return false
+		}
+		pos := offset + idx
+		if !hasNegationPrefix(label[:pos]) {
+			return true
+		}
+		offset = pos + len(marker)
+	}
+	return false
+}
+
+func hasNegationPrefix(prefix string) bool {
+	for _, neg := range chineseNegationPrefixes {
+		if strings.HasSuffix(prefix, neg) {
+			return true
+		}
+	}
+	lower := strings.ToLower(prefix)
+	for _, neg := range []string{"no", "not", "without"} {
+		if !strings.HasSuffix(lower, neg) {
+			continue
+		}
+		start := len(lower) - len(neg)
+		if start == 0 || !isASCIIAlnum(lower[start-1]) {
+			return true
+		}
+	}
+	return false
+}
+
+func isASCIIAlnum(b byte) bool {
+	return b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z' || b >= '0' && b <= '9'
+}
+
+func labelTokens(label string) []string {
+	return strings.FieldsFunc(strings.ToLower(label), func(r rune) bool {
+		return !((r >= 'a' && r <= 'z') || (r >= '0' && r <= '9'))
+	})
 }
 
 func isCheckLabel(label string) bool {

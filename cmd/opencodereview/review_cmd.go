@@ -21,7 +21,6 @@ import (
 	"github.com/alibaba/open-code-review/internal/mcp"
 	"github.com/alibaba/open-code-review/internal/prmeta"
 	"github.com/alibaba/open-code-review/internal/session"
-	"github.com/alibaba/open-code-review/internal/stdout"
 	"github.com/alibaba/open-code-review/internal/telemetry"
 	"github.com/alibaba/open-code-review/internal/tool"
 	"github.com/spf13/cobra"
@@ -535,7 +534,7 @@ func loadPRMetadata(ctx context.Context, prURL string) string {
 		fmt.Fprintf(os.Stderr, "[ocr] warning: fetch PR metadata: %v; continuing without PR metadata\n", err)
 		return ""
 	}
-	fmt.Fprintf(stdout.Writer(), "[ocr] PR metadata: %s/%s#%d (%d commits, body %d chars, %d checks)\n",
+	fmt.Fprintf(os.Stderr, "[ocr] PR metadata: %s/%s#%d (%d commits, body %d chars, %d checks)\n",
 		ref.Owner, ref.Repo, ref.Number, len(meta.Commits), len([]rune(meta.Body)), len(meta.Checks))
 	return prmeta.Render(meta)
 }

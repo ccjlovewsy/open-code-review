@@ -434,14 +434,15 @@ func fetchGitCodeChecks(meta *Metadata, pull gitcodePull) {
 		if !isCheckLabel(label) {
 			continue
 		}
+		status, conclusion := checkStateFromLabel(label)
 		meta.Checks = append(meta.Checks, Check{
 			Name:       label,
-			Status:     "completed",
-			Conclusion: checkConclusionFromLabel(label),
+			Status:     status,
+			Conclusion: conclusion,
 		})
 	}
-	meta.ChecksKnown = true
 	meta.Checks = dedupChecks(meta.Checks)
+	meta.ChecksKnown = len(meta.Checks) > 0
 }
 
 func parseIssueNumber(raw json.RawMessage) int {
