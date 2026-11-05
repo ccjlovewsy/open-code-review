@@ -1,0 +1,209 @@
+cmd/opencodereview/sarif_test.go
+  s_bd0b1bf185f382::t_9b59f130753ae1 759-860
+cmd/opencodereview/sarif.go
+  s_bd0b1bf185f382::t_958b0cffab3256 250-255,257-263
+  s_bd0b1bf185f382::t_420fc687a8d962 70
+  s_bd0b1bf185f382::t_00740d227b6829 192-201
+  s_bd0b1bf185f382::t_ec8ff2ade994d6 237
+internal/viewer/server_extra_test.go
+  s_bd0b1bf185f382::t_6e612ea4f1adcb 630-658
+acp/internal/adapter/presentation/report_test.go
+  s_bd0b1bf185f382::t_fde9ef49bbf3af 245-246
+  s_bd0b1bf185f382::t_c013e16918776c 242-244
+  s_bd0b1bf185f382::t_d2c1d9b749906e 247-249
+internal/viewer/templates/session.html
+  s_bd0b1bf185f382::t_40f90d76d1b6c5 139
+acp/internal/adapter/presentation/report.go
+  s_bd0b1bf185f382::t_337bf04624461a 205-207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "f1d714a3887c6ebcdc1868a807801fd2edc4495c",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_004845e21a9d76": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e563d157cffe2TsKeaIBCv0Dco",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 192,
+      "total_deletions": 11,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_2d66004b28d535": "volcengine/deepseek-v4.1-flash",
+        "t_3942fa81e93d46": "volcengine/deepseek-v4.1-flash",
+        "t_61aed4389a3982": "volcengine/deepseek-v4.1-flash",
+        "t_645aa4a5dca85d": "volcengine/deepseek-v4.1-flash",
+        "t_6a614dc7f15eef": "volcengine/deepseek-v4.1-flash",
+        "t_80b19b50c546bc": "volcengine/deepseek-v4.1-flash",
+        "t_81de356563a1ec": "volcengine/deepseek-v4.1-flash",
+        "t_97241e64c4f5e1": "volcengine/deepseek-v4.1-flash",
+        "t_bf02753d3c75ac": "volcengine/deepseek-v4.1-flash",
+        "t_c8ddd58abb339a": "volcengine/deepseek-v4.1-flash",
+        "t_da1f1e33842922": "volcengine/deepseek-v4.1-flash",
+        "t_dcc01e5ee2b3c1": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 192,
+          "deletions": 11
+        }
+      }
+    },
+    "s_3dc90e970a7fd3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e56551aebffeTAGr5JH3QpzyW9",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 584,
+      "total_deletions": 5,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_102ead3c537f56": "volcengine/deepseek-v4.1-flash",
+        "t_1190ae7b4f7d74": "volcengine/deepseek-v4.1-flash",
+        "t_1873cf13c27b00": "volcengine/deepseek-v4.1-flash",
+        "t_30f26d20e346c8": "volcengine/deepseek-v4.1-flash",
+        "t_4d80ba87a042f9": "volcengine/deepseek-v4.1-flash",
+        "t_5e3c71643211e2": "volcengine/deepseek-v4.1-flash",
+        "t_c6bb11c55e7277": "volcengine/deepseek-v4.1-flash",
+        "t_d6a33ab7c11e7a": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 584,
+          "deletions": 5
+        }
+      }
+    },
+    "s_64e12172468d68": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e561493c4ffephfE7eb1f69nGy",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 274,
+      "total_deletions": 21,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_2851af0a246c50": "volcengine/deepseek-v4.1-flash",
+        "t_33818a68aa6456": "volcengine/deepseek-v4.1-flash",
+        "t_5b4eae4e3ef261": "volcengine/deepseek-v4.1-flash",
+        "t_602a45889c4898": "volcengine/deepseek-v4.1-flash",
+        "t_629c8af38f28db": "volcengine/deepseek-v4.1-flash",
+        "t_65a10c71cae5d3": "volcengine/deepseek-v4.1-flash",
+        "t_70a6f53b4944ec": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 274,
+          "deletions": 21
+        }
+      }
+    },
+    "s_78539f46ed7369": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e561009dfffeDT4EjZHpFJm4qa",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 172,
+      "total_deletions": 59,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_1a497862f06927": "volcengine/deepseek-v4.1-flash",
+        "t_2fea552368045a": "volcengine/deepseek-v4.1-flash",
+        "t_43467d0a3becac": "volcengine/deepseek-v4.1-flash",
+        "t_4f2dd33d6ee07f": "volcengine/deepseek-v4.1-flash",
+        "t_50157e2a74fb5f": "volcengine/deepseek-v4.1-flash",
+        "t_5403a234732cae": "volcengine/deepseek-v4.1-flash",
+        "t_8a23dd900e457c": "volcengine/deepseek-v4.1-flash",
+        "t_a4e06c1415b21a": "volcengine/deepseek-v4.1-flash",
+        "t_a9d091d4faef72": "volcengine/deepseek-v4.1-flash",
+        "t_d99cc38108424d": "volcengine/deepseek-v4.1-flash",
+        "t_e8ef4607a03aaf": "volcengine/deepseek-v4.1-flash",
+        "t_f2693795c352d2": "volcengine/deepseek-v4.1-flash",
+        "t_f6aa3dd6fe10b7": "volcengine/deepseek-v4.1-flash",
+        "t_fc527a2ea75ce1": "volcengine/deepseek-v4.1-flash",
+        "t_fca9c6ee000de0": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 172,
+          "deletions": 59
+        }
+      }
+    },
+    "s_bd0b1bf185f382": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e55ff0163ffeUt900gK6rTkyzh",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 162,
+      "total_deletions": 5,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_00740d227b6829": "volcengine/deepseek-v4.1-flash",
+        "t_337bf04624461a": "volcengine/deepseek-v4.1-flash",
+        "t_40f90d76d1b6c5": "volcengine/deepseek-v4.1-flash",
+        "t_420fc687a8d962": "volcengine/deepseek-v4.1-flash",
+        "t_6e612ea4f1adcb": "volcengine/deepseek-v4.1-flash",
+        "t_958b0cffab3256": "volcengine/deepseek-v4.1-flash",
+        "t_9b59f130753ae1": "volcengine/deepseek-v4.1-flash",
+        "t_ec8ff2ade994d6": "volcengine/deepseek-v4.1-flash",
+        "t_fde9ef49bbf3af": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 162,
+          "deletions": 5
+        }
+      }
+    },
+    "s_ce780c705829d1": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e561c9185ffe66GQr5Zfubf5Ab",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 242,
+      "total_deletions": 32,
+      "overridden_lines": 0,
+      "turn_models": {
+        "t_04cfd42a7334af": "volcengine/deepseek-v4.1-flash",
+        "t_13e16f1aebb098": "volcengine/deepseek-v4.1-flash",
+        "t_20a22278cd94b4": "volcengine/deepseek-v4.1-flash",
+        "t_2f72c360292631": "volcengine/deepseek-v4.1-flash",
+        "t_34197d01ff6612": "volcengine/deepseek-v4.1-flash",
+        "t_7512b0e06dbcde": "volcengine/deepseek-v4.1-flash",
+        "t_756384b645d40d": "volcengine/deepseek-v4.1-flash",
+        "t_7e1b3f2b51951c": "volcengine/deepseek-v4.1-flash",
+        "t_7eebcf9bd0e269": "volcengine/deepseek-v4.1-flash",
+        "t_ac9326d56bab6a": "volcengine/deepseek-v4.1-flash",
+        "t_d7cd9a9c325c2c": "volcengine/deepseek-v4.1-flash",
+        "t_e397bc57ba5349": "volcengine/deepseek-v4.1-flash",
+        "t_f87347cc60581a": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 242,
+          "deletions": 32
+        }
+      }
+    }
+  }
+}
