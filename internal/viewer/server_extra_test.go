@@ -627,6 +627,35 @@ func TestRenderTemplate_SecondarySectionsCollapsedByDefault(t *testing.T) {
 	}
 }
 
+func TestRenderSessionTemplate_ProcessCategoryChip(t *testing.T) {
+	rr := httptest.NewRecorder()
+	renderTemplate(rr, "session.html", sessionPageData{
+		EncodedRepo: "repo",
+		RepoName:    "MyRepo",
+		Session: &ViewSession{
+			Summary: SessionSummary{SessionID: "abc", CWD: "/test"},
+			Comments: []*ReviewComment{
+				{FilePath: "a.go", Category: "process", Content: "process finding"},
+				{FilePath: "b.go", Category: "mystery", Content: "other finding"},
+			},
+		},
+	})
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rr.Code)
+	}
+	body := rr.Body.String()
+	for _, required := range []string{
+		`Process (1)`,
+		`data-filter-value="process"`,
+		`Other (1)`,
+		`All (2)`,
+	} {
+		if !strings.Contains(body, required) {
+			t.Errorf("rendered category filter missing %q", required)
+		}
+	}
+}
+
 func TestRenderTemplate_HidesEmptyConversationsSection(t *testing.T) {
 	rr := httptest.NewRecorder()
 	renderTemplate(rr, "session.html", sessionPageData{

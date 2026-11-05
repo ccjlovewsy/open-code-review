@@ -756,3 +756,105 @@ func TestOutputPreview_SarifRejects(t *testing.T) {
 		t.Error("outputPreview should return an error for sarif format")
 	}
 }
+
+func sarifResultJSON(t *testing.T, c model.LlmComment) map[string]any {
+	t.Helper()
+	raw, err := json.Marshal(sarifResultFromComment(c))
+	if err != nil {
+		t.Fatalf("marshal sarif result: %v", err)
+	}
+	var result map[string]any
+	if err := json.Unmarshal(raw, &result); err != nil {
+		t.Fatalf("unmarshal sarif result: %v", err)
+	}
+	return result
+}
+
+func TestSarifResultFromComment_DispositionPropertiesAndMessage(t *testing.T) {
+	result := sarifResultJSON(t, model.LlmComment{
+		Path:        "a.go",
+		Content:     "needs review",
+		StartLine:   1,
+		EndLine:     1,
+		Category:    "bug",
+		Severity:    "high",
+		Disposition: "needs_confirmation",
+	})
+	props, ok := result["properties"].(map[string]any)
+	if !ok {
+		t.Fatalf("properties missing or wrong type: %T", result["properties"])
+	}
+	if props["severity"] != "high" {
+		t.Errorf("properties.severity = %v, want high", props["severity"])
+	}
+	if props["disposition"] != "needs_confirmation" {
+		t.Errorf("properties.disposition = %v, want needs_confirmation", props["disposition"])
+	}
+	msg := result["message"].(map[string]any)
+	if !strings.Contains(msg["text"].(string), "Disposition: needs_confirmation") {
+		t.Errorf("message.text = %q, want disposition marker", msg["text"])
+	}
+	if result["level"] != "error" {
+		t.Errorf("level = %v, want error", result["level"])
+	}
+}
+
+func TestSarifResultFromComment_ConfirmedDispositionIsExplicit(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		disposition string
+	}{
+		{name: "empty", disposition: ""},
+		{name: "confirmed", disposition: "confirmed"},
+		{name: "unknown", disposition: "mystery"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			result := sarifResultJSON(t, model.LlmComment{
+				Path:        "a.go",
+				Content:     "original message",
+				Category:    "bug",
+				Severity:    "medium",
+				Disposition: tc.disposition,
+			})
+			props, ok := result["properties"].(map[string]any)
+			if !ok {
+				t.Fatalf("properties missing or wrong type: %T", result["properties"])
+			}
+			if props["disposition"] != "confirmed" {
+				t.Errorf("properties.disposition = %v, want confirmed", props["disposition"])
+			}
+			if props["severity"] != "medium" {
+				t.Errorf("properties.severity = %v, want medium", props["severity"])
+			}
+			msg := result["message"].(map[string]any)
+			if msg["text"] != "original message" {
+				t.Errorf("message.text = %q, want original message", msg["text"])
+			}
+		})
+	}
+}
+
+func TestSarifResultFromComment_DispositionDoesNotDowngradeLevel(t *testing.T) {
+	wantLevels := map[string]string{
+		"critical":   "error",
+		"high":       "error",
+		"medium":     "warning",
+		"suggestion": "note",
+	}
+	for severity, want := range wantLevels {
+		t.Run(severity, func(t *testing.T) {
+			base := sarifResultJSON(t, model.LlmComment{Content: "x", Severity: severity})
+			withDisposition := sarifResultJSON(t, model.LlmComment{
+				Content:     "x",
+				Severity:    severity,
+				Disposition: "needs_confirmation",
+			})
+			if withDisposition["level"] != base["level"] {
+				t.Errorf("level changed from %v to %v with needs_confirmation", base["level"], withDisposition["level"])
+			}
+			if withDisposition["level"] != want {
+				t.Errorf("level = %v, want %s", withDisposition["level"], want)
+			}
+		})
+	}
+}

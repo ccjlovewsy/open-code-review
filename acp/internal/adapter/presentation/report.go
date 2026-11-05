@@ -202,6 +202,9 @@ func writeFinding(b *strings.Builder, number int, c contract.Comment, location *
 	if c.Category != "" {
 		fmt.Fprintf(b, "\n\n**Category:** %s", markdownLabel(c.Category))
 	}
+	if c.Disposition == "needs_confirmation" {
+		fmt.Fprintf(b, "\n\n**Disposition:** %s", c.Disposition)
+	}
 	fmt.Fprintf(b, "\n\n%s", c.Content)
 	if c.ExistingCode != "" {
 		b.WriteString("\n\n**Existing code:**\n\n")

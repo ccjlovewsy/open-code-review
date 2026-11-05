@@ -224,3 +224,27 @@ func TestFormattedFindingsKeepSafeNavigationAndText(t *testing.T) {
 		t.Fatal("unsafe finding text lost")
 	}
 }
+
+func TestFindingDisplaysNeedsConfirmation(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		disposition string
+		wantMarker  bool
+	}{
+		{name: "needs confirmation", disposition: "needs_confirmation", wantMarker: true},
+		{name: "confirmed", disposition: "confirmed", wantMarker: false},
+		{name: "empty", disposition: "", wantMarker: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var b strings.Builder
+			writeFinding(&b, 1, contract.Comment{Disposition: tc.disposition, Content: "x"}, nil)
+			got := b.String()
+			if !strings.Contains(got, "x") {
+				t.Fatalf("finding content lost: %q", got)
+			}
+			if gotMarker := strings.Contains(got, "needs_confirmation"); gotMarker != tc.wantMarker {
+				t.Fatalf("disposition marker presence = %v, want %v in %q", gotMarker, tc.wantMarker, got)
+			}
+		})
+	}
+}

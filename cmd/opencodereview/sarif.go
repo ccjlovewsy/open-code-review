@@ -67,6 +67,7 @@ type sarifResult struct {
 	Locations           []sarifLocation   `json:"locations,omitempty"`
 	PartialFingerprints map[string]string `json:"partialFingerprints,omitempty"`
 	Fixes               []sarifFix        `json:"fixes,omitempty"`
+	Properties          map[string]string `json:"properties,omitempty"`
 }
 
 type sarifLocation struct {
@@ -188,6 +189,16 @@ func sarifSeverityLevel(severity string) string {
 	}
 }
 
+// sarifDisposition normalises a comment disposition for SARIF. Only
+// needs_confirmation is machine-distinct; an empty or unknown value means
+// confirmed, matching the model default.
+func sarifDisposition(disposition string) string {
+	if strings.ToLower(strings.TrimSpace(disposition)) == "needs_confirmation" {
+		return "needs_confirmation"
+	}
+	return "confirmed"
+}
+
 // sarifResults converts a slice of LlmComment to SARIF result objects. Returns
 // a non-nil empty slice when comments is empty or nil so that JSON serialises
 // "results": [] rather than null.
@@ -223,6 +234,7 @@ func sarifResults(comments []model.LlmComment) []sarifResult {
 //   - Severity      → level
 //   - SuggestionCode + ExistingCode + valid region → fixes
 //   - Path + Category + ExistingCode → partialFingerprints (stable fingerprint)
+//   - Severity and Disposition → properties (original severity, effective disposition)
 //
 // Fixes are only emitted when a valid region exists (StartLine > 0 &&
 // EndLine >= StartLine), because replacement.deletedRegion is required by
@@ -235,10 +247,20 @@ func sarifResultFromComment(c model.LlmComment) sarifResult {
 		category = "other"
 	}
 
+	disposition := sarifDisposition(c.Disposition)
+	message := c.Content
+	if disposition == "needs_confirmation" {
+		message += "\n\nDisposition: needs_confirmation"
+	}
+
 	result := sarifResult{
-		RuleID:              category,
-		Level:               sarifSeverityLevel(c.Severity),
-		Message:             sarifMessage{Text: c.Content},
+		RuleID:  category,
+		Level:   sarifSeverityLevel(c.Severity),
+		Message: sarifMessage{Text: message},
+		Properties: map[string]string{
+			"severity":    c.Severity,
+			"disposition": disposition,
+		},
 		PartialFingerprints: sarifFingerprints(c, category),
 	}
 
