@@ -5,11 +5,13 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/alibaba/open-code-review/internal/config/domainroute"
 	"github.com/alibaba/open-code-review/internal/config/rules"
 	"github.com/alibaba/open-code-review/internal/config/template"
 )
@@ -198,5 +200,69 @@ func TestResolveInputBeforeDiffRejectsInvalidRefs(t *testing.T) {
 				t.Fatal("unresolvable ref must fail before loading the diff")
 			}
 		})
+	}
+}
+
+func TestRuleConfigSHA256TracksPRMetadata(t *testing.T) {
+	empty := New(Args{}).ruleConfigSHA256()
+	a := New(Args{PRMetadata: "snapshot A"}).ruleConfigSHA256()
+	b := New(Args{PRMetadata: "snapshot B"}).ruleConfigSHA256()
+
+	if empty == a {
+		t.Error("adding PR metadata did not change rule_config_sha256")
+	}
+	if a == b {
+		t.Error("changing the PR metadata snapshot did not change rule_config_sha256")
+	}
+	if again := New(Args{PRMetadata: "snapshot A"}).ruleConfigSHA256(); again != a {
+		t.Errorf("PR metadata digest is not deterministic: %q != %q", again, a)
+	}
+}
+
+// identityRouteFixture loads the default route table with one project domain
+// whose identity-relevant fields are supplied by the test.
+func identityRouteFixture(t *testing.T, catalogDomains, sources []string) *domainroute.Router {
+	t.Helper()
+	dir := t.TempDir()
+	data, err := json.Marshal(map[string]any{
+		"domains": []map[string]any{{
+			"id":              "resume-identity-fixture",
+			"priority":        1,
+			"paths":           []string{"**/resume-identity/**"},
+			"checks":          []string{"fixture check"},
+			"catalog_domains": catalogDomains,
+			"sources":         sources,
+		}},
+	})
+	if err != nil {
+		t.Fatalf("marshal route fixture: %v", err)
+	}
+	path := filepath.Join(dir, ".opencodereview", "domain-routes.json")
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatalf("create route fixture dir: %v", err)
+	}
+	if err := os.WriteFile(path, data, 0o644); err != nil {
+		t.Fatalf("write route fixture: %v", err)
+	}
+	router, err := domainroute.Load(dir)
+	if err != nil {
+		t.Fatalf("load route fixture: %v", err)
+	}
+	return router
+}
+
+func TestRuleConfigSHA256TracksCatalogDomainsAndSources(t *testing.T) {
+	base := New(Args{DomainRoute: identityRouteFixture(t, []string{"runtime"}, []string{"skill/a"})})
+	catalogChanged := New(Args{DomainRoute: identityRouteFixture(t, []string{"runtime", "gc"}, []string{"skill/a"})})
+	sourcesChanged := New(Args{DomainRoute: identityRouteFixture(t, []string{"runtime"}, []string{"skill/b"})})
+
+	if base.ruleConfigSHA256() == catalogChanged.ruleConfigSHA256() {
+		t.Error("changing catalog_domains did not change rule_config_sha256")
+	}
+	if base.ruleConfigSHA256() == sourcesChanged.ruleConfigSHA256() {
+		t.Error("changing sources did not change rule_config_sha256")
+	}
+	if again := New(Args{DomainRoute: identityRouteFixture(t, []string{"runtime"}, []string{"skill/a"})}); again.ruleConfigSHA256() != base.ruleConfigSHA256() {
+		t.Error("identical catalog_domains and sources produced a different rule_config_sha256")
 	}
 }

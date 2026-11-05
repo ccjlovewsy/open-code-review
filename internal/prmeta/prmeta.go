@@ -487,12 +487,55 @@ func notProvided(s string) string {
 	return s
 }
 
-var blockMarkerPattern = regexp.MustCompile(`(?i)<[\s\p{Z}\p{C}]*/?[\s\p{Z}\p{C}]*pr_metadata\b`)
+// blockMarkerPattern matches prompt structure tags that provider-controlled
+// text must not be able to close or reopen. Matching tolerates case,
+// whitespace, and control characters around the slash and tag name.
+var blockMarkerPattern = regexp.MustCompile(
+	`(?i)<[\s\p{Z}\p{C}]*/?[\s\p{Z}\p{C}]*(?:pr_metadata|user_task|other_changed_files|review_files|domain_knowledge)\b`)
 
 func neutralizeBlockMarkers(s string) string {
 	return blockMarkerPattern.ReplaceAllStringFunc(s, func(marker string) string {
 		return "<\\" + marker[1:]
 	})
+}
+
+// quoteBody prefixes every body line with a fixed "> " marker so a crafted
+// line cannot forge a metadata field or start a new prompt section. The text
+// itself, including blank lines, is preserved.
+func quoteBody(body string) string {
+	body = neutralizeBlockMarkers(body)
+	var b strings.Builder
+	b.Grow(len(body) + 2)
+	for len(body) > 0 {
+		line, sep := splitBodyLine(body)
+		b.WriteString("> ")
+		b.WriteString(line)
+		if sep == "" {
+			b.WriteString("\n")
+		} else {
+			b.WriteString(sep)
+		}
+		body = body[len(line)+len(sep):]
+	}
+	return b.String()
+}
+
+// splitBodyLine returns the next logical body line and the line separator that
+// terminated it. Recognizing CRLF, CR, LF, VT, FF, NEL, U+2028, and U+2029
+// keeps a non-LF break from hiding the following line from the quote prefix.
+func splitBodyLine(s string) (line, sep string) {
+	for i, r := range s {
+		switch r {
+		case '\r':
+			if i+1 < len(s) && s[i+1] == '\n' {
+				return s[:i], "\r\n"
+			}
+			return s[:i], "\r"
+		case '\n', '\v', '\f', '\u0085', '\u2028', '\u2029':
+			return s[:i], string(r)
+		}
+	}
+	return s, ""
 }
 
 // Render formats the snapshot as a <pr_metadata> block. Missing fields are
@@ -560,16 +603,13 @@ func Render(meta *Metadata) string {
 	if strings.TrimSpace(meta.Body) == "" {
 		b.WriteString("not provided\n")
 	} else {
-		b.WriteString(neutralizeBlockMarkers(meta.Body))
-		if !strings.HasSuffix(meta.Body, "\n") {
-			b.WriteString("\n")
-		}
+		b.WriteString(quoteBody(meta.Body))
 		if meta.BodyTruncated {
 			limit := meta.BodyLimit
 			if limit <= 0 {
 				limit = DefaultMaxBodyRunes
 			}
-			fmt.Fprintf(&b, "[body truncated after %d characters]\n", limit)
+			fmt.Fprintf(&b, "> [body truncated after %d characters]\n", limit)
 		}
 	}
 
@@ -669,18 +709,71 @@ func renderComments(meta *Metadata) string {
 	return strconv.Itoa(meta.Comments)
 }
 
+func dcoStateFromLabel(label string) string {
+	negatedNext := false
+	failed, passed := false, false
+	for _, token := range labelTokens(label) {
+		switch {
+		case isNegationToken(token):
+			negatedNext = true
+			continue
+		case isFailureToken(token):
+			if !negatedNext {
+				failed = true
+			}
+			negatedNext = false
+		case isRunningToken(token):
+			negatedNext = false
+		case isPassedToken(token):
+			if !negatedNext {
+				passed = true
+			}
+			negatedNext = false
+		}
+	}
+	if hasUnnegatedMarker(label, gcLabelFailure) {
+		failed = true
+	}
+	if hasUnnegatedMarker(label, gcLabelSuccess) {
+		passed = true
+	}
+	switch {
+	case failed:
+		return "failed"
+	case passed:
+		return "passed"
+	default:
+		return ""
+	}
+}
+
 func computeDCO(commits []Commit, commitsKnown bool, labels []string) (string, string) {
+	var failedLabel, passedLabel, dcoLabel string
 	for _, label := range labels {
-		lower := strings.ToLower(label)
-		if !strings.Contains(lower, "dco") {
+		if !strings.Contains(strings.ToLower(label), "dco") {
 			continue
 		}
-		if strings.Contains(label, gcLabelSuccess) || strings.Contains(lower, "pass") || strings.Contains(lower, "success") {
-			return "passed", "label: " + label
+		if dcoLabel == "" {
+			dcoLabel = label
 		}
-		if strings.Contains(label, gcLabelFailure) || strings.Contains(lower, "fail") || strings.Contains(lower, "error") {
-			return "failed", "label: " + label
+		switch dcoStateFromLabel(label) {
+		case "failed":
+			if failedLabel == "" {
+				failedLabel = label
+			}
+		case "passed":
+			if passedLabel == "" {
+				passedLabel = label
+			}
 		}
+	}
+	switch {
+	case failedLabel != "":
+		return "failed", "label: " + failedLabel
+	case passedLabel != "":
+		return "passed", "label: " + passedLabel
+	case dcoLabel != "":
+		return "unknown", "label: " + dcoLabel
 	}
 	if !commitsKnown {
 		return "unknown", "commit list unavailable"
@@ -705,11 +798,10 @@ func checkStateFromLabel(label string) (string, string) {
 	negatedNext := false
 	failed, running, passed := false, false, false
 	for _, token := range tokens {
-		if isNegationToken(token) {
+		switch {
+		case isNegationToken(token):
 			negatedNext = true
 			continue
-		}
-		switch {
 		case isFailureToken(token):
 			if !negatedNext {
 				failed = true
@@ -722,6 +814,8 @@ func checkStateFromLabel(label string) (string, string) {
 			if !negatedNext {
 				passed = true
 			}
+		default:
+			continue
 		}
 		negatedNext = false
 	}

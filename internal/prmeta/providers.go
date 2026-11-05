@@ -75,7 +75,11 @@ type githubCheckRuns struct {
 }
 
 type githubReview struct {
+	ID    int64  `json:"id"`
 	State string `json:"state"`
+	User  struct {
+		Login string `json:"login"`
+	} `json:"user"`
 }
 
 type githubComment struct {
@@ -212,20 +216,56 @@ func fetchGitHubReviews(ctx context.Context, client *apiClient, meta *Metadata, 
 		return
 	}
 	meta.ReviewsKnown = true
-	meta.Reviews.Total = len(reviews)
 	if len(reviews) >= 100 {
 		meta.Warnings = append(meta.Warnings, "review list truncated to 100")
 	}
-	for _, review := range reviews {
+	type reviewerState struct {
+		decision  string
+		commented bool
+	}
+	reviewers := make(map[string]*reviewerState, len(reviews))
+	for i, review := range reviews {
+		key := review.User.Login
+		if key == "" {
+			if review.ID != 0 {
+				key = "id:" + strconv.FormatInt(review.ID, 10)
+			} else {
+				key = "index:" + strconv.Itoa(i)
+			}
+		}
+		state := reviewers[key]
+		if state == nil {
+			state = &reviewerState{}
+			reviewers[key] = state
+		}
 		switch strings.ToUpper(review.State) {
-		case "APPROVED":
-			meta.Reviews.Approved++
-		case "CHANGES_REQUESTED":
-			meta.Reviews.ChangesRequested++
+		case "APPROVED", "CHANGES_REQUESTED":
+			state.decision = strings.ToUpper(review.State)
+			state.commented = false
 		case "COMMENTED":
-			meta.Reviews.Commented++
+			if state.decision == "" {
+				state.commented = true
+			}
+		case "DISMISSED":
+			state.decision = ""
+			state.commented = false
 		}
 	}
+	var summary ReviewSummary
+	for _, state := range reviewers {
+		switch state.decision {
+		case "APPROVED":
+			summary.Approved++
+		case "CHANGES_REQUESTED":
+			summary.ChangesRequested++
+		default:
+			if state.commented {
+				summary.Commented++
+			}
+		}
+	}
+	summary.Total = summary.Approved + summary.ChangesRequested + summary.Commented
+	meta.Reviews = summary
 }
 
 func fetchGitHubComments(ctx context.Context, client *apiClient, meta *Metadata, ref Ref) {

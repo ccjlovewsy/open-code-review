@@ -1080,6 +1080,9 @@ func (a *Agent) ruleConfigSHA256() string {
 		}
 	}
 	fields = append(fields, a.args.DomainRoute.CanonicalConfig()...)
+	if a.args.PRMetadata != "" {
+		fields = append(fields, "pr-metadata", a.args.PRMetadata)
+	}
 	return hashFields(fields...)
 }
 
@@ -1324,7 +1327,6 @@ func (a *Agent) buildMainTaskMessages(rule, changeFiles, diffs, planResult, conf
 		if a.args.PRMetadata == "" {
 			content = stripEmptyPRMetadataBlock(content)
 		}
-		content = strings.ReplaceAll(content, "{{pr_metadata}}", a.args.PRMetadata)
 		if planResult == "" {
 			content = stripEmptyPlanBlock(content)
 		}
@@ -1333,6 +1335,8 @@ func (a *Agent) buildMainTaskMessages(rule, changeFiles, diffs, planResult, conf
 			content = stripEmptyConfirmedBlock(content)
 		}
 		content = strings.ReplaceAll(content, "{{confirmed_comments}}", confirmed)
+		// Keep metadata last so placeholder-like text inside it is not rescanned.
+		content = strings.ReplaceAll(content, "{{pr_metadata}}", a.args.PRMetadata)
 		messages = append(messages, llm.NewTextMessage(m.Role, content))
 	}
 	return messages
