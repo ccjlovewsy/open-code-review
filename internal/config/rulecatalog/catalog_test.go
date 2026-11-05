@@ -6,6 +6,7 @@ package rulecatalog
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 	"testing"
@@ -167,6 +168,211 @@ func TestLoadProjectOverride(t *testing.T) {
 	if !found {
 		t.Error("K1 missing after merge")
 	}
+}
+
+func TestMergePartialOverrideKeepsEmbeddedMetadata(t *testing.T) {
+	embedded, err := LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault() error: %v", err)
+	}
+	want, wantIndex := findRule(t, embedded, "K1")
+
+	repo := t.TempDir()
+	writeProjectCatalog(t, repo, `{
+  "schema": "ocr-rule-catalog/v1",
+  "rules": [
+    {
+      "id": "K1",
+      "severity": "high",
+      "source": {"path": ".opencodereview/rules/catalog.json", "line": 7}
+    }
+  ]
+}`)
+
+	cat, err := Load(repo)
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+	got, gotIndex := findRule(t, cat, "K1")
+	if gotIndex != wantIndex {
+		t.Errorf("K1 index = %d, want %d", gotIndex, wantIndex)
+	}
+	if got.Title != want.Title {
+		t.Errorf("K1 title = %q, want embedded %q", got.Title, want.Title)
+	}
+	if got.Check != want.Check {
+		t.Errorf("K1 check = %q, want embedded check", got.Check)
+	}
+	if got.Domain != want.Domain {
+		t.Errorf("K1 domain = %q, want embedded %q", got.Domain, want.Domain)
+	}
+	if got.Namespace != "ocr" {
+		t.Errorf("K1 namespace = %q, want ocr", got.Namespace)
+	}
+	if got.Prefix != "K" {
+		t.Errorf("K1 prefix = %q, want K", got.Prefix)
+	}
+	if got.Severity != "high" {
+		t.Errorf("K1 severity = %q, want high", got.Severity)
+	}
+	if got.Status != want.Status {
+		t.Errorf("K1 status = %q, want embedded %q", got.Status, want.Status)
+	}
+	if got.Source.Path != ".opencodereview/rules/catalog.json" || got.Source.Line != 7 {
+		t.Errorf("K1 source = %+v, want project location", got.Source)
+	}
+	if got.Source.Repo != want.Source.Repo {
+		t.Errorf("K1 source repo = %q, want embedded %q", got.Source.Repo, want.Source.Repo)
+	}
+	if cat.Counts.OCR != 5 || cat.Counts.CPF != 207 {
+		t.Errorf("counts after partial override = %+v, want OCR=5 CPF=207", cat.Counts)
+	}
+}
+
+func TestMergePartialOverridePreservesAppliesTo(t *testing.T) {
+	embedded, err := LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault() error: %v", err)
+	}
+	want, _ := findRule(t, embedded, "K1")
+	if want.AppliesTo == nil {
+		t.Fatal("embedded K1 has no applies_to")
+	}
+
+	for _, tc := range []struct {
+		name      string
+		appliesTo string
+	}{
+		{name: "absent"},
+		{name: "empty object", appliesTo: `,
+      "applies_to": {}`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			repo := t.TempDir()
+			writeProjectCatalog(t, repo, `{
+  "schema": "ocr-rule-catalog/v1",
+  "rules": [
+    {
+      "id": "K1",
+      "severity": "high"`+tc.appliesTo+`,
+      "source": {"path": ".opencodereview/rules/catalog.json", "line": 2}
+    }
+  ]
+}`)
+			cat, err := Load(repo)
+			if err != nil {
+				t.Fatalf("Load() error: %v", err)
+			}
+			got, _ := findRule(t, cat, "K1")
+			if got.AppliesTo == nil {
+				t.Fatal("K1 applies_to lost after partial override")
+			}
+			if !reflect.DeepEqual(got.AppliesTo, want.AppliesTo) {
+				t.Errorf("K1 applies_to = %+v, want embedded %+v", got.AppliesTo, want.AppliesTo)
+			}
+			if got.Severity != "high" {
+				t.Errorf("K1 severity = %q, want high", got.Severity)
+			}
+		})
+	}
+}
+
+func TestMergeAppendsRulesInDeterministicOrder(t *testing.T) {
+	ids := []string{"Z-008", "M-003", "A-001", "Q-006", "C-002", "Y-007", "B-005", "D-004"}
+	want := append([]string(nil), ids...)
+	sort.Strings(want)
+
+	order := append([]string(nil), ids...)
+	for attempt := 0; attempt < 25; attempt++ {
+		order = append(order[1:], order[0])
+		base := &Catalog{
+			Rules: []Rule{{ID: "K1", Namespace: "ocr", Prefix: "K", Source: RuleSource{Path: "p", Line: 1}}},
+		}
+		other := &Catalog{Rules: make([]Rule, 0, len(order))}
+		for _, id := range order {
+			other.Rules = append(other.Rules, Rule{
+				ID:        id,
+				Namespace: "project",
+				Prefix:    "Z",
+				Source:    RuleSource{Path: "p", Line: 2},
+			})
+		}
+		if err := base.Merge(other); err != nil {
+			t.Fatalf("attempt %d Merge() error: %v", attempt, err)
+		}
+		tail := base.Rules[1:]
+		if len(tail) != len(want) {
+			t.Fatalf("attempt %d tail length = %d, want %d", attempt, len(tail), len(want))
+		}
+		for i, rule := range tail {
+			if rule.ID != want[i] {
+				t.Fatalf("attempt %d appended order = %v, want %v", attempt, ruleIDs(tail), want)
+			}
+		}
+	}
+}
+
+func TestMergeKeepsContentHashEmpty(t *testing.T) {
+	embedded, err := LoadDefault()
+	if err != nil {
+		t.Fatalf("LoadDefault() error: %v", err)
+	}
+	if embedded.ContentHash == "" {
+		t.Fatal("embedded catalog content hash is empty")
+	}
+
+	repo := t.TempDir()
+	writeProjectCatalog(t, repo, `{
+  "schema": "ocr-rule-catalog/v1",
+  "rules": [
+    {"id": "K1", "severity": "high", "source": {"path": ".opencodereview/rules/catalog.json", "line": 1}}
+  ]
+}`)
+	cat, err := Load(repo)
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+	if cat.ContentHash != "" {
+		t.Errorf("content hash after merge = %q, want empty", cat.ContentHash)
+	}
+}
+
+func TestMergeZeroValueNamespacesDoesNotPanic(t *testing.T) {
+	c := &Catalog{
+		Rules: []Rule{{ID: "A1-001", Namespace: "cpf", Prefix: "A", Source: RuleSource{Path: "p", Line: 1}}},
+	}
+	other := &Catalog{
+		Rules:      []Rule{{ID: "PROJ-001", Namespace: "project", Prefix: "PROJ", Source: RuleSource{Path: "p", Line: 2}}},
+		Namespaces: map[string]Namespace{"project": {Description: "project rules"}},
+	}
+	if err := c.Merge(other); err != nil {
+		t.Fatalf("Merge() error: %v", err)
+	}
+	if got := c.Namespaces["project"].Description; got != "project rules" {
+		t.Errorf("namespace description = %q, want project rules", got)
+	}
+	if !c.HasRule("PROJ-001") {
+		t.Error("project rule not merged")
+	}
+}
+
+func findRule(t *testing.T, cat *Catalog, id string) (Rule, int) {
+	t.Helper()
+	for i, rule := range cat.Rules {
+		if rule.ID == id {
+			return rule, i
+		}
+	}
+	t.Fatalf("rule %q not found", id)
+	return Rule{}, -1
+}
+
+func ruleIDs(rules []Rule) []string {
+	ids := make([]string, 0, len(rules))
+	for _, rule := range rules {
+		ids = append(ids, rule.ID)
+	}
+	return ids
 }
 
 func TestLoadMissingProjectCatalog(t *testing.T) {

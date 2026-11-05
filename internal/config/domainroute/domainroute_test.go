@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 	"testing"
@@ -127,6 +128,33 @@ func TestRouteKeywordMatch(t *testing.T) {
 	}
 	if len(got.Domains[0].KeywordHits) == 0 {
 		t.Error("expected a keyword hit")
+	}
+}
+
+func TestRouteKeywordMatchesPathWhenContentEmpty(t *testing.T) {
+	cfg := Config{
+		Schema: Schema,
+		Domains: []Domain{
+			{ID: "path-keyword", Priority: 50, Keywords: []string{"konan.properties"}, Checks: []string{"path keyword check"}},
+		},
+	}
+	r, err := newRouter(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := r.Route([]File{{Path: "native/third_party/konan.properties", Content: ""}})
+	if len(got.Domains) != 1 {
+		t.Fatalf("got %d domains, want 1: %+v", len(got.Domains), got.Domains)
+	}
+	if got.Domains[0].Domain.ID != "path-keyword" {
+		t.Errorf("domain = %q, want path-keyword", got.Domains[0].Domain.ID)
+	}
+	if len(got.Domains[0].KeywordHits) != 1 {
+		t.Fatalf("KeywordHits = %+v, want exactly one path keyword hit", got.Domains[0].KeywordHits)
+	}
+	hit := got.Domains[0].KeywordHits[0]
+	if hit.Path != "native/third_party/konan.properties" || hit.Keyword != "konan.properties" {
+		t.Errorf("hit = %+v, want the path keyword hit", hit)
 	}
 }
 
@@ -275,10 +303,59 @@ func TestCanonicalConfig(t *testing.T) {
 		t.Fatal("CanonicalConfig() is empty")
 	}
 	joined := strings.Join(fields, "\x00")
-	for _, want := range []string{"domain-route", "ohos-platform", "P1-001", "token_budget"} {
+	for _, want := range []string{
+		"domain-route", "ohos-platform", "P1-001", "token_budget",
+		"catalog_domains", "native-compiler-backend",
+		"sources", "agent-skills/kmp-ohos-platform",
+	} {
 		if !strings.Contains(joined, want) {
 			t.Errorf("CanonicalConfig() missing %q", want)
 		}
+	}
+
+	// Catalog domains and sources are rendered into the prompt, so their values
+	// and configuration order must both reach the digest. The exact sequence
+	// pins both, and it also catches a sort that would silently accept a
+	// reordered but otherwise identical project file.
+	custom := &Router{
+		enabled:     true,
+		maxDomains:  2,
+		tokenBudget: 3,
+		domains: []Domain{{
+			ID:             "custom",
+			CatalogDomains: []string{"runtime", "gc"},
+			Priority:       7,
+			Paths:          []string{"*.go"},
+			Keywords:       []string{"kw"},
+			Sources:        []string{"skill/b", "skill/a"},
+			Checks:         []string{"c1"},
+		}},
+	}
+	want := []string{
+		"layer", "domain-route",
+		"enabled", "true",
+		"max_domains", "2",
+		"token_budget", "3",
+		"domain", "custom", "priority", "7",
+		"path", "*.go",
+		"keyword", "kw",
+		"check", "c1",
+		"catalog_domains", "runtime", "catalog_domains", "gc",
+		"sources", "skill/b", "sources", "skill/a",
+	}
+	if got := custom.CanonicalConfig(); !reflect.DeepEqual(got, want) {
+		t.Errorf("CanonicalConfig() = %#v, want %#v", got, want)
+	}
+
+	// A domain without these fields must not grow empty labels: that would
+	// change the digest of every older configuration for no reason.
+	plain := &Router{
+		enabled: true,
+		domains: []Domain{{ID: "plain", Paths: []string{"*.go"}, Checks: []string{"c"}}},
+	}
+	plainFields := strings.Join(plain.CanonicalConfig(), "\x00")
+	if strings.Contains(plainFields, "catalog_domains") || strings.Contains(plainFields, "sources") {
+		t.Errorf("CanonicalConfig() emitted catalog labels for empty slices: %q", plainFields)
 	}
 }
 

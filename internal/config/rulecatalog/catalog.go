@@ -155,9 +155,15 @@ func (c *Catalog) Merge(other *Catalog) error {
 	c.ensureIndex()
 	other.ensureIndex()
 
-	for id, index := range other.byID {
+	otherIDs := make([]string, 0, len(other.byID))
+	for id := range other.byID {
+		otherIDs = append(otherIDs, id)
+	}
+	sort.Strings(otherIDs)
+	for _, id := range otherIDs {
+		index := other.byID[id]
 		if existing, ok := c.byID[id]; ok {
-			c.Rules[existing] = other.Rules[index]
+			c.Rules[existing] = mergeRule(c.Rules[existing], other.Rules[index])
 			continue
 		}
 		c.Rules = append(c.Rules, other.Rules[index])
@@ -188,6 +194,9 @@ func (c *Catalog) Merge(other *Catalog) error {
 			c.Sources = append(c.Sources, source)
 		}
 	}
+	if len(other.Namespaces) > 0 && c.Namespaces == nil {
+		c.Namespaces = make(map[string]Namespace, len(other.Namespaces))
+	}
 	for name, namespace := range other.Namespaces {
 		c.Namespaces[name] = namespace
 	}
@@ -197,6 +206,44 @@ func (c *Catalog) Merge(other *Catalog) error {
 	// A merged catalog no longer matches the generated artifact hash.
 	c.ContentHash = ""
 	return nil
+}
+
+// mergeRule overlays non-empty project fields on an embedded rule so a partial
+// override does not erase metadata the project did not restate.
+func mergeRule(base, override Rule) Rule {
+	if override.Namespace != "" {
+		base.Namespace = override.Namespace
+	}
+	if override.Prefix != "" {
+		base.Prefix = override.Prefix
+	}
+	if override.Title != "" {
+		base.Title = override.Title
+	}
+	if override.Domain != "" {
+		base.Domain = override.Domain
+	}
+	if override.Severity != "" {
+		base.Severity = override.Severity
+	}
+	if override.SourceSeverity != "" {
+		base.SourceSeverity = override.SourceSeverity
+	}
+	if override.Check != "" {
+		base.Check = override.Check
+	}
+	base.Source.Path = override.Source.Path
+	base.Source.Line = override.Source.Line
+	if override.Source.Repo != "" {
+		base.Source.Repo = override.Source.Repo
+	}
+	if override.AppliesTo != nil && (len(override.AppliesTo.Paths) > 0 || len(override.AppliesTo.Keywords) > 0) {
+		base.AppliesTo = override.AppliesTo
+	}
+	if override.Status != "" {
+		base.Status = override.Status
+	}
+	return base
 }
 
 // HasRule reports whether every comma-separated ID exists in the catalog.

@@ -44,7 +44,8 @@ const (
 	kotlinPRReviewURL     = "https://gitcode.com/LPJ_2026/CPF-KMP-CMP-AI.git"
 	agentSkillsURL        = "https://gitcode.com/CPF-KMP-CMP/agent-skills"
 	ruleLicense           = "Apache-2.0"
-	reverseMapName        = "\u89c4\u5219\u6620\u5c04\u8868.md"
+	reverseMapName        = "ocr_vs_cpf/\u89c4\u5219\u6620\u5c04\u8868.md"
+	legacyReverseMapName  = "\u89c4\u5219\u6620\u5c04\u8868.md"
 	ocrRulesHeading       = "### 1.4 OCR"
 )
 
@@ -164,9 +165,22 @@ func main() {
 		return
 	}
 
-	cat, err := buildCatalog(*kotlinRoot, *agentRoot, *repoRoot, *version, *allowMissing)
+	cat, skippedSources, err := buildCatalog(*kotlinRoot, *agentRoot, *repoRoot, *version, *allowMissing)
 	if err != nil {
 		fail(err)
+	}
+	partial := len(skippedSources) > 0
+	if partial {
+		if *check {
+			fail(fmt.Errorf("-check requires a complete catalog; skipped sources: %s", strings.Join(skippedSources, "; ")))
+		}
+		if isDefaultCatalogPath(*out) {
+			fail(fmt.Errorf("refusing to write a partial catalog to the default output %s; pass an explicit -out path", defaultOut))
+		}
+		fmt.Println("WARNING: partial catalog; the following sources were skipped:")
+		for _, reason := range skippedSources {
+			fmt.Printf("  - %s\n", reason)
+		}
 	}
 	data, err := encodeCatalog(cat)
 	if err != nil {
@@ -191,6 +205,11 @@ func main() {
 	if err := os.WriteFile(*out, data, 0o644); err != nil {
 		fail(fmt.Errorf("write catalog: %w", err))
 	}
+	if partial {
+		fmt.Printf("wrote PARTIAL %s: %d rules (cpf=%d, ocr=%d), %d references from %d catalogs; this catalog is incomplete\n",
+			*out, cat.Counts.Rules, cat.Counts.CPF, cat.Counts.OCR, cat.Counts.References, cat.Counts.ReferenceCatalogs)
+		return
+	}
 	fmt.Printf("wrote %s: %d rules (cpf=%d, ocr=%d), %d references from %d catalogs\n",
 		*out, cat.Counts.Rules, cat.Counts.CPF, cat.Counts.OCR, cat.Counts.References, cat.Counts.ReferenceCatalogs)
 }
@@ -200,30 +219,56 @@ func fail(err error) {
 	os.Exit(1)
 }
 
-func buildCatalog(kotlinRoot, agentRoot, repoRoot, version string, allowMissing bool) (*catalog, error) {
+func isDefaultCatalogPath(out string) bool {
+	outAbs, err := filepath.Abs(out)
+	if err != nil {
+		return false
+	}
+	defaultAbs, err := filepath.Abs(defaultOut)
+	if err != nil {
+		return false
+	}
+	return filepath.Clean(outAbs) == filepath.Clean(defaultAbs)
+}
+
+func buildCatalog(kotlinRoot, agentRoot, repoRoot, version string, allowMissing bool) (*catalog, []string, error) {
+	var skipped []string
+	kotlinSkipped := false
 	refsDir, err := findReferencesDir(kotlinRoot)
-	if err != nil && !allowMissing {
-		return nil, err
+	if err != nil {
+		if !allowMissing {
+			return nil, nil, err
+		}
+		if _, statErr := os.Stat(kotlinRoot); statErr == nil {
+			return nil, nil, err
+		} else if !errors.Is(statErr, os.ErrNotExist) {
+			return nil, nil, fmt.Errorf("stat kotlin-pr-review root %s: %w", kotlinRoot, statErr)
+		}
+		kotlinSkipped = true
+		skipped = append(skipped, fmt.Sprintf("kotlin-pr-review root %s does not exist", kotlinRoot))
 	}
 
 	var rules []ruleEntry
 	if refsDir != "" {
 		rules, err = parseKotlinPRReview(kotlinRoot, refsDir)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
 	ocrRules, err := parseOCRRules(repoRoot)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	rules = append(rules, ocrRules...)
 	sortRules(rules)
 
-	references, catalogs, err := parseAgentSkills(agentRoot, allowMissing)
+	references, catalogs, agentSkipped, err := parseAgentSkills(agentRoot, allowMissing)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	if agentSkipped {
+		skipped = append(skipped, fmt.Sprintf("agent-skills root %s does not exist", agentRoot))
 	}
 
 	cat := &catalog{
@@ -269,15 +314,15 @@ func buildCatalog(kotlinRoot, agentRoot, repoRoot, version string, allowMissing 
 	cat.ContentHash = hashContent(cat.Rules, cat.References)
 
 	if err := validateCatalog(cat, false); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	if cat.Counts.CPF != 207 {
-		return nil, fmt.Errorf("expected 207 CPF rules, got %d", cat.Counts.CPF)
+	if !kotlinSkipped && cat.Counts.CPF != 207 {
+		return nil, nil, fmt.Errorf("expected 207 CPF rules, got %d", cat.Counts.CPF)
 	}
 	if cat.Counts.OCR != 5 {
-		return nil, fmt.Errorf("expected 5 OCR rules, got %d", cat.Counts.OCR)
+		return nil, nil, fmt.Errorf("expected 5 OCR rules, got %d", cat.Counts.OCR)
 	}
-	return cat, nil
+	return cat, skipped, nil
 }
 
 func findReferencesDir(root string) (string, error) {
@@ -290,7 +335,10 @@ func findReferencesDir(root string) (string, error) {
 			return candidate, nil
 		}
 	}
-	return "", fmt.Errorf("kotlin-pr-review references not found under %s", root)
+	if _, err := os.Stat(root); errors.Is(err, os.ErrNotExist) {
+		return "", fmt.Errorf("kotlin-pr-review root %s does not exist", root)
+	}
+	return "", fmt.Errorf("kotlin-pr-review layout is invalid under %s: missing comment-format.md", root)
 }
 
 func parseKotlinPRReview(root, refsDir string) ([]ruleEntry, error) {
@@ -368,12 +416,22 @@ func parseKotlinPRReview(root, refsDir string) ([]ruleEntry, error) {
 }
 
 func parseOCRRules(repoRoot string) ([]ruleEntry, error) {
-	path := filepath.Join(repoRoot, reverseMapName)
+	path := filepath.Join(repoRoot, filepath.FromSlash(reverseMapName))
 	data, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		legacy := filepath.Join(repoRoot, legacyReverseMapName)
+		if legacyData, legacyErr := os.ReadFile(legacy); legacyErr == nil {
+			path, data, err = legacy, legacyData, nil
+		}
+	}
 	if err != nil {
-		return nil, fmt.Errorf("read %s: %w", path, err)
+		return nil, fmt.Errorf("read rule mapping table %s: %w", path, err)
 	}
 	lines := strings.Split(string(data), "\n")
+	rel, err := filepath.Rel(repoRoot, path)
+	if err != nil {
+		return nil, fmt.Errorf("relative path for %s: %w", path, err)
+	}
 	var rules []ruleEntry
 	inSection := false
 	for i, line := range lines {
@@ -405,7 +463,7 @@ func parseOCRRules(repoRoot string) ([]ruleEntry, error) {
 			AppliesTo: &appliesTo{Paths: []string{pathPattern}},
 			Source: ruleSource{
 				Repo: "ocr",
-				Path: reverseMapName,
+				Path: filepath.ToSlash(rel),
 				Line: i + 1,
 			},
 			Status: "active",
@@ -432,19 +490,22 @@ func ocrDomain(pathPattern string) string {
 	}
 }
 
-func parseAgentSkills(root string, allowMissing bool) ([]referenceEntry, int, error) {
+func parseAgentSkills(root string, allowMissing bool) ([]referenceEntry, int, bool, error) {
 	files, err := filepath.Glob(filepath.Join(root, "skills", "*", "references", "catalog.generated.yaml"))
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, false, err
 	}
 	if len(files) == 0 {
-		if allowMissing {
-			return nil, 0, nil
+		if _, statErr := os.Stat(root); statErr != nil {
+			if !errors.Is(statErr, os.ErrNotExist) {
+				return nil, 0, false, fmt.Errorf("stat agent-skills root %s: %w", root, statErr)
+			}
+			if allowMissing {
+				return nil, 0, true, nil
+			}
+			return nil, 0, false, fmt.Errorf("agent-skills root %s does not exist", root)
 		}
-		if _, err := os.Stat(root); err != nil {
-			return nil, 0, fmt.Errorf("agent-skills root %s: %w", root, err)
-		}
-		return nil, 0, fmt.Errorf("no catalog.generated.yaml under %s", root)
+		return nil, 0, false, fmt.Errorf("no catalog.generated.yaml under %s (root exists)", root)
 	}
 	sort.Strings(files)
 
@@ -453,18 +514,18 @@ func parseAgentSkills(root string, allowMissing bool) ([]referenceEntry, int, er
 	for _, file := range files {
 		refs, err := parseReferenceCatalog(file)
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, false, err
 		}
 		for _, ref := range refs {
 			if prev, dup := seen[ref.ID]; dup {
-				return nil, 0, fmt.Errorf("duplicate reference ID %q at %s and %s", ref.ID, prev, file)
+				return nil, 0, false, fmt.Errorf("duplicate reference ID %q at %s and %s", ref.ID, prev, file)
 			}
 			seen[ref.ID] = file
 			references = append(references, ref)
 		}
 	}
 	sort.Slice(references, func(i, j int) bool { return references[i].ID < references[j].ID })
-	return references, len(files), nil
+	return references, len(files), false, nil
 }
 
 func parseReferenceCatalog(path string) ([]referenceEntry, error) {
@@ -650,9 +711,12 @@ func verifyCatalog(path, kotlinRoot, agentRoot, repoRoot string) error {
 		return err
 	}
 
-	checked, skipped, err := verifySources(&cat, kotlinRoot, agentRoot, repoRoot)
+	checked, skipped, skipReasons, err := verifySources(&cat, kotlinRoot, agentRoot, repoRoot)
 	if err != nil {
 		return err
+	}
+	for _, reason := range skipReasons {
+		fmt.Printf("skipped: %s\n", reason)
 	}
 	fmt.Printf("catalog ok: %d rules (cpf=%d, ocr=%d), %d references; source lines checked=%d skipped=%d\n",
 		cat.Counts.Rules, cat.Counts.CPF, cat.Counts.OCR, cat.Counts.References, checked, skipped)
@@ -746,47 +810,96 @@ func countsEqual(a, b counts) bool {
 	return true
 }
 
-func verifySources(cat *catalog, kotlinRoot, agentRoot, repoRoot string) (checked, skipped int, err error) {
-	for _, rule := range cat.Rules {
-		var root string
-		switch rule.Source.Repo {
-		case "kotlin-pr-review":
-			root = kotlinRoot
-		case "ocr":
-			root = repoRoot
-		default:
-			skipped++
-			continue
-		}
-		path := filepath.Join(root, filepath.FromSlash(rule.Source.Path))
-		data, readErr := os.ReadFile(path)
-		if errors.Is(readErr, os.ErrNotExist) {
-			skipped++
-			continue
-		}
-		if readErr != nil {
-			return checked, skipped, fmt.Errorf("read source %s: %w", path, readErr)
-		}
-		lines := strings.Split(string(data), "\n")
-		if rule.Source.Line > len(lines) {
-			return checked, skipped, fmt.Errorf("rule %s source line %d is past EOF in %s", rule.ID, rule.Source.Line, path)
-		}
-		if !strings.Contains(lines[rule.Source.Line-1], rule.ID) {
-			return checked, skipped, fmt.Errorf("rule %s not found on %s:%d", rule.ID, path, rule.Source.Line)
-		}
-		checked++
+func verifySources(cat *catalog, kotlinRoot, agentRoot, repoRoot string) (checked, skipped int, skipReasons []string, err error) {
+	if _, statErr := os.Stat(repoRoot); statErr != nil {
+		return 0, 0, nil, fmt.Errorf("ocr repository root %s: %w", repoRoot, statErr)
 	}
 
-	for _, ref := range cat.References {
-		path := filepath.Join(agentRoot, filepath.FromSlash(ref.Path))
-		if _, statErr := os.Stat(path); statErr != nil {
-			if errors.Is(statErr, os.ErrNotExist) {
+	kotlinAvailable := true
+	if _, statErr := os.Stat(kotlinRoot); statErr != nil {
+		if !errors.Is(statErr, os.ErrNotExist) {
+			return 0, 0, nil, fmt.Errorf("stat kotlin-pr-review root %s: %w", kotlinRoot, statErr)
+		}
+		kotlinAvailable = false
+		skipReasons = append(skipReasons, fmt.Sprintf("kotlin-pr-review root %s does not exist", kotlinRoot))
+	}
+
+	for _, rule := range cat.Rules {
+		switch rule.Source.Repo {
+		case "kotlin-pr-review":
+			if !kotlinAvailable {
 				skipped++
 				continue
 			}
-			return checked, skipped, fmt.Errorf("stat reference %s: %w", path, statErr)
+			path := filepath.Join(kotlinRoot, filepath.FromSlash(rule.Source.Path))
+			if err := verifyRuleSource(rule, path); err != nil {
+				return checked, skipped, skipReasons, err
+			}
+			checked++
+		case "ocr":
+			path, pathErr := resolveReverseMapPath(repoRoot, rule.Source.Path)
+			if pathErr != nil {
+				return checked, skipped, skipReasons, pathErr
+			}
+			if err := verifyRuleSource(rule, path); err != nil {
+				return checked, skipped, skipReasons, err
+			}
+			fmt.Printf("checked OCR rule %s at %s:%d\n", rule.ID, path, rule.Source.Line)
+			checked++
+		default:
+			return checked, skipped, skipReasons, fmt.Errorf("rule %s has unknown source repo %q", rule.ID, rule.Source.Repo)
+		}
+	}
+
+	agentAvailable := true
+	if _, statErr := os.Stat(agentRoot); statErr != nil {
+		if !errors.Is(statErr, os.ErrNotExist) {
+			return checked, skipped, skipReasons, fmt.Errorf("stat agent-skills root %s: %w", agentRoot, statErr)
+		}
+		agentAvailable = false
+		skipReasons = append(skipReasons, fmt.Sprintf("agent-skills root %s does not exist", agentRoot))
+	}
+	for _, ref := range cat.References {
+		if !agentAvailable {
+			skipped++
+			continue
+		}
+		path := filepath.Join(agentRoot, filepath.FromSlash(ref.Path))
+		if _, readErr := os.ReadFile(path); readErr != nil {
+			return checked, skipped, skipReasons, fmt.Errorf("reference %s source file %s is missing or unreadable (agent-skills root exists): %w", ref.ID, path, readErr)
 		}
 		checked++
 	}
-	return checked, skipped, nil
+	return checked, skipped, skipReasons, nil
+}
+
+func resolveReverseMapPath(repoRoot, recorded string) (string, error) {
+	recorded = filepath.FromSlash(recorded)
+	candidates := []string{filepath.Join(repoRoot, recorded)}
+	if recorded == legacyReverseMapName {
+		candidates = append(candidates, filepath.Join(repoRoot, filepath.FromSlash(reverseMapName)))
+	}
+	for _, candidate := range candidates {
+		if _, statErr := os.Stat(candidate); statErr == nil {
+			return candidate, nil
+		} else if !errors.Is(statErr, os.ErrNotExist) {
+			return "", fmt.Errorf("stat OCR reverse map %s: %w", candidate, statErr)
+		}
+	}
+	return "", fmt.Errorf("OCR reverse map %q not found under %s (root exists)", recorded, repoRoot)
+}
+
+func verifyRuleSource(rule ruleEntry, path string) error {
+	data, readErr := os.ReadFile(path)
+	if readErr != nil {
+		return fmt.Errorf("rule %s source file %s is missing or unreadable: %w", rule.ID, path, readErr)
+	}
+	lines := strings.Split(string(data), "\n")
+	if rule.Source.Line > len(lines) {
+		return fmt.Errorf("rule %s source line %d is past EOF in %s", rule.ID, rule.Source.Line, path)
+	}
+	if !strings.Contains(lines[rule.Source.Line-1], rule.ID) {
+		return fmt.Errorf("rule %s not found on %s:%d", rule.ID, path, rule.Source.Line)
+	}
+	return nil
 }

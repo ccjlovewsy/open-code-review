@@ -208,6 +208,12 @@ func (r *Router) CanonicalConfig() []string {
 		for _, c := range d.Checks {
 			fields = append(fields, "check", c)
 		}
+		for _, c := range d.CatalogDomains {
+			fields = append(fields, "catalog_domains", c)
+		}
+		for _, s := range d.Sources {
+			fields = append(fields, "sources", s)
+		}
 	}
 	return fields
 }
@@ -236,13 +242,12 @@ func (r *Router) Route(files []File) Result {
 					}
 				}
 			}
-			if f.Content == "" {
-				continue
-			}
 			lowerContent := strings.ToLower(f.Content)
 			for _, keyword := range d.Keywords {
-				if strings.Contains(lowerPath, strings.ToLower(keyword)) ||
-					strings.Contains(lowerContent, strings.ToLower(keyword)) {
+				lowerKeyword := strings.ToLower(keyword)
+				pathHit := strings.Contains(lowerPath, lowerKeyword)
+				contentHit := lowerContent != "" && strings.Contains(lowerContent, lowerKeyword)
+				if pathHit || contentHit {
 					m.KeywordHits = append(m.KeywordHits, KeywordHit{Path: f.Path, Keyword: keyword})
 					if len(keyword) > len(strongestKeyword) {
 						strongestKeyword = keyword
