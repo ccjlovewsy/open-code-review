@@ -51,6 +51,14 @@ type commonContext struct {
 	IsGitRepo bool
 }
 
+// commonContextLoadOptions selects the optional configuration files
+// loadCommonContext reads. Callers disable the ones they do not use so a
+// malformed optional file cannot block their command.
+type commonContextLoadOptions struct {
+	Catalog      bool
+	DomainRoutes bool
+}
+
 // resolveMaxTokens applies the per-run CLI override, then the saved setting,
 // and finally the embedded task-template default.
 func resolveMaxTokens(templateDefault int, cfg *Config, cliOverride int) (int, error) {
@@ -112,7 +120,11 @@ func previewMaxTokens(templateDefault, cliOverride int) (int, error) {
 // inspect when disambiguating ambiguous extensions — derive it via
 // tool.ParseReviewMode(from, to, commit).RefValue(to, commit). Pass "" to
 // read the working tree, which is what scan wants.
-func loadCommonContext(repoDirInput, rulePath, contentRef string, maxTools, maxGitProcs int, requireGit bool) (*commonContext, error) {
+//
+// loadOptions selects the optional domain routes and rule catalog. A caller
+// that does not use them (delegate) disables both so a damaged optional file
+// cannot block the command.
+func loadCommonContext(repoDirInput, rulePath, contentRef string, maxTools, maxGitProcs int, requireGit bool, loadOptions commonContextLoadOptions) (*commonContext, error) {
 	tpl, err := template.LoadDefault()
 	if err != nil {
 		return nil, fmt.Errorf("load default template: %w", err)
@@ -141,14 +153,20 @@ func loadCommonContext(repoDirInput, rulePath, contentRef string, maxTools, maxG
 		return nil, fmt.Errorf("load rules: %w", err)
 	}
 
-	catalog, err := rulecatalog.Load(repoDir)
-	if err != nil {
-		return nil, fmt.Errorf("load rule catalog: %w", err)
+	var catalog *rulecatalog.Catalog
+	if loadOptions.Catalog {
+		catalog, err = rulecatalog.Load(repoDir)
+		if err != nil {
+			return nil, fmt.Errorf("load rule catalog: %w", err)
+		}
 	}
 
-	domainRouter, err := domainroute.Load(repoDir)
-	if err != nil {
-		return nil, fmt.Errorf("load domain routes: %w", err)
+	var domainRouter *domainroute.Router
+	if loadOptions.DomainRoutes {
+		domainRouter, err = domainroute.Load(repoDir)
+		if err != nil {
+			return nil, fmt.Errorf("load domain routes: %w", err)
+		}
 	}
 
 	return &commonContext{

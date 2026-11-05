@@ -124,12 +124,12 @@ func executeScanContext(ctx context.Context, opts scanOptions) (retErr error) {
 		}
 	}()
 
-	cc, err := loadCommonContext(opts.repoDir, opts.rulePath, "", opts.maxTools, opts.maxGitProcs, false)
+	cc, err := loadCommonContext(opts.repoDir, opts.rulePath, "", opts.maxTools, opts.maxGitProcs, false, commonContextLoadOptions{
+		Catalog:      true,
+		DomainRoutes: !opts.noDomainRouting,
+	})
 	if err != nil {
 		return err
-	}
-	if opts.noDomainRouting {
-		cc.DomainRoute = nil
 	}
 	applyCLIExcludes(cc, splitPaths(opts.excludes))
 

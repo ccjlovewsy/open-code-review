@@ -4,12 +4,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/alibaba/open-code-review/internal/agent"
 	"github.com/alibaba/open-code-review/internal/session"
 )
 
@@ -140,5 +142,58 @@ func TestParseReviewFlagsAllowsFromAndTo(t *testing.T) {
 	}
 	if opts.from != "main" || opts.to != "HEAD" {
 		t.Fatalf("unexpected opts: from=%q to=%q", opts.from, opts.to)
+	}
+}
+
+// resumeParentWithPRMetadata persists a parent session whose manifest was built
+// from the same review inputs plus the given PR snapshot.
+func resumeParentWithPRMetadata(t *testing.T, repoDir string, cc *commonContext, opts reviewOptions, prMetadata string) *session.ResumeState {
+	t.Helper()
+	sealed, err := agent.ResolveIdentity(context.Background(), agent.Args{
+		RepoDir:    repoDir,
+		From:       opts.from,
+		To:         opts.to,
+		ReviewMode: reviewModeFromOptions(opts),
+		Template:   *cc.Template,
+		PRMetadata: prMetadata,
+	})
+	if err != nil {
+		t.Fatalf("ResolveIdentity: %v", err)
+	}
+	parentID := writeVerifiableParent(t, repoDir, sealed.Identity, "anthropic", "claude")
+	state, err := loadReviewResumeState(repoDir, reviewOptions{resume: parentID, from: opts.from, to: opts.to})
+	if err != nil {
+		t.Fatalf("loadReviewResumeState: %v", err)
+	}
+	return state
+}
+
+func TestValidateResumeIdentityRejectsChangedPRMetadata(t *testing.T) {
+	t.Setenv("HOME", t.TempDir())
+	repoDir := initResumeRepo(t)
+	cc := resumeTestContext(repoDir)
+	opts := reviewOptions{from: "HEAD~1", to: "HEAD"}
+
+	state := resumeParentWithPRMetadata(t, repoDir, cc, opts, "snapshot A")
+	rt := &llmRuntime{Provider: "anthropic", Model: "claude"}
+	_, err := validateResumeIdentity(context.Background(), cc, opts, rt, state, "snapshot B")
+	if err == nil {
+		t.Fatal("resume must be rejected when the current PR metadata snapshot changed")
+	}
+	if !strings.Contains(err.Error(), "rule identity changed") {
+		t.Errorf("rejection must name the rule identity as the cause, got: %v", err)
+	}
+}
+
+func TestValidateResumeIdentityAcceptsSamePRMetadata(t *testing.T) {
+	t.Setenv("HOME", t.TempDir())
+	repoDir := initResumeRepo(t)
+	cc := resumeTestContext(repoDir)
+	opts := reviewOptions{from: "HEAD~1", to: "HEAD"}
+
+	state := resumeParentWithPRMetadata(t, repoDir, cc, opts, "snapshot A")
+	rt := &llmRuntime{Provider: "anthropic", Model: "claude"}
+	if _, err := validateResumeIdentity(context.Background(), cc, opts, rt, state, "snapshot A"); err != nil {
+		t.Errorf("resume with the same PR metadata snapshot must be accepted, got: %v", err)
 	}
 }

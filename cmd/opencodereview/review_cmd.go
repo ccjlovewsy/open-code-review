@@ -141,12 +141,12 @@ func executeReviewContext(ctx context.Context, opts reviewOptions) (retErr error
 	}()
 
 	contentRef, _ := tool.ParseReviewMode(opts.from, opts.to, opts.commit).RefValue(opts.to, opts.commit)
-	cc, err := loadCommonContext(opts.repoDir, opts.rulePath, contentRef, opts.maxTools, opts.maxGitProcs, true)
+	cc, err := loadCommonContext(opts.repoDir, opts.rulePath, contentRef, opts.maxTools, opts.maxGitProcs, true, commonContextLoadOptions{
+		Catalog:      true,
+		DomainRoutes: !opts.noDomainRouting,
+	})
 	if err != nil {
 		return err
-	}
-	if opts.noDomainRouting {
-		cc.DomainRoute = nil
 	}
 	applyCLIExcludes(cc, splitPaths(opts.excludes))
 
@@ -195,7 +195,7 @@ func executeReviewContext(ctx context.Context, opts reviewOptions) (retErr error
 	// Strictly before agent.New, so a rejected resume persists nothing. The sealed
 	// input it returns pins the run to the very commits this check passed on, so
 	// the decision cannot be undone by a ref moving afterwards.
-	sealed, err := validateResumeIdentity(ctx, cc, opts, rt, resumeState)
+	sealed, err := validateResumeIdentity(ctx, cc, opts, rt, resumeState, prMetadata)
 	if err != nil {
 		return err
 	}
@@ -407,7 +407,7 @@ func loadReviewResumeState(repoDir string, opts reviewOptions) (*session.ResumeS
 // command line: both default to the empty string and nothing else can set them,
 // so a provider that changed via config file or environment stays implicit —
 // which is the transition this check exists to reject.
-func validateResumeIdentity(ctx context.Context, cc *commonContext, opts reviewOptions, rt *llmRuntime, state *session.ResumeState) (*agent.SealedInput, error) {
+func validateResumeIdentity(ctx context.Context, cc *commonContext, opts reviewOptions, rt *llmRuntime, state *session.ResumeState, prMetadata string) (*agent.SealedInput, error) {
 	if state == nil {
 		return nil, nil
 	}
@@ -421,6 +421,7 @@ func validateResumeIdentity(ctx context.Context, cc *commonContext, opts reviewO
 		SystemRule:  cc.Resolver,
 		FileFilter:  cc.FileFilter,
 		DomainRoute: cc.DomainRoute,
+		PRMetadata:  prMetadata,
 		GitRunner:   cc.GitRunner,
 	})
 	if err != nil {
