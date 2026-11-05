@@ -1,0 +1,56 @@
+ocr_vs_cpf/OCR审查问题修复报告.md
+  h_05242cdacff7ac 62-67
+  s_3dc90e970a7fd3::t_1190ae7b4f7d74 357
+  s_3dc90e970a7fd3::t_30f26d20e346c8 138
+  s_3dc90e970a7fd3::t_d6a33ab7c11e7a 353-354
+  s_3dc90e970a7fd3::t_4d80ba87a042f9 499
+  s_3dc90e970a7fd3::t_c6bb11c55e7277 162
+  s_3dc90e970a7fd3::t_1873cf13c27b00 369
+  s_3dc90e970a7fd3::t_5e3c71643211e2 297
+  s_3dc90e970a7fd3::t_102ead3c537f56 1-61,68-137,139-161,163-296,298-352,355-356,358-368,370-498,500-579
+  s_3dc90e970a7fd3::t_d8971472301b5f 580-582
+  h_05242cdacff7ac 583-588
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "5.30.1",
+  "base_commit_sha": "27d5a0a5f33162c44d351df540128ec250cb48be",
+  "prompts": {},
+  "humans": {
+    "h_05242cdacff7ac": {
+      "author": "MRXVAM <2747477431@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_3dc90e970a7fd3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_e56551aebffeTAGr5JH3QpzyW9",
+        "model": "volcengine/deepseek-v4.1-flash"
+      },
+      "human_author": "MRXVAM <2747477431@qq.com>",
+      "total_additions": 584,
+      "total_deletions": 5,
+      "overridden_lines": 6,
+      "model_overridden": {
+        "volcengine/deepseek-v4.1-flash": 6
+      },
+      "turn_models": {
+        "t_102ead3c537f56": "volcengine/deepseek-v4.1-flash",
+        "t_1190ae7b4f7d74": "volcengine/deepseek-v4.1-flash",
+        "t_1873cf13c27b00": "volcengine/deepseek-v4.1-flash",
+        "t_30f26d20e346c8": "volcengine/deepseek-v4.1-flash",
+        "t_4d80ba87a042f9": "volcengine/deepseek-v4.1-flash",
+        "t_5e3c71643211e2": "volcengine/deepseek-v4.1-flash",
+        "t_c6bb11c55e7277": "volcengine/deepseek-v4.1-flash",
+        "t_d6a33ab7c11e7a": "volcengine/deepseek-v4.1-flash"
+      },
+      "model_totals": {
+        "volcengine/deepseek-v4.1-flash": {
+          "additions": 584,
+          "deletions": 5
+        }
+      }
+    }
+  }
+}
